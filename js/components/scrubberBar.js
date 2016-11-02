@@ -193,15 +193,18 @@ var ScrubberBar = React.createClass({
 
   render: function() {
     var scrubberBarStyle = {
-      backgroundColor: this.props.skinConfig.controlBar.scrubberBar.backgroundColor
+      backgroundColor: this.props.skinConfig.controlBar.scrubberBar.backgroundColor ? this.props.skinConfig.controlBar.scrubberBar.backgroundColor : 
+                                                                                      this.props.skinConfig.general.accentColor
     };
     var bufferedIndicatorStyle = {
       width: Math.min((parseFloat(this.props.buffered) / parseFloat(this.props.duration)) * 100, 100) + "%",
-      backgroundColor: this.props.skinConfig.controlBar.scrubberBar.bufferedColor
+      backgroundColor: this.props.skinConfig.controlBar.scrubberBar.bufferedColor ? this.props.skinConfig.controlBar.scrubberBar.bufferedColor : 
+                                                                                    this.props.skinConfig.general.accentColor
     };
     var playedIndicatorStyle = {
       width: Math.min((parseFloat(this.props.currentPlayhead) / parseFloat(this.props.duration)) * 100, 100) + "%",
-      backgroundColor: this.props.skinConfig.controlBar.scrubberBar.playedColor
+      backgroundColor: this.props.skinConfig.controlBar.scrubberBar.playedColor ? this.props.skinConfig.controlBar.scrubberBar.playedColor :
+                                                                                  this.props.skinConfig.general.accentColor
     };
 
     var playheadStyle = {};
@@ -237,9 +240,12 @@ var ScrubberBar = React.createClass({
       playedIndicatorClassName += " oo-played-ad-indicator";
       playheadMouseDown = null;
 
-      scrubberBarStyle.backgroundColor = this.props.skinConfig.controlBar.adScrubberBar.backgroundColor;
-      bufferedIndicatorStyle.backgroundColor = this.props.skinConfig.controlBar.adScrubberBar.bufferedColor;
-      playedIndicatorStyle.backgroundColor = this.props.skinConfig.controlBar.adScrubberBar.playedColor;
+      scrubberBarStyle.backgroundColor = this.props.skinConfig.controlBar.adScrubberBar.backgroundColor ? this.props.skinConfig.controlBar.adScrubberBar.backgroundColor :
+                                                                                                          this.props.skinConfig.general.accentColor;
+      bufferedIndicatorStyle.backgroundColor = this.props.skinConfig.controlBar.adScrubberBar.bufferedColor ? this.props.skinConfig.controlBar.adScrubberBar.bufferedColor :
+                                                                                                              this.props.skinConfig.general.accentColor;
+      playedIndicatorStyle.backgroundColor = this.props.skinConfig.controlBar.adScrubberBar.playedColor ? this.props.skinConfig.controlBar.adScrubberBar.playedColor :
+                                                                                                          this.props.skinConfig.general.accentColor;
     }
 
     var thumbnailContainer = null;
@@ -269,7 +275,8 @@ var ScrubberBar = React.createClass({
         hoverTime = (this.state.hoveringX / this.state.scrubberBarWidth) * this.props.duration;
         hoveredIndicatorStyle = {
           width: Math.min((parseFloat(hoverTime) / parseFloat(this.props.duration)) * 100, 100) + "%",
-          backgroundColor: this.props.skinConfig.controlBar.scrubberBar.playedColor
+          backgroundColor: this.props.skinConfig.controlBar.scrubberBar.playedColor ? this.props.skinConfig.controlBar.scrubberBar.playedColor :
+                                                                                      this.props.skinConfig.general.accentColor
         };
         scrubberBarClassName += " oo-scrubber-bar-hover";
         playheadClassName += " oo-playhead-hovering";

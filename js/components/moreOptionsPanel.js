@@ -32,13 +32,15 @@ var MoreOptionsPanel = React.createClass({
   },
 
   highlight: function (evt) {
-    var color = this.props.skinConfig.moreOptionsScreen.iconStyle.active.color;
+    var color = this.props.skinConfig.moreOptionsScreen.iconStyle.active.color ? this.props.skinConfig.moreOptionsScreen.iconStyle.active.color :
+                                                                                 this.props.skinConfig.general.accentColor;
     var opacity = this.props.skinConfig.moreOptionsScreen.iconStyle.active.opacity;
     Utils.highlight(evt.target, opacity, color);
   },
 
   removeHighlight: function (evt) {
-    var color = this.props.skinConfig.moreOptionsScreen.iconStyle.inactive.color;
+    var color = this.props.skinConfig.moreOptionsScreen.iconStyle.inactive.color ? this.props.skinConfig.moreOptionsScreen.iconStyle.inactive.color :
+                                                                                   this.props.skinConfig.general.accentColor;
     var opacity = this.props.skinConfig.moreOptionsScreen.iconStyle.inactive.opacity;
     Utils.removeHighlight(evt.target, opacity, color);
   },
@@ -47,7 +49,8 @@ var MoreOptionsPanel = React.createClass({
     //inline style for config/skin.json elements only
     var buttonStyle = {
       fontSize: this.props.skinConfig.moreOptionsScreen.iconSize + "px",
-      color: this.props.skinConfig.moreOptionsScreen.iconStyle.inactive.color,
+      color: this.props.skinConfig.moreOptionsScreen.iconStyle.inactive.color ? this.props.skinConfig.moreOptionsScreen.iconStyle.inactive.color :
+                                                                                this.props.skinConfig.general.accentColor,
       opacity: this.props.skinConfig.moreOptionsScreen.iconStyle.inactive.opacity
     };
 

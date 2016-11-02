@@ -48,13 +48,16 @@ var PauseScreen = React.createClass({
   render: function() {
     //inline style for config/skin.json elements only
     var titleStyle = {
-      color: this.props.skinConfig.startScreen.titleFont.color
+      color: this.props.skinConfig.startScreen.titleFont.color ? this.props.skinConfig.startScreen.titleFont.color :
+                                                                 this.props.skinConfig.general.accentColor
     };
     var descriptionStyle = {
-      color: this.props.skinConfig.startScreen.descriptionFont.color
+      color: this.props.skinConfig.startScreen.descriptionFont.color ? this.props.skinConfig.startScreen.descriptionFont.color :
+                                                                       this.props.skinConfig.general.accentColor
     };
     var actionIconStyle = {
-      color: this.props.skinConfig.pauseScreen.PauseIconStyle.color,
+      color: this.props.skinConfig.pauseScreen.PauseIconStyle.color ? this.props.skinConfig.pauseScreen.PauseIconStyle.color :
+                                                                      this.props.skinConfig.general.accentColor,
       opacity: this.props.skinConfig.pauseScreen.PauseIconStyle.opacity
     };
 

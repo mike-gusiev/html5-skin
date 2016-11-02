@@ -162,13 +162,15 @@ var ControlBar = React.createClass({
 
   //TODO(dustin) revisit this, doesn't feel like the "react" way to do this.
   highlight: function(evt) {
-    var color = this.props.skinConfig.controlBar.iconStyle.active.color;
+    var color = this.props.skinConfig.controlBar.iconStyle.active.color ? 
+                this.props.skinConfig.controlBar.iconStyle.active.color : this.props.skinConfig.general.accentColor;
     var opacity = this.props.skinConfig.controlBar.iconStyle.active.opacity;
     Utils.highlight(evt.target, opacity, color);
   },
 
   removeHighlight: function(evt) {
-    var color = this.props.skinConfig.controlBar.iconStyle.inactive.color;
+    var color = this.props.skinConfig.controlBar.iconStyle.inactive.color ? 
+                this.props.skinConfig.controlBar.iconStyle.inactive.color : this.props.skinConfig.general.accentColor;
     var opacity = this.props.skinConfig.controlBar.iconStyle.inactive.opacity;
     Utils.removeHighlight(evt.target, opacity, color);
   },
@@ -226,7 +228,8 @@ var ControlBar = React.createClass({
         "oo-volume-bar": true,
         "oo-on": turnedOn
       });
-      var barStyle = turnedOn ? {backgroundColor: this.props.skinConfig.controlBar.volumeControl.color} : null;
+      var barStyle = {backgroundColor: this.props.skinConfig.controlBar.volumeControl.color ? 
+                     this.props.skinConfig.controlBar.volumeControl.color : this.props.skinConfig.general.accentColor};
       volumeBars.push(<a data-volume={(i+1)/10} className={volumeClass} key={i}
         style={barStyle}
         onClick={this.handleVolumeClick}></a>);
@@ -250,13 +253,14 @@ var ControlBar = React.createClass({
 
     var playheadTime = isFinite(parseInt(this.props.currentPlayhead)) ? Utils.formatSeconds(parseInt(this.props.currentPlayhead)) : null;
     var isLiveStream = this.props.isLiveStream;
-    var durationSetting = {color: this.props.skinConfig.controlBar.iconStyle.inactive.color};
+    var durationSetting = {color: this.props.skinConfig.controlBar.iconStyle.inactive.color ? 
+                          this.props.skinConfig.controlBar.iconStyle.inactive.color : this.props.skinConfig.general.accentColor};
     var timeShift = this.props.currentPlayhead - this.props.duration;
     // checking timeShift < 1 seconds (not == 0) as processing of the click after we rewinded and then went live may take some time
     var isLiveNow = Math.abs(timeShift) < 1;
     var liveClick = isLiveNow ? null : this.handleLiveClick;
     var playheadTimeContent = isLiveStream ? (isLiveNow ? null : Utils.formatSeconds(timeShift)) : playheadTime;
-    var totalTimeContent = isLiveStream ? null : <span className="oo-total-time">{totalTime}</span>;
+    var totalTimeContent = isLiveStream ? null : <span className="oo-total-time" style = {durationSetting}>{totalTime}</span>;
 
     // TODO: Update when implementing localization
     var liveText = Utils.getLocalizedString(this.props.language, CONSTANTS.SKIN_TEXT.LIVE, this.props.localizableStrings);
@@ -449,7 +453,8 @@ var ControlBar = React.createClass({
     var returnStyles = {};
 
     returnStyles.iconCharacter = {
-      color: this.props.skinConfig.controlBar.iconStyle.inactive.color,
+      color: this.props.skinConfig.controlBar.iconStyle.inactive.color ? 
+             this.props.skinConfig.controlBar.iconStyle.inactive.color : this.props.skinConfig.general.accentColor,
       opacity: this.props.skinConfig.controlBar.iconStyle.inactive.opacity
 
     };

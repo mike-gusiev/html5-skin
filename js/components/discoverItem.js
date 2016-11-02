@@ -30,11 +30,14 @@ var DiscoverItem = React.createClass({
       backgroundImage: "url('" + this.props.src + "')"
     };
 
-    var itemTitleStyle = {
-      color: Utils.getPropertyValue(this.props.skinConfig, 'discoveryScreen.contentTitle.font.color'),
-      fontFamily: Utils.getPropertyValue(this.props.skinConfig, 'discoveryScreen.contentTitle.font.fontFamily')
+   var itemTitleStyle = {
+      color: Utils.getPropertyValue(this.props.skinConfig, 'discoveryScreen.contentTitle.font.color') ? 
+             Utils.getPropertyValue(this.props.skinConfig, 'discoveryScreen.contentTitle.font.color') :
+             Utils.getPropertyValue(this.props.skinConfig, 'general.accentColor'),
+      fontFamily: Utils.getPropertyValue(this.props.skinConfig, 'discoveryScreen.contentTitle.font.fontFamily') ? 
+                  Utils.getPropertyValue(this.props.skinConfig, 'discoveryScreen.contentTitle.font.fontFamily') :
+                  Utils.getPropertyValue(this.props.skinConfig, 'general.accentColor')
     };
-
     return (
       <div className="oo-discovery-image-wrapper-style">
         <div className="oo-discovery-wrapper">

@@ -29,7 +29,9 @@ var ContentScreen = React.createClass({
     switch (this.props.screen) {
       case CONSTANTS.SCREEN.DISCOVERY_SCREEN:
         titleBarStyle.fontFamily = Utils.getPropertyValue(this.props.skinConfig, 'discoveryScreen.panelTitle.titleFont.fontFamily');
-        titleBarStyle.color = Utils.getPropertyValue(this.props.skinConfig, 'discoveryScreen.panelTitle.titleFont.color');
+        titleBarStyle.color = Utils.getPropertyValue(this.props.skinConfig, 'discoveryScreen.panelTitle.titleFont.color') ? 
+                              Utils.getPropertyValue(this.props.skinConfig, 'discoveryScreen.panelTitle.titleFont.color') : 
+                              Utils.getPropertyValue(this.props.skinConfig, 'general.accentColor');
         break;
     }
 

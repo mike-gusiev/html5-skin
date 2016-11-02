@@ -22,7 +22,8 @@ var EndScreen = React.createClass({
 
   render: function() {
     var actionIconStyle = {
-      color: this.props.skinConfig.endScreen.replayIconStyle.color,
+      color: this.props.skinConfig.endScreen.replayIconStyle.color ? this.props.skinConfig.endScreen.replayIconStyle.color : 
+                                                                     this.props.skinConfig.general.accentColor,
       opacity: this.props.skinConfig.endScreen.replayIconStyle.opacity
     };
 

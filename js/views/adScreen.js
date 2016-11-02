@@ -146,7 +146,8 @@ var AdScreen = React.createClass({
 
   render: function() {
     var actionIconStyle = {
-      color: this.props.skinConfig.pauseScreen.PauseIconStyle.color,
+      color: this.props.skinConfig.pauseScreen.PauseIconStyle.color ? this.props.skinConfig.pauseScreen.PauseIconStyle.color :
+                                                                      this.props.skinConfig.general.accentColor,
       opacity: this.props.skinConfig.pauseScreen.PauseIconStyle.opacity
     };
     var actionIconClass = ClassNames({

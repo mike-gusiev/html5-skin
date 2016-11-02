@@ -42,13 +42,16 @@ var StartScreen = React.createClass({
   render: function() {
     //inline style for config/skin.json elements only
     var titleStyle = {
-      color: this.props.skinConfig.startScreen.titleFont.color
+      color: this.props.skinConfig.startScreen.titleFont.color ? this.props.skinConfig.startScreen.titleFont.color :
+                                                                 this.props.skinConfig.general.accentColor
     };
     var descriptionStyle = {
-      color: this.props.skinConfig.startScreen.descriptionFont.color
+      color: this.props.skinConfig.startScreen.descriptionFont.color ? this.props.skinConfig.startScreen.descriptionFont.color :
+                                                                       this.props.skinConfig.general.accentColor
     };
     var actionIconStyle = {
-      color: this.props.skinConfig.startScreen.playIconStyle.color,
+      color: this.props.skinConfig.startScreen.playIconStyle.color ? this.props.skinConfig.startScreen.playIconStyle.color :
+                                                                     this.props.skinConfig.general.accentColor,
       opacity: this.props.skinConfig.startScreen.playIconStyle.opacity
     };
     var posterImageUrl = this.props.skinConfig.startScreen.showPromo ? this.props.contentTree.promo_image : '';
