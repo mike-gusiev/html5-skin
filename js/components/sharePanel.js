@@ -23,39 +23,27 @@ var SharePanel = React.createClass({
   },
 
   getActivePanel: function() {
-    if (this.state.activeTab === this.tabs.SHARE) {
-      var titleString = Utils.getLocalizedString(this.props.language, CONSTANTS.SKIN_TEXT.SHARE_CALL_TO_ACTION, this.props.localizableStrings);
+    var titleString = Utils.getLocalizedString(this.props.language, CONSTANTS.SKIN_TEXT.SHARE_CALL_TO_ACTION, this.props.localizableStrings);
 
-      return (
+    try {
+      var iframeURL = this.props.skinConfig.shareScreen.embed.source
+          .replace("<ASSET_ID>", this.props.assetId)
+          .replace("<PLAYER_ID>", this.props.playerParam.playerBrandingId)
+          .replace("<PUBLISHER_ID>", this.props.playerParam.pcode);
+    } catch(err) {
+      iframeURL = "";
+    }
+
+    return (
         <div className="oo-share-tab-panel">
           <div className="oo-social-action-text oo-text-capitalize">{titleString}</div>
           <a className="oo-twitter" onClick={this.handleTwitterClick}> </a>
           <a className="oo-facebook" onClick={this.handleFacebookClick}> </a>
           <a className="oo-google-plus" onClick={this.handleGPlusClick}> </a>
           <a className="oo-email-share" onClick={this.handleEmailClick}> </a>
+          <textarea className="oo-form-control oo-embed-form" rows="3" value={iframeURL} readOnly />
         </div>
-      );
-    }
-
-    else if (this.state.activeTab === this.tabs.EMBED) {
-      try {
-        var iframeURL = this.props.skinConfig.shareScreen.embed.source
-          .replace("<ASSET_ID>", this.props.assetId)
-          .replace("<PLAYER_ID>", this.props.playerParam.playerBrandingId)
-          .replace("<PUBLISHER_ID>", this.props.playerParam.pcode);
-      } catch(err) {
-        iframeURL = "";
-      }
-
-      return (
-        <div className="oo-share-tab-panel">
-          <textarea className="oo-form-control oo-embed-form"
-                    rows="3"
-                    value={iframeURL}
-                    readOnly />
-        </div>
-      );
-    }
+    );
   },
 
   handleEmailClick: function(event) {
@@ -96,10 +84,6 @@ var SharePanel = React.createClass({
     window.open(twitterUrl, "twitter window", "height=300,width=750");
   },
 
-  showPanel: function(panelToShow) {
-    this.setState({activeTab: panelToShow});
-  },
-
   render: function() {
     var shareTab = ClassNames({
       'oo-share-tab': true,
@@ -115,10 +99,6 @@ var SharePanel = React.createClass({
 
     return (
       <div className="oo-content-panel oo-share-panel">
-        <div className="oo-tab-row">
-          <a className={shareTab} onClick={this.showPanel.bind(this, this.tabs.SHARE)}>{shareString}</a>
-          <a className={embedTab} onClick={this.showPanel.bind(this, this.tabs.EMBED)}>{embedString}</a>
-        </div>
         {this.getActivePanel()}
       </div>
     );
