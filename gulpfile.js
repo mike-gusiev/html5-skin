@@ -17,6 +17,7 @@ var gulp        = require('gulp'),
     replace     = require('gulp-replace'),
     connect     = require('gulp-connect'),
     open        = require('gulp-open'),
+    insert        = require('gulp-insert'),
     git         = require('git-rev'),
     realFs      = require('fs'),
     gracefulFs  = require('graceful-fs');
@@ -71,6 +72,7 @@ function buildJS(file, hash, watch, ugly, sourcemap, debug, externalReact) {
       .pipe(replace('<SKIN_REV>', hash))
       .pipe(ugly ? uglify() : gutil.noop())
       .pipe(sourcemap ? sourcemaps.write('./') : gutil.noop())
+      .pipe(insert.prepend("/*eslint-disable */\n"))
       .pipe(gulp.dest('./build'))
       .pipe(reload ? connect.reload() : gutil.noop())
   }

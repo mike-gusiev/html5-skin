@@ -73,6 +73,8 @@ using *git submodule* commands:
 
    Once the app is built a webserver will start and serve `sample.html` in your browser [http://0.0.0.0:4444/](http://0.0.0.0:4444/).
 
+8. Or you can just use `gulp browserify` - to build only html5-skin.js file
+
 ## Style
 We use [Sass](http://sass-lang.com/) (SCSS) for CSS preprocessor.
 
