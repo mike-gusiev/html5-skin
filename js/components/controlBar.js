@@ -301,7 +301,7 @@ var ControlBar = React.createClass({
 
       "volume": <div className="oo-volume oo-control-bar-item" key="volume">
         <Icon {...this.props} icon={volumeIcon} ref="volumeIcon"
-          style={this.props.skinConfig.controlBar.iconStyle.inactive}
+          style={dynamicStyles.iconCharacter}
           onClick={this.handleVolumeIconClick}
           onMouseOver={this.volumeHighlight} onMouseOut={this.volumeRemoveHighlight}/>
         {volumeControls}
