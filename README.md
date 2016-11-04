@@ -54,7 +54,7 @@ This simple test HTML page can also be hosted on your environment to showcase ht
 
 3. Install [gulp](http://gulpjs.com) globally by running: `npm install --global gulp-cli`
 
-4. Clone project: `git clone https://github.com/ooyala/html5-skin.git`
+4. Clone project: `git clone https://github.com/mike-gusiev/html5-skin.git`
 
 5. After cloning, just `cd` in there, install dependencies by running `npm install`
 

@@ -1,0 +1,26 @@
+root = true
+
+# Set default charset
+[*.{js,py}]
+charset = utf-8
+
+# 2 space indentation
+[*.js]
+indent_style = space
+indent_size = 2
+
+[*.{css,less,scss}]
+indent_style = space
+
+[*.{hbs,stache,mustache,jade,html,xml}]
+indent_style = space
+
+[*.{js,coffee}]
+indent_style = space
+
+[*.json]
+indent_style = space
+
+[*.{md,txt}]
+indent_style = space
+
