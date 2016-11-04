@@ -23,7 +23,11 @@ var ResponsiveManagerMixin = {
   },
 
   onResize: function() {
-    this.generateResponsiveData();
+    try {
+      this.generateResponsiveData();
+    } catch(e) {
+        console.log(e);
+    }
   },
 
   generateResponsiveData: function() {
