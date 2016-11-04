@@ -89,6 +89,7 @@ var StartScreen = React.createClass({
     var titleMetadata = (<div className={titleClass} style={titleStyle}>{this.props.contentTree.title}</div>);
     var iconName = (this.props.controller.state.playerState == CONSTANTS.STATE.END ? "replay" : "play");
     var descriptionMetadata = (<div className={descriptionClass} ref="description" style={descriptionStyle}>{this.state.descriptionText}</div>);
+    var isPgatourAutorun = (iconName === "play" && pgatour && pgatour.is && pgatour.is.touchDevice === false) ? true : false;
 
     var actionIcon = (
       <a className={actionIconClass} onClick={this.handleClick}>
@@ -106,7 +107,7 @@ var StartScreen = React.createClass({
           {this.props.skinConfig.startScreen.showDescription ? descriptionMetadata : null}
         </div>
 
-        {(this.state.playButtonClicked && this.props.controller.state.playerState == CONSTANTS.STATE.START) || this.props.controller.state.buffering ?
+        {(this.state.playButtonClicked && this.props.controller.state.playerState == CONSTANTS.STATE.START) || this.props.controller.state.buffering || isPgatourAutorun ?
           <Spinner loadingImage={this.props.skinConfig.general.loadingImage.imageResource.url}/> : actionIcon}
       </div>
     );
