@@ -4,6 +4,7 @@
 var React = require('react'),
     ReactDOM = require('react-dom'),
     Utils = require('./components/utils'),
+    ClassNames = require('classnames'),
     CONSTANTS = require('./constants/constants'),
     AccessibilityControls = require('./components/accessibilityControls'),
     Fullscreen = require('screenfull'),
@@ -211,6 +212,19 @@ OO.plugin("Html5Skin", function (OO, _, $, W) {
      ---------------------------------------------------------------------*/
     onPlayerCreated: function (event, elementId, params, settings) {
       //set state variables
+
+      var deviceClasses = ClassNames({
+        'oo-safari': Utils.isSafari(),
+        'oo-chrome': Utils.isChrome(),
+        'oo-edge': Utils.isEdge(),
+        'oo-ie': Utils.isIE(),
+        'oo-android': Utils.isAndroid(),
+        'oo-ios': Utils.isIos(),
+        'oo-iphone': Utils.isIPhone(),
+        'oo-mobile': Utils.isMobile(),
+        'oo-ie10': Utils.isIE10()
+      });
+
       this.state.mainVideoContainer = $("#" + elementId);
       this.state.mainVideoInnerWrapper = $("#" + elementId + " .innerWrapper");
       this.state.playerParam = params;
@@ -221,6 +235,7 @@ OO.plugin("Html5Skin", function (OO, _, $, W) {
       //initial DOM manipulation
       this.state.mainVideoContainer.addClass('oo-player-container');
       this.state.mainVideoInnerWrapper.addClass('oo-player');
+      this.state.mainVideoInnerWrapper.addClass(deviceClasses);
       this.state.mainVideoInnerWrapper.append("<div class='oo-player-skin'></div>");
 
       var tmpLocalizableStrings = {};

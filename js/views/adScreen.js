@@ -120,7 +120,7 @@ var AdScreen = React.createClass({
   },
 
   getPlaybackControlItems: function() {
-    if (pgatour && pgatour.playerOptions && pgatour.playerOptions.showAdControls) {
+    if (window.pgatour && pgatour.playerOptions && pgatour.playerOptions.showAdControls) {
       console.log('showAdControls mode is forcibly on!');
     } else {
       if (!this.props.controller.state.showAdControls) return null;
