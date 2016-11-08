@@ -50,11 +50,11 @@ var UpNextPanel = React.createClass({
             <CountDownClock {...this.props} timeToShow={this.props.skinConfig.upNext.timeToShow} currentPlayhead={this.props.currentPlayhead}/>
 
             <div className="oo-up-next-title-text oo-text-truncate">
-              {upNextString}: <span dangerouslySetInnerHTML={Utils.createMarkup(this.props.upNextInfo.upNextData.name)}></span>
+              {upNextString}
             </div>
           </div>
 
-          <div className="oo-content-description oo-text-truncate" dangerouslySetInnerHTML={Utils.createMarkup(this.props.upNextInfo.upNextData.description)}></div>
+          <div className="oo-content-description oo-text-truncate" dangerouslySetInnerHTML={Utils.createMarkup(this.props.upNextInfo.upNextData.name)}></div>
         </div>
 
         <CloseButton {...this.props}
