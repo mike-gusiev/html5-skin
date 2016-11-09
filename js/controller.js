@@ -1220,6 +1220,10 @@ OO.plugin("Html5Skin", function (OO, _, $, W) {
     },
 
     sendDiscoveryClickEvent: function(selectedContentData, isAutoUpNext) {
+      if (this.state.playerParam.discoveryRedirect && selectedContentData.clickedVideo.hostedAtURL && window.pgatour) {
+        pgatour.setWindowLocation(selectedContentData.clickedVideo.hostedAtURL);
+        return;
+      }
       this.state.pluginsElement.removeClass("oo-overlay-blur");
       this.state.upNextInfo.showing = false;
       if (isAutoUpNext){
