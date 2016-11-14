@@ -694,7 +694,7 @@ OO.plugin("Html5Skin", function (OO, _, $, W) {
         height: "",
         width: ""
       });
-      this.state.forceControlBarVisible = (this.state.pluginsElement.children().length > 0);
+      this.state.forceControlBarVisible = false;
     },
 
     onAdPodStarted: function(event, numberOfAds) {
