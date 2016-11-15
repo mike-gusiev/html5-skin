@@ -8,6 +8,7 @@
 * @constructor
 */
 var React = require('react'),
+    ReactDOM = require('react-dom'),
     CONSTANTS = require('./../constants/constants'),
     Utils = require('./utils'),
     CloseButton = require('./closeButton'),
@@ -35,6 +36,13 @@ var UpNextPanel = React.createClass({
 
   render: function() {
     var upNextString = Utils.getLocalizedString(this.props.language, CONSTANTS.SKIN_TEXT.UP_NEXT, this.props.localizableStrings);
+    var upNextTitle = this.props.upNextInfo.upNextData.name;
+    if (this.props.upNextTitle) {
+      upNextTitle = this.props.upNextTitle;
+    } else if (ReactDOM.findDOMNode(this.refs.description)) {
+      this.props.upNextTitle = Utils.truncateTextToWidth(ReactDOM.findDOMNode(this.refs.description), this.props.upNextInfo.upNextData.name, 2);
+      upNextTitle = this.props.upNextTitle;
+    }
     var thumbnailStyle = {
       backgroundImage: "url('" + this.props.upNextInfo.upNextData.preview_image_url + "')"
     };
@@ -54,7 +62,7 @@ var UpNextPanel = React.createClass({
             </div>
           </div>
 
-          <div className="oo-content-description oo-text-truncate" dangerouslySetInnerHTML={Utils.createMarkup(this.props.upNextInfo.upNextData.name)}></div>
+          <div ref="description" className="oo-content-description oo-text-truncate" dangerouslySetInnerHTML={Utils.createMarkup(upNextTitle)}></div>
         </div>
 
         <CloseButton {...this.props}
