@@ -88,11 +88,9 @@ var CountDownClock = React.createClass({
   },
 
   updateClockSize: function(){
-    if (this.props.controller.state.screenToShow === CONSTANTS.SCREEN.DISCOVERY_SCREEN){
-      var clockWidth = 75;
-    }
-    else {
-      var clockWidth = this.props.responsiveView == this.props.skinConfig.responsive.breakpoints.xs.id ? 25 : 36;
+    var clockWidth = 75;
+    if (this.props.controller.state.screenToShow !== CONSTANTS.SCREEN.DISCOVERY_SCREEN){
+      clockWidth = 24;
     }
     this.setState({
       clockRadius: parseInt(clockWidth, 10)/2,
