@@ -191,27 +191,23 @@ var ControlBar = React.createClass({
 
   updateVolume: function (x, vol) {
     var volume = $('.volume');
-    var percentage, volume_level;
     if (vol) {
-      percentage = parseInt(vol * 100, 10);
-      volume_level = parseFloat(vol);
+      this.props.percentage = parseInt(vol * 100, 10);
+      this.props.volume_level = parseFloat(vol);
     } else {
       var position = x - volume.offset().left;
-      percentage = parseInt(100 * position / volume.width(), 10);
-      volume_level = parseFloat(position / volume.width());
+      this.props.percentage = parseInt(100 * position / volume.width(), 10);
+      this.props.volume_level = parseFloat(position / volume.width());
     }
-    if (percentage > 100) {
-      percentage = 100;
-      volume_level = 1;
+    if (this.props.percentage > 100) {
+      this.props.percentage = 100;
+      this.props.volume_level = 1;
     }
-    if (percentage < 10) {
-      percentage = 0;
-      volume_level = 0;
+    if (this.props.percentage < 10) {
+      this.props.percentage = 0;
+      this.props.volume_level = 0;
     }
-    this.props.controller.setVolume(volume_level);
-
-    //update volume bar and video volume
-    $('.volume span').css('width', percentage + '%');
+    this.props.controller.setVolume(this.props.volume_level);
   },
 
   populateControlBar: function() {
