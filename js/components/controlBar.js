@@ -252,20 +252,20 @@ var ControlBar = React.createClass({
       "volume": true
     });
     var barStyle = turnedOn ? {backgroundColor: this.props.skinConfig.controlBar.volumeControl.color} : null;
-    volumeBars.push(<div className="{volumeClass}"
-                         key={i}
+    var spanStyle = {width: this.props.controller.state.volumeState.volume * 100 + '%'};
+    volumeBars.push(<div className={volumeClass}
                          style={barStyle}
                          onMouseDown={
                            function (e) {
                              this.volumeDrag = true;
                              me.updateVolume(e.pageX);
+                             }
                            }
-                         }
                          onMouseUp={
                            function (e) {
                              if (this.volumeDrag) {
-                               this.volumeDrag = false;
-                               me.updateVolume(e.pageX);
+                              this.volumeDrag = false;
+                              me.updateVolume(e.pageX);
                              }
                            }
                          }
@@ -276,7 +276,9 @@ var ControlBar = React.createClass({
                              }
                            }
                          }
-    ><span style="width: {this.props.controller.state.volumeState.volume * 100}%"></span></div>);
+    ><span style={spanStyle}></span></div>);
+
+    //<span style="width: {this.props.controller.state.volumeState.volume * 100}%"></span>
     /*volumeBars.push(React.createElement("div", {
       className: volumeClass,
       key: 0,
