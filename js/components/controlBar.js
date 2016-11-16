@@ -190,15 +190,15 @@ var ControlBar = React.createClass({
   },
 
   updateVolume: function (x, vol) {
-    var volume = $('.volume');
+    var volume = ReactDOM.findDOMNode(this.refs.volumeBar);
     var percentage, volume_level;
     if (vol) {
       percentage = parseInt(vol * 100, 10);
       volume_level = parseFloat(vol);
     } else {
-      var position = x - volume.offset().left;
-      percentage = parseInt(100 * position / volume.width(), 10);
-      volume_level = parseFloat(position / volume.width());
+      var position = x - volume.offsetLeft;
+      percentage = parseInt(100 * position / volume.clientWidth, 10);
+      volume_level = parseFloat(position / volume.clientWidth);
     }
     if (percentage > 100) {
       volume_level = 1;
@@ -208,6 +208,24 @@ var ControlBar = React.createClass({
     }
 
     this.props.controller.setVolume(volume_level);
+  },
+
+  onMouseDown: function (e) {
+    this.props.controller.state.volumeState.volumeDrag = true;
+    this.updateVolume(e.pageX);
+  },
+
+  onMouseUp: function (e) {
+    if (this.props.controller.state.volumeState.volumeDrag) {
+      this.props.controller.state.volumeState.volumeDrag = false;
+      this.updateVolume(e.pageX);
+    }
+  },
+
+  onMouseMove: function (e) {
+    if (this.props.controller.state.volumeState.volumeDrag) {
+      this.updateVolume(e.pageX);
+    }
   },
 
   populateControlBar: function() {
@@ -241,8 +259,6 @@ var ControlBar = React.createClass({
 
     var volumeBars = [];
     this.volumeDrag = false;
-    var me = this;
-    //create each volume tick separately
     var turnedOn = this.props.controller.state.volumeState.volume >= 1 / 10;
     var volumeClass = ClassNames({
       "volume": true
@@ -251,27 +267,11 @@ var ControlBar = React.createClass({
     var spanStyle = {width: this.props.controller.state.volumeState.volume * 100 + '%'};
     volumeBars.push(<div className={volumeClass}
                          style={barStyle}
-                         onMouseDown={
-                           function (e) {
-                             this.volumeDrag = true;
-                             me.updateVolume(e.pageX);
-                             }
-                           }
-                         onMouseUp={
-                           function (e) {
-                             if (this.volumeDrag) {
-                              this.volumeDrag = false;
-                              me.updateVolume(e.pageX);
-                             }
-                           }
-                         }
-                         onMouseMove={
-                           function (e) {
-                             if (this.volumeDrag) {
-                               me.updateVolume(e.pageX);
-                             }
-                           }
-                         }
+                         key="0"
+                         ref="volumeBar"
+                         onMouseDown={this.onMouseDown}
+                         onMouseUp={this.onMouseUp}
+                         onMouseMove={this.onMouseMove}
     ><span style={spanStyle}></span></div>);
     var volumeSlider = <div className="oo-volume-slider"><Slider value={parseFloat(this.props.controller.state.volumeState.volume)}
                         onChange={this.changeVolumeSlider}
