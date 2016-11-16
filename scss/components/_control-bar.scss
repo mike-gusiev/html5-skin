@@ -134,32 +134,6 @@
   }
 }
 
-.volume {
-    position: relative;
-    cursor: pointer;
-    width: 100px;
-    height: 10px;
-    float: left;
-    margin: 6px 0;
-    background-color: #003e7e;
-}
-
-.volume span {
-    display: block;
-    height: inherit;
-    position: absolute;
-    top: 0;
-    left: 0;
-    background-color: #ffffff;
-    z-index: 10;
-    width: 100%;
-}
-
-.oo-volume .oo-icon {
-    float: left;
-    margin-right: 10px;
-}
-
 a.oo-volume-bar {
   border:0;
   outline: none;

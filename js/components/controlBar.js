@@ -277,31 +277,6 @@ var ControlBar = React.createClass({
                            }
                          }
     ><span style={spanStyle}></span></div>);
-
-    //<span style="width: {this.props.controller.state.volumeState.volume * 100}%"></span>
-    /*volumeBars.push(React.createElement("div", {
-      className: volumeClass,
-      key: 0,
-      style: barStyle,
-      onMouseDown: function (e) {
-        this.volumeDrag = true;
-        me.updateVolume(e.pageX);
-      },
-      onMouseUp: function (e) {
-        if (this.volumeDrag) {
-          this.volumeDrag = false;
-          me.updateVolume(e.pageX);
-        }
-      },
-      onMouseMove:  function (e) {
-        if (this.volumeDrag) {
-          me.updateVolume(e.pageX);
-        }
-      }
-    }, React.createElement("span", {
-      width: this.props.controller.state.volumeState.volume * 100 + '%'
-    })));*/
-
     var volumeSlider = <div className="oo-volume-slider"><Slider value={parseFloat(this.props.controller.state.volumeState.volume)}
                         onChange={this.changeVolumeSlider}
                         className={"oo-slider oo-slider-volume"}
