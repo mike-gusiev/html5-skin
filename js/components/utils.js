@@ -13,7 +13,11 @@ var Utils = {
   * @param {String} text - The string to trim
   * @returns {String} String truncated to fit the width of the element
   */
-  truncateTextToWidth: function(element, text) {
+  truncateTextToWidth: function(element, text, coef) {
+    var truncCoef = 1.8;
+    if (coef) {
+      truncCoef = coef;
+    }
     var testText = document.createElement("span");
     testText.style.visibility = "hidden";
     testText.style.position = "absolute";
@@ -25,9 +29,9 @@ var Utils = {
     var actualWidth = element.clientWidth;
     var textWidth = testText.scrollWidth;
     var truncatedText = "";
-    if (textWidth > (actualWidth * 1.8)){
+    if (textWidth > (actualWidth * truncCoef)){
       var truncPercent = actualWidth / textWidth;
-      var newWidth = (Math.floor(truncPercent * text.length) * 1.8) - 3;
+      var newWidth = (Math.floor(truncPercent * text.length) * truncCoef) - 3;
       truncatedText = text.slice(0,newWidth) + "...";
     }
     else {
