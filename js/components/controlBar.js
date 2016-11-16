@@ -191,12 +191,13 @@ var ControlBar = React.createClass({
 
   updateVolume: function (x, vol) {
     var volume = ReactDOM.findDOMNode(this.refs.volumeBar);
+    var screenOffset = document.getElementsByClassName('oo-state-screen-selectable')[0].getBoundingClientRect() || 0;
     var percentage, volume_level;
     if (vol) {
       percentage = parseInt(vol * 100, 10);
       volume_level = parseFloat(vol);
     } else {
-      var position = x - volume.offsetLeft;
+      var position = x - volume.offsetLeft - screenOffset.left;
       percentage = parseInt(100 * position / volume.clientWidth, 10);
       volume_level = parseFloat(position / volume.clientWidth);
     }
