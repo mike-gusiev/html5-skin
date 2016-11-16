@@ -191,7 +191,7 @@ var ControlBar = React.createClass({
 
   updateVolume: function (x, vol) {
     var volume = ReactDOM.findDOMNode(this.refs.volumeBar);
-    var screenOffset = ReactDOM.findDOMNode(this).getBoundingClientRect() || 0;
+    var screenOffset = ReactDOM.findDOMNode(this).getBoundingClientRect() || { left: 0 };
     var percentage, volume_level;
     if (vol) {
       percentage = parseInt(vol * 100, 10);
