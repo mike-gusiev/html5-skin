@@ -23,34 +23,36 @@ var SharePanel = React.createClass({
   },
 
   getPgatourPanel: function (titleString, iframeURL) {
-      return (
-        <div className="oo-share-tab-panel pgatour">
-          <div className="oo-social-action-text oo-text-uppercase" >{titleString}</div>
-          <div className="oo-share-url">
-            <div className="oo-start-at-line">
-              <label><input className="oo-share-checkbox" type="checkbox" /> Start at</label>
-              <input className="oo-share-input-time" type="text" value="00:00" />
-            </div>
-            <div className="oo-share-url-line">
-              <input className="oo-share-link-copy" type="button" value="Copy" />
-              <input className="oo-share-link-input" type="text" readonly value="beta61-www.pgatour.ctmsp.com/video.html" />
-            </div>
+    var shareLink = this.props.contentTree.hostedAtURL + this.props.startAtLink;
+
+    return (
+      <div className="oo-share-tab-panel pgatour">
+        <div className="oo-social-action-text oo-text-uppercase" >{titleString}</div>
+        <div className="oo-share-url">
+          <div className="oo-start-at-line">
+            <label><input className="oo-share-checkbox" type="checkbox" /> Start at</label>
+            <input className="oo-share-input-time" type="text" value="00:00" maxlength="5" />
           </div>
-          <a className="oo-pgatour-facebook" onClick={this.handleFacebookClick}> </a>
-          <a className="oo-pgatour-twitter" onClick={this.handleTwitterClick}> </a>
-          <div className="oo-share-url">
-            <div className="oo-start-at-line">
-              <span>Embed Code</span>
-              <label><input className="oo-share-checkbox" type="checkbox" /> Start at</label>
-              <input className="oo-share-input-time" type="text" value="00:00" />
-            </div>
-            <div className="oo-share-url-line">
-              <input className="oo-share-link-copy" type="button" value="Copy" />
-              <input className="oo-share-link-input" type="text" readonly value={iframeURL} />
-            </div>
+          <div className="oo-share-url-line">
+            <input className="oo-share-link-copy" type="button" value="Copy" />
+            <input className="oo-share-link-input" type="text" readonly value={shareLink} />
           </div>
         </div>
-      );
+        <a className="oo-pgatour-facebook" onClick={this.handleFacebookClick}> </a>
+        <a className="oo-pgatour-twitter" onClick={this.handleTwitterClick}> </a>
+        <div className="oo-share-url">
+          <div className="oo-start-at-line">
+            <span>Embed Code</span>
+            <label><input className="oo-share-checkbox" type="checkbox" /> Start at</label>
+            <input className="oo-share-input-time" type="text" value="00:00" maxlength="5" />
+          </div>
+          <div className="oo-share-url-line">
+            <input className="oo-share-link-copy" type="button" value="Copy" />
+            <input className="oo-share-link-input" type="text" readonly value={iframeURL} />
+          </div>
+        </div>
+      </div>
+    );
   },
 
   getActivePanel: function() {
@@ -144,7 +146,9 @@ SharePanel.defaultProps = {
   contentTree: {
     title: ''
   },
-  pgatourShare: true
+  pgatourShare: true,
+  startAtLink: '',
+  startAtEmbedCode: ''
 };
 
 module.exports = SharePanel;
