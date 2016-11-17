@@ -7,7 +7,7 @@
   <script src="//player.ooyala.com/static/v4/stable/4.9.8/video-plugin/bit_wrapper.min.js"></script>
   <script src="//player.ooyala.com/static/v4/stable/4.9.8/other-plugin/discovery_api.min.js"></script>
   <script src="build/html5-skin.js"></script>
-  <link rel="stylesheet" href="/build/html5-skin.min.css"/>
+  <link rel="stylesheet" href="/build/html5-skin.css"/>
   <style>
       .oo-player-container .oo-share-tab-panel .oo-social-action-text {
         font-size: 24px;
@@ -17,6 +17,25 @@
         max-width: 560px;
         text-align: left;
         font-family: "UniversLTStd-Cn",sans-serif;
+        font-size: 16px;
+      }
+
+      .oo-player-container .oo-share-tab-panel .oo-pgatour-twitter {
+        background: url('/build/assets/images/icon-twitter.png') no-repeat 0 0;
+        width: 76px;
+        height: 28px;
+        display: inline-block;
+        text-decoration: none;
+        margin: 15px 15px 25px 0;
+      }
+
+      .oo-player-container .oo-share-tab-panel .oo-pgatour-facebook {
+        background: url('/build/assets/images/icon-facebook.png') no-repeat 0 0;
+        width: 76px;
+        height: 28px;
+        display: inline-block;
+        text-decoration: none;
+        margin: 15px 15px 25px 0;
       }
 
       .oo-player-container .oo-share-tab-panel .oo-share-url-line {
@@ -26,14 +45,18 @@
 
       .oo-player-container .oo-share-tab-panel .oo-social-action-text {
         text-align: center;
+        margin-bottom: 0;
       }
 
-      .oo-player-container .oo-share-tab-panel .oo-share-input-type {
+      .oo-player-container .oo-share-tab-panel .oo-share-input-time {
+        font-size: 14px;
+        color: #000;
         width: 47px;
         height: 20px;
       }
 
       .oo-player-container .oo-share-tab-panel .oo-share-link-input {
+        font-size: 14px;
         width: 100%;
         height: 40px;
         line-height: 40px;
@@ -50,6 +73,7 @@
         width: 85px;
         height: 38px;
         background: #fff;
+        color: #000;
         border: 0;
         outline: 0;
         padding: 0;
@@ -83,7 +107,7 @@
   <div class="oo-share-url">
     <div class="oo-start-at-line">
       <label><input class="oo-share-checkbox" type="checkbox"> Start at</label>
-      <input class="oo-share-input-type" type="text" value="00:00">
+      <input class="oo-share-input-time" type="text" value="00:00">
     </div>
     <div class="oo-share-url-line">
       <input class="oo-share-link-copy" type="button" value="Copy">
@@ -91,22 +115,20 @@
     </div>
   </div>
 
-  <a class="oo-twitter" > </a>
-  <a class="oo-facebook" > </a>
+  <a class="oo-pgatour-twitter" > </a>
+  <a class="oo-pgatour-facebook" > </a>
 
   <div class="oo-share-url">
     <div class="oo-start-at-line">
       <span>Embed Code &nbsp;</span>
       <label><input class="oo-share-checkbox" type="checkbox"> Start at</label>
-      <input class="oo-share-input-type" type="text" value="00:00">
+      <input class="oo-share-input-time" type="text" value="00:00">
     </div>
     <div class="oo-share-url-line">
       <input class="oo-share-link-copy" type="button" value="Copy">
       <input class="oo-share-link-input" type="text" readonly value="beta61-www.pgatour.ctmsp.com/video.html">
     </div>
   </div>
-
-
 </div>
 
 </div>
