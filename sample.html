@@ -8,8 +8,17 @@
   <script src="//player.ooyala.com/static/v4/stable/4.9.8/other-plugin/discovery_api.min.js"></script>
   <script src="build/html5-skin.js"></script>
   <link rel="stylesheet" href="/build/html5-skin.min.css"/>
-</head>
+  <style>
+      .oo-player-container .oo-share-tab-panel .oo-social-action-text {
+        font-size: 24px;
+      }
 
+      .oo-player-container .oo-share-tab-panel {
+        max-width: 560px;
+        text-align: left;
+      }
+  </style>
+</head>
 <body>
 <div id='container'></div>
 <script>
@@ -26,6 +35,30 @@
     window.pp = OO.Player.create('container', 'RmZW4zcDo6KqkTIhn1LnowEZyUYn5Tb2', playerParam);
   });
 </script>
+
+<div style="display: none">
+
+<div class="oo-share-tab-panel">
+  <div class="oo-social-action-text oo-text-uppercase" >Share this</div>
+  <div class="oo-share-url">
+    <div class="oo-start-at-line">
+      <label><input class="oo-share-checkbox" type="checkbox"> Start at</label>
+      <input class="oo-share-input" type="text" placeholder="00:00">
+    </div>
+    <div class="oo-share-url-line">
+      <input type="text" readonly value="beta61-www.pgatour.ctmsp.com/video.html">
+      <input type="button" value="Copy">
+    </div>
+  </div>
+
+  <a class="oo-twitter" > </a>
+  <a class="oo-facebook" > </a>
+
+
+  <textarea class="oo-form-control oo-embed-form" rows="3" readonly="" ></textarea>
+</div>
+
+</div>
 
 </body>
 </html>
