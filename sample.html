@@ -16,6 +16,40 @@
       .oo-player-container .oo-share-tab-panel {
         max-width: 560px;
         text-align: left;
+        font-family: "Roboto Condensed",sans-serif;
+      }
+
+      .oo-player-container .oo-share-tab-panel .oo-share-url-line {
+        width: 100%;
+        position: relative;
+      }
+
+      .oo-player-container .oo-share-tab-panel .oo-social-action-text {
+        text-align: center;
+      }
+
+      .oo-player-container .oo-share-tab-panel .oo-share-link-input {
+        width: 100%;
+        height: 40px;
+        line-height: 40px;
+        padding: 0px 5px;
+        color: #000;
+        background: #ccc;
+        border: 0;
+      }
+
+      .oo-player-container .oo-share-tab-panel .oo-share-link-copy {
+        position: absolute;
+        right: 0;
+        top: 0;
+        width: 85px;
+        height: 38px;
+        background: #fff;
+        border: 0;
+        outline: 0;
+        padding: 0;
+        margin: 1px;
+        cursor: pointer;
       }
   </style>
 </head>
@@ -46,8 +80,8 @@
       <input class="oo-share-input" type="text" placeholder="00:00">
     </div>
     <div class="oo-share-url-line">
-      <input type="text" readonly value="beta61-www.pgatour.ctmsp.com/video.html">
-      <input type="button" value="Copy">
+      <input class="oo-share-link-copy" type="button" value="Copy">
+      <input class="oo-share-link-input" type="text" readonly value="beta61-www.pgatour.ctmsp.com/video.html">
     </div>
   </div>
 
