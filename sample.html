@@ -16,7 +16,7 @@
       .oo-player-container .oo-share-tab-panel {
         max-width: 560px;
         text-align: left;
-        font-family: "Roboto Condensed",sans-serif;
+        font-family: "UniversLTStd-Cn",sans-serif;
       }
 
       .oo-player-container .oo-share-tab-panel .oo-share-url-line {
@@ -26,6 +26,11 @@
 
       .oo-player-container .oo-share-tab-panel .oo-social-action-text {
         text-align: center;
+      }
+
+      .oo-player-container .oo-share-tab-panel .oo-share-input-type {
+        width: 47px;
+        height: 20px;
       }
 
       .oo-player-container .oo-share-tab-panel .oo-share-link-input {
@@ -74,10 +79,11 @@
 
 <div class="oo-share-tab-panel">
   <div class="oo-social-action-text oo-text-uppercase" >Share this</div>
+
   <div class="oo-share-url">
     <div class="oo-start-at-line">
       <label><input class="oo-share-checkbox" type="checkbox"> Start at</label>
-      <input class="oo-share-input" type="text" placeholder="00:00">
+      <input class="oo-share-input-type" type="text" value="00:00">
     </div>
     <div class="oo-share-url-line">
       <input class="oo-share-link-copy" type="button" value="Copy">
@@ -88,8 +94,19 @@
   <a class="oo-twitter" > </a>
   <a class="oo-facebook" > </a>
 
+  <div class="oo-share-url">
+    <div class="oo-start-at-line">
+      <span>Embed Code &nbsp;</span>
+      <label><input class="oo-share-checkbox" type="checkbox"> Start at</label>
+      <input class="oo-share-input-type" type="text" value="00:00">
+    </div>
+    <div class="oo-share-url-line">
+      <input class="oo-share-link-copy" type="button" value="Copy">
+      <input class="oo-share-link-input" type="text" readonly value="beta61-www.pgatour.ctmsp.com/video.html">
+    </div>
+  </div>
 
-  <textarea class="oo-form-control oo-embed-form" rows="3" readonly="" ></textarea>
+
 </div>
 
 </div>
