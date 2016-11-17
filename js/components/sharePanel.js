@@ -9,6 +9,7 @@
  */
 var React = require('react'),
     ClassNames = require('classnames'),
+    ReactDOM = require('react-dom'),
     Utils = require('./utils'),
     CONSTANTS = require('../constants/constants');
 
@@ -31,11 +32,11 @@ var SharePanel = React.createClass({
         <div className="oo-share-url">
           <div className="oo-start-at-line">
             <label><input className="oo-share-checkbox" type="checkbox" /> Start at</label>
-            <input className="oo-share-input-time" type="text" value="00:00" maxlength="5" />
+            <input className="oo-share-input-time" type="text" value="00:00" maxLength="5" />
           </div>
           <div className="oo-share-url-line">
-            <input className="oo-share-link-copy" type="button" value="Copy" />
-            <input className="oo-share-link-input" type="text" readonly value={shareLink} />
+            <input className="oo-share-link-copy" type="button" value="Copy" onClick={this.handleCopyClick} />
+            <input className="oo-share-link-input" type="text" readOnly value={shareLink} />
           </div>
         </div>
         <a className="oo-pgatour-facebook" onClick={this.handleFacebookClick}> </a>
@@ -44,11 +45,11 @@ var SharePanel = React.createClass({
           <div className="oo-start-at-line">
             <span>Embed Code</span>
             <label><input className="oo-share-checkbox" type="checkbox" /> Start at</label>
-            <input className="oo-share-input-time" type="text" value="00:00" maxlength="5" />
+            <input className="oo-share-input-time" type="text" value="00:00" maxLength="5" />
           </div>
           <div className="oo-share-url-line">
-            <input className="oo-share-link-copy" type="button" value="Copy" />
-            <input className="oo-share-link-input" type="text" readonly value={iframeURL} />
+            <input className="oo-share-link-copy" type="button" value="Copy" onClick={this.handleCopyClick} />
+            <input className="oo-share-link-input" type="text" readOnly value={iframeURL} />
           </div>
         </div>
       </div>
@@ -119,6 +120,11 @@ var SharePanel = React.createClass({
     twitterUrl += "?text=" + encodeURIComponent(this.props.contentTree.title+": ");
     twitterUrl += "&url=" + encodeURIComponent(location.href);
     window.open(twitterUrl, "twitter window", "height=300,width=750");
+  },
+
+  handleCopyClick: function (event) {
+    var text = ReactDOM.findDOMNode(event.target).parentNode.getElementsByClassName('oo-share-link-input')[0].value;
+    alert(text);
   },
 
   render: function() {
