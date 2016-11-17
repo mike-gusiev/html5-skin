@@ -86,3 +86,67 @@
     height: calc(15vh);
   }
 }
+
+.oo-share-tab-panel.pgatour {
+  max-width: 560px;
+  text-align: left;
+  font-family: "UniversLTStd-Cn",sans-serif;
+  font-size: 16px;
+  margin-top: 0;
+
+  .oo-pgatour-twitter, .oo-pgatour-facebook {
+    background: url('/build/assets/images/icon-twitter.png') no-repeat 0 0;
+    width: 76px;
+    height: 28px;
+    display: inline-block;
+    text-decoration: none;
+    margin: 15px 15px 25px 0;
+  }
+
+  .oo-pgatour-facebook {
+    background: url('/build/assets/images/icon-facebook.png') no-repeat 0 0;
+  }
+
+  .oo-share-url-line {
+    width: 100%;
+    position: relative;
+  }
+
+  .oo-social-action-text {
+    text-align: center;
+    margin-bottom: 0;
+  }
+
+  .oo-share-input-time {
+    font-size: 14px;
+    color: #000;
+    width: 47px;
+    height: 20px;
+  }
+
+  .oo-share-link-input {
+    font-size: 14px;
+    width: 100%;
+    height: 40px;
+    line-height: 40px;
+    padding: 0px 5px;
+    color: #000;
+    background: #ccc;
+    border: 0;
+  }
+
+  .oo-share-link-copy {
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 85px;
+    height: 38px;
+    background: #fff;
+    color: #000;
+    border: 0;
+    outline: 0;
+    padding: 0;
+    margin: 1px;
+    cursor: pointer;
+  }
+}

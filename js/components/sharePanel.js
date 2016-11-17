@@ -22,6 +22,37 @@ var SharePanel = React.createClass({
     };
   },
 
+  getPgatourPanel: function (titleString, iframeURL) {
+      return (
+        <div className="oo-share-tab-panel pgatour">
+          <div className="oo-social-action-text oo-text-uppercase" >{titleString}</div>
+          <div className="oo-share-url">
+            <div className="oo-start-at-line">
+              <label><input className="oo-share-checkbox" type="checkbox" /> Start at</label>
+              <input className="oo-share-input-time" type="text" value="00:00" />
+            </div>
+            <div className="oo-share-url-line">
+              <input className="oo-share-link-copy" type="button" value="Copy" />
+              <input className="oo-share-link-input" type="text" readonly value="beta61-www.pgatour.ctmsp.com/video.html" />
+            </div>
+          </div>
+          <a className="oo-pgatour-facebook" onClick={this.handleFacebookClick}> </a>
+          <a className="oo-pgatour-twitter" onClick={this.handleTwitterClick}> </a>
+          <div className="oo-share-url">
+            <div className="oo-start-at-line">
+              <span>Embed Code</span>
+              <label><input className="oo-share-checkbox" type="checkbox" /> Start at</label>
+              <input className="oo-share-input-time" type="text" value="00:00" />
+            </div>
+            <div className="oo-share-url-line">
+              <input className="oo-share-link-copy" type="button" value="Copy" />
+              <input className="oo-share-link-input" type="text" readonly value={iframeURL} />
+            </div>
+          </div>
+        </div>
+      );
+  },
+
   getActivePanel: function() {
     var titleString = Utils.getLocalizedString(this.props.language, CONSTANTS.SKIN_TEXT.SHARE_CALL_TO_ACTION, this.props.localizableStrings);
 
@@ -32,6 +63,10 @@ var SharePanel = React.createClass({
           .replace("<PUBLISHER_ID>", this.props.playerParam.pcode);
     } catch(err) {
       iframeURL = "";
+    }
+
+    if (this.props.pgatourShare) {
+      return this.getPgatourPanel(titleString, iframeURL);
     }
 
     return (
@@ -108,7 +143,8 @@ var SharePanel = React.createClass({
 SharePanel.defaultProps = {
   contentTree: {
     title: ''
-  }
+  },
+  pgatourShare: true
 };
 
 module.exports = SharePanel;
