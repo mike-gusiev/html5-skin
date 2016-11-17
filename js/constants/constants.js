@@ -40,7 +40,7 @@ module.exports = {
     DISCOVER: "Discover",
     UP_NEXT: "Up next",
     VIDEO_QUALITY: "Video Quality",
-    SHARE_CALL_TO_ACTION: "Invest In Social Change",
+    SHARE_CALL_TO_ACTION: "Share this",
     SHARE: "Share",
     START_AT: "Start at",
     EMBED: "Embed",
