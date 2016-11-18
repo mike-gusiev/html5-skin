@@ -96,8 +96,9 @@
 
   .oo-pgatour-twitter, .oo-pgatour-facebook {
     background: url('/build/assets/images/icon-twitter.png') no-repeat 0 0;
-    width: 76px;
+    background-size: 74px 28px;
     height: 28px;
+    width: 74px;
     display: inline-block;
     text-decoration: none;
     margin: 15px 15px 25px 0;
@@ -105,6 +106,7 @@
 
   .oo-pgatour-facebook {
     background: url('/build/assets/images/icon-facebook.png') no-repeat 0 0;
+    background-size: 74px 28px;
   }
 
   .oo-share-url-line {
@@ -148,5 +150,17 @@
     padding: 0;
     margin: 1px;
     cursor: pointer;
+  }
+
+  .oo-share-input-time {
+    background: #ccc;
+    border: 0;
+    outline: 0;
+    padding: 0px 5px;
+    margin: 0 8px;
+  }
+
+  .oo-start-at-line > span {
+    margin: 0 15px 0 0;
   }
 }
