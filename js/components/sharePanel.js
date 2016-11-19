@@ -34,6 +34,19 @@ var SharePanel = React.createClass({
     return 0;
   },
 
+  getTimeString: function (x) {
+    var seconds = parseInt(x, 10);
+    var minutes = parseInt(seconds / 60, 10);
+    seconds -= minutes * 60;
+    if (minutes < 10) {
+      minutes = '0' + minutes;
+    }
+    if (seconds < 10) {
+      seconds = '0' + seconds;
+    }
+    return minutes + ':' + seconds;
+  },
+
   getPgatourPanel: function (titleString, iframeURL) {
     var shareLink = this.props.contentTree.hostedAtURL + this.state.startLink;
     if (this.state.embedLink) {
@@ -176,7 +189,16 @@ var SharePanel = React.createClass({
 
   handleTimeChange: function (event) {
     var timeString = event.target.value;
-    this.setNewTime(event, timeString);
+    var time = timeString.match(/(\d{2}):(\d{2})/);
+    if (time) {
+      if (parseInt(time[2], 10) > 60) {
+        timeString = time[1] + ':60';
+      }
+      if (this.getTimeInSeconds(timeString) > this.props.controller.state.duration) {
+        timeString = this.getTimeString(this.props.controller.state.duration);
+      }
+      this.setNewTime(event, timeString);
+    }
   },
 
   render: function() {
