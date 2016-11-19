@@ -8,7 +8,6 @@
  * @constructor
  */
 var React = require('react'),
-    ClassNames = require('classnames'),
     ReactDOM = require('react-dom'),
     Utils = require('./utils'),
     CONSTANTS = require('../constants/constants');
@@ -21,11 +20,17 @@ var SharePanel = React.createClass({
       activeTab: this.tabs.SHARE,
       hasError: false,
       startLink: '',
-      embedLink: ''
+      embedLink: '',
+      startTime: '00:00',
+      embedTime: '00:00'
     };
   },
 
   getTimeInSeconds: function (x) {
+    var time = x.match(/(\d{2}):(\d{2})/);
+    if (time) {
+      return parseInt(time[1], 10) * 60 + parseInt(time[2], 10);
+    }
     return 0;
   },
 
@@ -41,8 +46,8 @@ var SharePanel = React.createClass({
         <div className="oo-social-action-text oo-text-uppercase" >{titleString}</div>
         <div className="oo-share-url">
           <div className="oo-start-at-line">
-            <label><input className="oo-share-checkbox" id="startTime" type="checkbox" onChange={this.handleTimeCheckbox} /> Start at</label>
-            <input className="oo-share-input-time" ref="startTime" type="text" value="00:00" maxLength="5" onChange={this.handleTimeChange} />
+            <label><input className="oo-share-checkbox" ref="startTime" id="startTime" type="checkbox" onChange={this.handleTimeCheckbox} /> Start at</label>
+            <input className="oo-share-input-time" rel="startTime" type="text" value={this.state.startTime} maxLength="5" onChange={this.handleTimeChange} />
           </div>
           <div className="oo-share-url-line">
             <input className="oo-share-link-copy" type="button" value="Copy" onClick={this.handleCopyClick} />
@@ -54,8 +59,8 @@ var SharePanel = React.createClass({
         <div className="oo-share-url">
           <div className="oo-start-at-line">
             <span>Embed Code</span>
-            <label><input className="oo-share-checkbox" id="embedTime" type="checkbox" onChange={this.handleTimeCheckbox} /> Start at</label>
-            <input className="oo-share-input-time" ref="embedTime" type="text" value="00:00" maxLength="5" onChange={this.handleTimeChange} />
+            <label><input className="oo-share-checkbox" ref="embedTime" id="embedTime" type="checkbox" onChange={this.handleTimeCheckbox} /> Start at</label>
+            <input className="oo-share-input-time" rel="embedTime" type="text" value={this.state.embedTime} maxLength="5" onChange={this.handleTimeChange} />
           </div>
           <div className="oo-share-url-line">
             <input className="oo-share-link-copy" type="button" value="Copy" onClick={this.handleCopyClick} />
@@ -92,6 +97,21 @@ var SharePanel = React.createClass({
           <textarea className="oo-form-control oo-embed-form" rows="3" value={iframeURL} readOnly />
         </div>
     );
+  },
+
+  setNewTime: function (event, timeString) {
+    if (event.target.getAttribute('rel') === 'startTime') {
+      this.setState( { startTime: timeString } );
+      if (this.refs.startTime.checked) {
+        this.setState( { startLink: '?ootime=' + this.getTimeInSeconds(timeString) } );
+      }
+    }
+    if (event.target.getAttribute('rel') === 'embedTime') {
+      this.setState( { embedTime: timeString } );
+      if (this.refs.embedTime.checked) {
+        this.setState( { embedLink: '&options[initialTime]=' + this.getTimeInSeconds(timeString) } );
+      }
+    }
   },
 
   handleEmailClick: function(event) {
@@ -140,14 +160,14 @@ var SharePanel = React.createClass({
   handleTimeCheckbox: function (event) {
     if (event.target.id === 'startTime') {
       if (event.target.checked) {
-        this.setState( { startLink: '?ootime=' + this.getTimeInSeconds(this.refs.startTime.value) } );
+        this.setState( { startLink: '?ootime=' + this.getTimeInSeconds(this.state.startTime) } );
       } else {
         this.setState( { startLink: '' } );
       }
     }
     if (event.target.id === 'embedTime') {
       if (event.target.checked) {
-        this.setState( { embedLink: '&options[initialTime]=' + this.getTimeInSeconds(this.refs.embedTime.value) } );
+        this.setState( { embedLink: '&options[initialTime]=' + this.getTimeInSeconds(this.state.embedTime) } );
       } else {
         this.setState( { embedLink: '' } );
       }
@@ -156,7 +176,7 @@ var SharePanel = React.createClass({
 
   handleTimeChange: function (event) {
     var timeString = event.target.value;
-    debugger;
+    this.setNewTime(event, timeString);
   },
 
   render: function() {
