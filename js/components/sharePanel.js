@@ -19,6 +19,8 @@ var SharePanel = React.createClass({
     return {
       activeTab: this.tabs.SHARE,
       hasError: false,
+      startValue: '00:00',
+      embedValue: '00:00',
       startLink: '',
       embedLink: '',
       startTime: '00:00',
@@ -60,7 +62,7 @@ var SharePanel = React.createClass({
         <div className="oo-share-url">
           <div className="oo-start-at-line">
             <label><input className="oo-share-checkbox" ref="startTime" id="startTime" type="checkbox" onChange={this.handleTimeCheckbox} /> Start at</label>
-            <input className="oo-share-input-time" rel="startTime" type="text" value={this.state.startTime} maxLength="5" onChange={this.handleTimeChange} />
+            <input className="oo-share-input-time" rel="startTime" type="text" value={this.state.startValue} maxLength="5" onChange={this.handleInputChange} onBlur={this.handleTimeChange} />
           </div>
           <div className="oo-share-url-line">
             <input className="oo-share-link-copy" type="button" value="Copy" onClick={this.handleCopyClick} />
@@ -73,7 +75,7 @@ var SharePanel = React.createClass({
           <div className="oo-start-at-line">
             <span>Embed Code</span>
             <label><input className="oo-share-checkbox" ref="embedTime" id="embedTime" type="checkbox" onChange={this.handleTimeCheckbox} /> Start at</label>
-            <input className="oo-share-input-time" rel="embedTime" type="text" value={this.state.embedTime} maxLength="5" onChange={this.handleTimeChange} />
+            <input className="oo-share-input-time" rel="embedTime" type="text" value={this.state.embedValue} maxLength="5" onChange={this.handleInputChange} onBlur={this.handleTimeChange} />
           </div>
           <div className="oo-share-url-line">
             <input className="oo-share-link-copy" type="button" value="Copy" onClick={this.handleCopyClick} />
@@ -114,13 +116,27 @@ var SharePanel = React.createClass({
 
   setNewTime: function (event, timeString) {
     if (event.target.getAttribute('rel') === 'startTime') {
-      this.setState( { startTime: timeString } );
+      if (!timeString) {
+        this.setState( { startValue: this.state.startTime } );
+        return;
+      }
+      this.setState( {
+        startTime: timeString,
+        startValue: timeString
+      } );
       if (this.refs.startTime.checked) {
         this.setState( { startLink: '?ootime=' + this.getTimeInSeconds(timeString) } );
       }
     }
     if (event.target.getAttribute('rel') === 'embedTime') {
-      this.setState( { embedTime: timeString } );
+      if (!timeString) {
+        this.setState( { embedValue: this.state.embedTime } );
+        return;
+      }
+      this.setState( {
+        embedTime: timeString,
+        embedValue: timeString
+      } );
       if (this.refs.embedTime.checked) {
         this.setState( { embedLink: '&options[initialTime]=' + this.getTimeInSeconds(timeString) } );
       }
@@ -198,6 +214,17 @@ var SharePanel = React.createClass({
         timeString = this.getTimeString(this.props.controller.state.duration);
       }
       this.setNewTime(event, timeString);
+    } else {
+      this.setNewTime(event, '');
+    }
+  },
+
+  handleInputChange: function (event) {
+    if (event.target.getAttribute('rel') === 'startTime') {
+      this.setState( { startValue: event.target.value } );
+    }
+    if (event.target.getAttribute('rel') === 'embedTime') {
+      this.setState( { embedValue: event.target.value } );
     }
   },
 
