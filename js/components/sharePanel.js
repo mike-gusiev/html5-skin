@@ -19,21 +19,30 @@ var SharePanel = React.createClass({
   getInitialState: function() {
     return {
       activeTab: this.tabs.SHARE,
-      hasError: false
+      hasError: false,
+      startLink: '',
+      embedLink: ''
     };
   },
 
+  getTimeInSeconds: function (x) {
+    return 0;
+  },
+
   getPgatourPanel: function (titleString, iframeURL) {
-    var shareLink = this.props.contentTree.hostedAtURL + this.props.startAtLink;
-    console.log('render', this.props);
+    var shareLink = this.props.contentTree.hostedAtURL + this.state.startLink;
+    if (this.state.embedLink) {
+      iframeURL = iframeURL.replace(/'>(\s)*<\/iframe>/, this.state.embedLink + "'></iframe>");
+      iframeURL = iframeURL.replace(/">(\s)*<\/iframe>/, this.state.embedLink + '"></iframe>');
+    }
 
     return (
       <div className="oo-share-tab-panel pgatour">
         <div className="oo-social-action-text oo-text-uppercase" >{titleString}</div>
         <div className="oo-share-url">
           <div className="oo-start-at-line">
-            <label><input data-target="startAtLink" className="oo-share-checkbox" type="checkbox" onChange={this.handleTimeCheckbox} /> Start at</label>
-            <input className="oo-share-input-time" type="text" value="00:00" maxLength="5" onChange={this.handleTimeChange} />
+            <label><input className="oo-share-checkbox" id="startTime" type="checkbox" onChange={this.handleTimeCheckbox} /> Start at</label>
+            <input className="oo-share-input-time" ref="startTime" type="text" value="00:00" maxLength="5" onChange={this.handleTimeChange} />
           </div>
           <div className="oo-share-url-line">
             <input className="oo-share-link-copy" type="button" value="Copy" onClick={this.handleCopyClick} />
@@ -45,8 +54,8 @@ var SharePanel = React.createClass({
         <div className="oo-share-url">
           <div className="oo-start-at-line">
             <span>Embed Code</span>
-            <label><input data-target="startAtEmbedCode" className="oo-share-checkbox" type="checkbox" onChange={this.handleTimeCheckbox} /> Start at</label>
-            <input className="oo-share-input-time" type="text" value="00:00" maxLength="5" onChange={this.handleTimeChange} />
+            <label><input className="oo-share-checkbox" id="embedTime" type="checkbox" onChange={this.handleTimeCheckbox} /> Start at</label>
+            <input className="oo-share-input-time" ref="embedTime" type="text" value="00:00" maxLength="5" onChange={this.handleTimeChange} />
           </div>
           <div className="oo-share-url-line">
             <input className="oo-share-link-copy" type="button" value="Copy" onClick={this.handleCopyClick} />
@@ -129,18 +138,20 @@ var SharePanel = React.createClass({
   },
 
   handleTimeCheckbox: function (event) {
-    var target = event.target.getAttribute('data-target');
-    if (event.target.checked) {
-      this.setState( { target: '123' } );
-      console.log(this.props[target]);
-
-      this.setState( { startAtLink: '123' } );
-      // this.props[target] = '?111';
-      console.log(this.props[target]);
-    } else {
-      this.props[target] = '';
+    if (event.target.id === 'startTime') {
+      if (event.target.checked) {
+        this.setState( { startLink: '?ootime=' + this.getTimeInSeconds(this.refs.startTime.value) } );
+      } else {
+        this.setState( { startLink: '' } );
+      }
     }
-    this.render();
+    if (event.target.id === 'embedTime') {
+      if (event.target.checked) {
+        this.setState( { embedLink: '&options[initialTime]=' + this.getTimeInSeconds(this.refs.embedTime.value) } );
+      } else {
+        this.setState( { embedLink: '' } );
+      }
+    }
   },
 
   handleTimeChange: function (event) {
@@ -161,11 +172,7 @@ SharePanel.defaultProps = {
   contentTree: {
     title: ''
   },
-  pgatourShare: true,
-  startAtLink: '',
-  timeStrLink: '00:00',
-  startAtEmbedCode: '',
-  timeStrEmbedCode: '00:00'
+  pgatourShare: true
 };
 
 module.exports = SharePanel;
