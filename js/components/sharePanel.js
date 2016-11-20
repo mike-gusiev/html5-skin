@@ -8,8 +8,8 @@
  * @constructor
  */
 var React = require('react'),
-    ReactDOM = require('react-dom'),
     Utils = require('./utils'),
+    Clipboard = require('clipboard'),
     CONSTANTS = require('../constants/constants');
 
 var SharePanel = React.createClass({
@@ -29,7 +29,7 @@ var SharePanel = React.createClass({
   },
 
   getTimeInSeconds: function (x) {
-    var time = x.match(/(\d{2}):(\d{2})/);
+    var time = x.match(/(\d{1,2}):(\d{1,2})/);
     if (time) {
       return parseInt(time[1], 10) * 60 + parseInt(time[2], 10);
     }
@@ -61,11 +61,13 @@ var SharePanel = React.createClass({
         <div className="oo-social-action-text oo-text-uppercase" >{titleString}</div>
         <div className="oo-share-url">
           <div className="oo-start-at-line">
-            <label><input className="oo-share-checkbox" ref="startTime" id="startTime" type="checkbox" onChange={this.handleTimeCheckbox} /> Start at</label>
-            <input className="oo-share-input-time" rel="startTime" type="text" value={this.state.startValue} maxLength="5" onChange={this.handleInputChange} onBlur={this.handleTimeChange} />
+            <label><input className="oo-share-checkbox" ref="startTime" id="startTime" type="checkbox"
+                          onChange={this.handleTimeCheckbox} /> Start at</label>
+            <input className="oo-share-input-time" rel="startTime" type="text" value={this.state.startValue}
+                   maxLength="5" onChange={this.handleInputChange} onBlur={this.handleTimeChange} />
           </div>
           <div className="oo-share-url-line">
-            <input className="oo-share-link-copy" type="button" value="Copy" onClick={this.handleCopyClick} />
+            <input className="oo-share-link-copy" type="button" value="Copy" />
             <input className="oo-share-link-input" type="text" readOnly value={shareLink} />
           </div>
         </div>
@@ -74,11 +76,13 @@ var SharePanel = React.createClass({
         <div className="oo-share-url">
           <div className="oo-start-at-line">
             <span>Embed Code</span>
-            <label><input className="oo-share-checkbox" ref="embedTime" id="embedTime" type="checkbox" onChange={this.handleTimeCheckbox} /> Start at</label>
-            <input className="oo-share-input-time" rel="embedTime" type="text" value={this.state.embedValue} maxLength="5" onChange={this.handleInputChange} onBlur={this.handleTimeChange} />
+            <label><input className="oo-share-checkbox" ref="embedTime" id="embedTime" type="checkbox"
+                          onChange={this.handleTimeCheckbox} /> Start at</label>
+            <input className="oo-share-input-time" rel="embedTime" type="text" value={this.state.embedValue}
+                   maxLength="5" onChange={this.handleInputChange} onBlur={this.handleTimeChange} />
           </div>
           <div className="oo-share-url-line">
-            <input className="oo-share-link-copy" type="button" value="Copy" onClick={this.handleCopyClick} />
+            <input className="oo-share-link-copy" type="button" value="Copy" />
             <input className="oo-share-link-input" type="text" readOnly value={iframeURL} />
           </div>
         </div>
@@ -120,6 +124,7 @@ var SharePanel = React.createClass({
         this.setState( { startValue: this.state.startTime } );
         return;
       }
+      timeString = this.getTimeString(this.getTimeInSeconds(timeString));
       this.setState( {
         startTime: timeString,
         startValue: timeString
@@ -133,6 +138,7 @@ var SharePanel = React.createClass({
         this.setState( { embedValue: this.state.embedTime } );
         return;
       }
+      timeString = this.getTimeString(this.getTimeInSeconds(timeString));
       this.setState( {
         embedTime: timeString,
         embedValue: timeString
@@ -181,11 +187,6 @@ var SharePanel = React.createClass({
     window.open(twitterUrl, "twitter window", "height=300,width=750");
   },
 
-  handleCopyClick: function (event) {
-    var text = ReactDOM.findDOMNode(event.target).parentNode.getElementsByClassName('oo-share-link-input')[0].value;
-    alert(text);
-  },
-
   handleTimeCheckbox: function (event) {
     if (event.target.id === 'startTime') {
       if (event.target.checked) {
@@ -205,7 +206,7 @@ var SharePanel = React.createClass({
 
   handleTimeChange: function (event) {
     var timeString = event.target.value;
-    var time = timeString.match(/(\d{2}):(\d{2})/);
+    var time = timeString.match(/(\d{1,2}):(\d{1,2})/);
     if (time) {
       if (parseInt(time[2], 10) > 60) {
         timeString = time[1] + ':60';
@@ -234,7 +235,19 @@ var SharePanel = React.createClass({
         {this.getActivePanel()}
       </div>
     );
+  },
+
+  componentDidMount: function () {
+    if (this.clipboard) {
+      this.clipboard.destroy();
+    }
+    this.clipboard = new Clipboard('.oo-share-link-copy', {
+      text: function(trigger) {
+        return trigger.nextElementSibling.value;
+      }
+    });
   }
+
 });
 
 SharePanel.defaultProps = {
