@@ -50,7 +50,7 @@ var SharePanel = React.createClass({
   },
 
   getPgatourPanel: function (titleString, iframeURL) {
-    var shareLink = this.props.contentTree.hostedAtURL + this.state.startLink;
+    var shareLink = location.href.replace(location.hash, '').replace(location.search, '') + this.state.startLink;
     if (this.state.embedLink) {
       iframeURL = iframeURL.replace(/'>(\s)*<\/iframe>/, this.state.embedLink + "'></iframe>");
       iframeURL = iframeURL.replace(/">(\s)*<\/iframe>/, this.state.embedLink + '"></iframe>');
