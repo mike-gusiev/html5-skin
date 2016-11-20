@@ -16,6 +16,13 @@ var React = require('react'),
     Icon = require('../components/icon');
 
 var UpNextPanel = React.createClass({
+
+  getInitialState: function() {
+    return {
+      upNextTitle: this.props.upNextInfo.upNextData.name
+    };
+  },
+
   closeUpNextPanel: function() {
     this.props.controller.upNextDismissButtonClicked();
   },
@@ -36,13 +43,6 @@ var UpNextPanel = React.createClass({
 
   render: function() {
     var upNextString = Utils.getLocalizedString(this.props.language, CONSTANTS.SKIN_TEXT.UP_NEXT, this.props.localizableStrings);
-    var upNextTitle = this.props.upNextInfo.upNextData.name;
-    if (this.props.upNextTitle) {
-      upNextTitle = this.props.upNextTitle;
-    } else if (ReactDOM.findDOMNode(this.refs.description)) {
-      this.props.upNextTitle = Utils.truncateTextToWidth(ReactDOM.findDOMNode(this.refs.description), this.props.upNextInfo.upNextData.name, 2);
-      upNextTitle = this.props.upNextTitle;
-    }
     var thumbnailStyle = {
       backgroundImage: "url('" + this.props.upNextInfo.upNextData.preview_image_url + "')"
     };
@@ -62,14 +62,22 @@ var UpNextPanel = React.createClass({
             </div>
           </div>
 
-          <div ref="description" className="oo-content-description oo-text-truncate" dangerouslySetInnerHTML={Utils.createMarkup(upNextTitle)}></div>
+          <div ref="description" className="oo-content-description oo-text-truncate" dangerouslySetInnerHTML={Utils.createMarkup(this.state.upNextTitle)}></div>
         </div>
 
         <CloseButton {...this.props}
           cssClass="oo-up-next-close-btn" closeAction={this.closeUpNextPanel}/>
       </div>
     );
+  },
+
+  componentDidMount: function () {
+    if (ReactDOM.findDOMNode(this.refs.description)) {
+      var truncedTitle = Utils.truncateTextToWidth(ReactDOM.findDOMNode(this.refs.description), this.state.upNextTitle, 2);
+      this.setState( { upNextTitle: truncedTitle } );
+    }
   }
+
 });
 
 UpNextPanel.propTypes = {
