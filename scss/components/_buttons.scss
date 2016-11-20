@@ -11,7 +11,14 @@ button.oo-close-btn {
 }
 
 button.oo-up-next-close-btn {
-  top: 10px;
-  right: 10px;
   @include close(-10px, -10px);
+  font-size: 12px;
+  color: #fff;
+  opacity: 1;
+  right: 20px;
+  top: 20px;
+
+  span {
+    font-weight: bold !important;
+  }
 }

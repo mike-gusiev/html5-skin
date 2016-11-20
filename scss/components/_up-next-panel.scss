@@ -1,21 +1,31 @@
 .oo-up-next-panel {
-  position: relative;
-  width: 100%;
-  height: 80px;
   right: 0;
   background-color: rgba(22, 22, 22, 0.9);
   transition: bottom 0.5s;
+
+  position: absolute;
+  width: 335px;
+  height: 100px;
+  bottom: 100px;
+  opacity: 0.9;
+  outline: 1px solid #666;
   
   a.oo-up-next-content {
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 140px;
-    height: 100%;
     cursor: pointer;
     background-size: cover;
     background-repeat: no-repeat;
     background-position: center;
+
+    color: rgb(0, 62, 126);
+    top: 10px;
+    left: 10px;
+    width: 110px;
+    height: 80px;
+
+    &:hover {
+      color: rgb(0, 62, 126);
+    }
     
     img.oo-content-image {
     @include absolute-center;
@@ -34,32 +44,33 @@
     }
   }
 
-
 }
 
 .oo-content-metadata {
   position: absolute;
   top: 0;
-  left: 140px;
-  width: 78%;
   height: 100%;
+
+  left: 115px;
+  width: 220px;
   
   .oo-up-next-title {
     position: absolute;
     display: flex;
-    top: 3px;
     left: 15px;
     width: 100%;
     color: $white;
 
+    top: 13px;
+
     .oo-up-next-count-down {
-      width: 36px;
-      height: 36px;
       float: left;
+
+      width: 30px;
+      height: 30px;
     }
 
     .oo-up-next-title-text {
-      font-size: 18pt;
       font-family: $font-family-roboto-condensed;
       font-weight: bold;
       max-width: 70%;
@@ -67,18 +78,44 @@
       resize: none;
       display: inline-block;
       float: left;
+
+      text-transform: uppercase;
+      font-size: 18px;
     }
   }
   
   .oo-content-description {
     position: absolute;
-    bottom: 5px;
-    left: 15px;
-    width: 70%;
-    margin-top: 10px;
     color: rgba(255, 255, 255, 0.6);
-    font-size: 12pt;
-    font-family: 'Open Sans', sans-serif;
     font-weight: normal;
+
+    left: 15px;
+    width: 90%;
+    margin-top: 0;
+    color: #fff;
+    height: 40px;
+    white-space: normal;
+    font-family: 'UniversLTStd-Cn', sans-serif;
+    top: 50px;
+    line-height: 20px;
+    font-size: 16px;
   }
+}
+
+.oo-xsmall {
+
+  .oo-up-next-panel {
+    a.oo-up-next-content {
+      width: 89px;
+      top: 2px;
+      left: 2px;
+      height: 52px;
+    }
+  }
+
+  .oo-content-metadata {
+    left: 90px;
+    width: 245px;
+  }
+
 }
