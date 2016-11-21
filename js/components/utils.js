@@ -207,6 +207,20 @@ var Utils = {
   },
 
   /**
+   * Check if the current page is loaded in iframe
+   *
+   * @function isIframe
+   * @returns {Boolean} Whether the page loaded in iframe
+   */
+  isIframe: function () {
+    try {
+      return window.self !== window.top;
+    } catch (e) {
+      return true;
+    }
+  },
+
+  /**
   * Determine the best language to use for localization
   *
   * @function getLanguageToUse

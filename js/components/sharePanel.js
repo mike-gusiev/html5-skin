@@ -8,8 +8,8 @@
  * @constructor
  */
 var React = require('react'),
-    ClassNames = require('classnames'),
     Utils = require('./utils'),
+    Clipboard = require('clipboard'),
     CONSTANTS = require('../constants/constants');
 
 var SharePanel = React.createClass({
@@ -18,8 +18,79 @@ var SharePanel = React.createClass({
   getInitialState: function() {
     return {
       activeTab: this.tabs.SHARE,
-      hasError: false
+      hasError: false,
+      startValue: '00:00',
+      embedValue: '00:00',
+      startLink: '',
+      embedLink: '',
+      startTime: '00:00',
+      embedTime: '00:00'
     };
+  },
+
+  getTimeInSeconds: function (x) {
+    var time = x.match(/(\d{1,2}):(\d{1,2})/);
+    if (time) {
+      return parseInt(time[1], 10) * 60 + parseInt(time[2], 10);
+    }
+    return 0;
+  },
+
+  getTimeString: function (x) {
+    var seconds = parseInt(x, 10);
+    var minutes = parseInt(seconds / 60, 10);
+    seconds -= minutes * 60;
+    if (minutes < 10) {
+      minutes = '0' + minutes;
+    }
+    if (seconds < 10) {
+      seconds = '0' + seconds;
+    }
+    return minutes + ':' + seconds;
+  },
+
+  getPgatourPanel: function (titleString, iframeURL) {
+    var shareLink = location.href.replace(location.hash, '').replace(location.search, '') + this.state.startLink;
+    if (Utils.isIframe()) {
+      shareLink = this.props.contentTree.hostedAtURL + this.state.startLink;
+    }
+    if (this.state.embedLink) {
+      iframeURL = iframeURL.replace(/'>(\s)*<\/iframe>/, this.state.embedLink + "'></iframe>");
+      iframeURL = iframeURL.replace(/">(\s)*<\/iframe>/, this.state.embedLink + '"></iframe>');
+    }
+
+    return (
+      <div className="oo-share-tab-panel pgatour">
+        <div className="oo-social-action-text oo-text-uppercase" >{titleString}</div>
+        <div className="oo-share-url">
+          <div className="oo-start-at-line">
+            <label><input className="oo-share-checkbox" ref="startTime" id="startTime" type="checkbox"
+                          onChange={this.handleTimeCheckbox} /> Start at</label>
+            <input className="oo-share-input-time" rel="startTime" type="text" value={this.state.startValue}
+                   maxLength="5" onChange={this.handleInputChange} onBlur={this.handleTimeChange} />
+          </div>
+          <div className="oo-share-url-line">
+            <input className="oo-share-link-copy" type="button" value="Copy" />
+            <input className="oo-share-link-input" type="text" readOnly value={shareLink} />
+          </div>
+        </div>
+        <a className="oo-pgatour-facebook" onClick={this.handleFacebookClick}> </a>
+        <a className="oo-pgatour-twitter" onClick={this.handleTwitterClick}> </a>
+        <div className="oo-share-url">
+          <div className="oo-start-at-line">
+            <span>Embed Code</span>
+            <label><input className="oo-share-checkbox" ref="embedTime" id="embedTime" type="checkbox"
+                          onChange={this.handleTimeCheckbox} /> Start at</label>
+            <input className="oo-share-input-time" rel="embedTime" type="text" value={this.state.embedValue}
+                   maxLength="5" onChange={this.handleInputChange} onBlur={this.handleTimeChange} />
+          </div>
+          <div className="oo-share-url-line">
+            <input className="oo-share-link-copy" type="button" value="Copy" />
+            <input className="oo-share-link-input" type="text" readOnly value={iframeURL} />
+          </div>
+        </div>
+      </div>
+    );
   },
 
   getActivePanel: function() {
@@ -34,9 +105,13 @@ var SharePanel = React.createClass({
       iframeURL = "";
     }
 
+    if (this.props.pgatourShare) {
+      return this.getPgatourPanel(titleString, iframeURL);
+    }
+
     return (
         <div className="oo-share-tab-panel">
-          <div className="oo-social-action-text oo-text-capitalize">{titleString}</div>
+          <div className="oo-social-action-text oo-text-uppercase">{titleString}</div>
           <a className="oo-twitter" onClick={this.handleTwitterClick}> </a>
           <a className="oo-facebook" onClick={this.handleFacebookClick}> </a>
           <a className="oo-google-plus" onClick={this.handleGPlusClick}> </a>
@@ -44,6 +119,37 @@ var SharePanel = React.createClass({
           <textarea className="oo-form-control oo-embed-form" rows="3" value={iframeURL} readOnly />
         </div>
     );
+  },
+
+  setNewTime: function (event, timeString) {
+    if (event.target.getAttribute('rel') === 'startTime') {
+      if (!timeString) {
+        this.setState( { startValue: this.state.startTime } );
+        return;
+      }
+      timeString = this.getTimeString(this.getTimeInSeconds(timeString));
+      this.setState( {
+        startTime: timeString,
+        startValue: timeString
+      } );
+      if (this.refs.startTime.checked) {
+        this.setState( { startLink: '?ootime=' + this.getTimeInSeconds(timeString) } );
+      }
+    }
+    if (event.target.getAttribute('rel') === 'embedTime') {
+      if (!timeString) {
+        this.setState( { embedValue: this.state.embedTime } );
+        return;
+      }
+      timeString = this.getTimeString(this.getTimeInSeconds(timeString));
+      this.setState( {
+        embedTime: timeString,
+        embedValue: timeString
+      } );
+      if (this.refs.embedTime.checked) {
+        this.setState( { embedLink: '&options[initialTime]=' + this.getTimeInSeconds(timeString) } );
+      }
+    }
   },
 
   handleEmailClick: function(event) {
@@ -84,31 +190,74 @@ var SharePanel = React.createClass({
     window.open(twitterUrl, "twitter window", "height=300,width=750");
   },
 
+  handleTimeCheckbox: function (event) {
+    if (event.target.id === 'startTime') {
+      if (event.target.checked) {
+        this.setState( { startLink: '?ootime=' + this.getTimeInSeconds(this.state.startTime) } );
+      } else {
+        this.setState( { startLink: '' } );
+      }
+    }
+    if (event.target.id === 'embedTime') {
+      if (event.target.checked) {
+        this.setState( { embedLink: '&options[initialTime]=' + this.getTimeInSeconds(this.state.embedTime) } );
+      } else {
+        this.setState( { embedLink: '' } );
+      }
+    }
+  },
+
+  handleTimeChange: function (event) {
+    var timeString = event.target.value;
+    var time = timeString.match(/(\d{1,2}):(\d{1,2})/);
+    if (time) {
+      if (parseInt(time[2], 10) > 60) {
+        timeString = time[1] + ':60';
+      }
+      if (this.getTimeInSeconds(timeString) > this.props.controller.state.duration) {
+        timeString = this.getTimeString(this.props.controller.state.duration);
+      }
+      this.setNewTime(event, timeString);
+    } else {
+      this.setNewTime(event, '');
+    }
+  },
+
+  handleInputChange: function (event) {
+    if (event.target.getAttribute('rel') === 'startTime') {
+      this.setState( { startValue: event.target.value } );
+    }
+    if (event.target.getAttribute('rel') === 'embedTime') {
+      this.setState( { embedValue: event.target.value } );
+    }
+  },
+
   render: function() {
-    var shareTab = ClassNames({
-      'oo-share-tab': true,
-      'oo-active': this.state.activeTab == this.tabs.SHARE
-    });
-    var embedTab = ClassNames({
-      'oo-embed-tab': true,
-      'oo-active': this.state.activeTab == this.tabs.EMBED
-    });
-
-    var shareString = Utils.getLocalizedString(this.props.language, CONSTANTS.SKIN_TEXT.SHARE, this.props.localizableStrings),
-        embedString = Utils.getLocalizedString(this.props.language, CONSTANTS.SKIN_TEXT.EMBED, this.props.localizableStrings);
-
     return (
       <div className="oo-content-panel oo-share-panel">
         {this.getActivePanel()}
       </div>
     );
+  },
+
+  componentDidMount: function () {
+    if (this.clipboard) {
+      this.clipboard.destroy();
+    }
+    this.clipboard = new Clipboard('.oo-share-link-copy', {
+      text: function(trigger) {
+        return trigger.nextElementSibling.value;
+      }
+    });
   }
+
 });
 
 SharePanel.defaultProps = {
   contentTree: {
     title: ''
-  }
+  },
+  pgatourShare: true
 };
 
 module.exports = SharePanel;

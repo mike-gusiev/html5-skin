@@ -20,6 +20,7 @@
   },
   "dependencies": {
     "classnames": "*",
+    "clipboard": "1.5.15",
     "lodash.debounce": "4.0.3",
     "lodash.values": "4.1.0",
     "react": "0.14.7",
