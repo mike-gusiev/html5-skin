@@ -10,6 +10,7 @@
 var React = require('react'),
     ReactDOM = require('react-dom'),
     CONSTANTS = require('./../constants/constants'),
+    ClassNames = require('classnames'),
     Utils = require('./utils'),
     CloseButton = require('./closeButton'),
     CountDownClock = require('./countDownClock'),
@@ -47,8 +48,13 @@ var UpNextPanel = React.createClass({
       backgroundImage: "url('" + this.props.upNextInfo.upNextData.preview_image_url + "')"
     };
 
+    var upNextClass = ClassNames({
+      'oo-up-next-panel': true,
+      'animation': this.props.controller.state.upNextInfo.animation
+    });
+
     return (
-      <div className="oo-up-next-panel">
+      <div className={upNextClass}>
         <a className="oo-up-next-content" onClick={this.handleStartUpNextClick} style={thumbnailStyle}>
           <Icon {...this.props} icon="play"/>
         </a>

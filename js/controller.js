@@ -492,6 +492,8 @@ OO.plugin("Html5Skin", function (OO, _, $, W) {
         !this.state.upNextInfo.countDownCancelled &&
         this.state.isPlayingAd !== true &&
         this.state.upNextInfo.upNextData !== null && (this.state.playerState === CONSTANTS.STATE.PLAYING || this.state.playerState === CONSTANTS.STATE.PAUSE)) {
+
+        this.state.upNextInfo.animation = !this.state.upNextInfo.animationDisable;
         this.state.upNextInfo.showing = true;
       }
       else {
@@ -507,6 +509,9 @@ OO.plugin("Html5Skin", function (OO, _, $, W) {
     onPlaying: function(event, source) {
       if (source == OO.VIDEO.MAIN) {
         this.state.pauseAnimationDisabled = false;
+        if (this.state.upNextInfo.animation) {
+          this.state.upNextInfo.animationDisable = true;
+        }
         this.state.screenToShow = CONSTANTS.SCREEN.PLAYING_SCREEN;
         this.state.playerState = CONSTANTS.STATE.PLAYING;
         this.setClosedCaptionsLanguage();
@@ -529,6 +534,8 @@ OO.plugin("Html5Skin", function (OO, _, $, W) {
     },
 
     onPause: function(event, source, pauseReason) {
+      this.state.upNextInfo.animationDisable = true;
+      this.state.upNextInfo.animation = false;
       if (pauseReason === CONSTANTS.PAUSE_REASON.TRANSITION){
         this.state.pauseAnimationDisabled = true;
         this.endSeeking();
@@ -627,6 +634,7 @@ OO.plugin("Html5Skin", function (OO, _, $, W) {
 
     onSeeked: function(event) {
       this.state.seeking = false;
+      this.state.upNextInfo.animationDisable = false;
       if (this.state.queuedPlayheadUpdate) {
         OO.log("popping queued update");
         this.skin.updatePlayhead.apply(this.skin, this.state.queuedPlayheadUpdate);
