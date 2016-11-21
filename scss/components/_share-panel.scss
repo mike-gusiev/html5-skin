@@ -158,11 +158,20 @@
     background: #ccc;
     border: 0;
     outline: 0;
-    padding: 0 5px;
+    padding: 4px 5px 0 5px;
     margin: 0 8px;
   }
 
-  .oo-start-at-line > span {
-    margin: 0 15px 0 0;
+  .oo-start-at-line {
+    & > span {
+      margin: 0 15px 0 0;
+    }
+
+    label {
+      span {
+        position: relative;
+        top: 1px;
+      }
+    }
   }
 }
