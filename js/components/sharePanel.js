@@ -9,6 +9,7 @@
  */
 var React = require('react'),
     Utils = require('./utils'),
+    ClassNames = require('classnames'),
     Clipboard = require('clipboard'),
     CONSTANTS = require('../constants/constants');
 
