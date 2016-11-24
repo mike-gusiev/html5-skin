@@ -52,10 +52,7 @@ var SharePanel = React.createClass({
   },
 
   getPgatourPanel: function (titleString, iframeURL) {
-    var shareLink = location.href.replace(location.hash, '').replace(location.search, '') + this.state.startLink;
-    if (Utils.isIframe()) {
-      shareLink = this.props.contentTree.hostedAtURL + this.state.startLink;
-    }
+    var shareLink = this.props.contentTree.hostedAtURL + this.state.startLink;
     if (this.state.embedLink) {
       iframeURL = iframeURL.replace(/'>(\s)*<\/iframe>/, this.state.embedLink + "'></iframe>");
       iframeURL = iframeURL.replace(/">(\s)*<\/iframe>/, this.state.embedLink + '"></iframe>');
@@ -153,6 +150,27 @@ var SharePanel = React.createClass({
         this.setState( { embedLink: '&options[initialTime]=' + this.getTimeInSeconds(timeString) } );
       }
     }
+  },
+
+  setCurrentTime: function () {
+    var currentTime  = this.getTimeString(this.props.controller.state.mainVideoPlayhead);
+    this.setState({
+      startValue: currentTime,
+      embedValue: currentTime,
+      startTime: currentTime,
+      embedTime: currentTime
+    });
+  },
+
+  setClipboardEvents: function () {
+    if (this.clipboard) {
+      this.clipboard.destroy();
+    }
+    this.clipboard = new Clipboard('.oo-share-link-copy', {
+      text: function(trigger) {
+        return trigger.nextElementSibling.value;
+      }
+    });
   },
 
   handleEmailClick: function(event) {
@@ -269,14 +287,8 @@ var SharePanel = React.createClass({
   },
 
   componentDidMount: function () {
-    if (this.clipboard) {
-      this.clipboard.destroy();
-    }
-    this.clipboard = new Clipboard('.oo-share-link-copy', {
-      text: function(trigger) {
-        return trigger.nextElementSibling.value;
-      }
-    });
+    this.setCurrentTime();
+    this.setClipboardEvents();
   }
 
 });
