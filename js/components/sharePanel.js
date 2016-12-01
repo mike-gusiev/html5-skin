@@ -70,7 +70,7 @@ var SharePanel = React.createClass({
           </div>
           <div className="oo-share-url-line">
             <input className="oo-share-link-copy" type="button" value="Copy" />
-            <input className="oo-share-link-input" type="text" readOnly value={shareLink} />
+            <input className="oo-share-link-input" type="text" readOnly value={shareLink} ref="startValue" />
           </div>
         </div>
         <a className="oo-pgatour-facebook" onClick={this.handleFacebookClick}> </a>
@@ -194,7 +194,7 @@ var SharePanel = React.createClass({
 
   handleFacebookClick: function() {
     var facebookUrl = "http://www.facebook.com/sharer.php";
-    facebookUrl += "?u=" + encodeURIComponent(location.href);
+    facebookUrl += "?u=" + encodeURIComponent(this.refs.startValue.value);
     window.open(facebookUrl, "facebook window", "height=315,width=780");
   },
 
@@ -207,7 +207,7 @@ var SharePanel = React.createClass({
   handleTwitterClick: function() {
     var twitterUrl = "https://twitter.com/intent/tweet";
     twitterUrl += "?text=" + encodeURIComponent(this.props.contentTree.title+": ");
-    twitterUrl += "&url=" + encodeURIComponent(location.href);
+    twitterUrl += "&url=" + encodeURIComponent(this.refs.startValue.value);
     window.open(twitterUrl, "twitter window", "height=300,width=750");
   },
 
