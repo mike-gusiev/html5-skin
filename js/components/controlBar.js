@@ -473,7 +473,7 @@ var ControlBar = React.createClass({
       controlBarItems.push(defaultItems[k]);
     }
 
-    var collapsedResult = Utils.collapse(this.props.componentWidth + this.responsiveUIMultiple * (extraSpaceDuration + extraSpaceVolume - controlBarLeftRightPadding), controlBarItems, this.responsiveUIMultiple);
+    var collapsedResult = Utils.collapse(1000, controlBarItems, this.responsiveUIMultiple);
     var collapsedControlBarItems = collapsedResult.fit;
     var collapsedMoreOptionsItems = collapsedResult.overflow;
     this.moreOptionsItems = collapsedMoreOptionsItems;
