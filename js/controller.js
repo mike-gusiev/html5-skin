@@ -106,7 +106,7 @@ OO.plugin("Html5Skin", function (OO, _, $, W) {
         "volume": 1,
         "muted": false,
         "oldVolume": 1,
-        "volumeSliderVisible": false
+        "volumeSliderVisible": true
       },
 
       "upNextInfo": {
@@ -1438,6 +1438,7 @@ OO.plugin("Html5Skin", function (OO, _, $, W) {
     },
 
     hideVolumeSliderBar: function() {
+      return;
       this.state.volumeState.volumeSliderVisible = false;
       this.renderSkin();
     },
