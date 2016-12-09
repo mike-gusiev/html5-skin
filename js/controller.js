@@ -279,7 +279,14 @@ OO.plugin("Html5Skin", function (OO, _, $, W) {
         this.state.mainVideoElement = element;
         this.enableFullScreen();
         this.updateAspectRatio();
+        this.fixIphonePlayIssue(this.state.mainVideoElement);
       }
+    },
+
+    fixIphonePlayIssue: function ($video) {
+        if (Utils.isIPhone()) {
+          $video.on('click', this.togglePlayPause.bind(this));
+        }
     },
 
     // functions dependent on video metadata
