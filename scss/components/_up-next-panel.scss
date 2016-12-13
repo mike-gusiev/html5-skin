@@ -109,17 +109,41 @@
 .oo-xsmall {
 
   .oo-up-next-panel {
+    width: 250px;
+    left: calc(100% - 250px);
+
     a.oo-up-next-content {
       width: 89px;
       top: 2px;
       left: 2px;
       height: 52px;
+
+      & > span {
+        display: none;
+      }
     }
   }
 
   .oo-content-metadata {
     left: 90px;
     width: 245px;
+
+    div.oo-content-description {
+      top: 27px;
+      height: 2.2em;
+      line-height: 1.1em;
+      padding: 1px 0 0 0;
+      margin-top: 3px;
+      width: 140px;
+    }
+
+    .oo-up-next-title div.oo-up-next-count-down {
+      width: 18px;
+      height: 18px;
+      position: relative;
+      top: 3px;
+    }
+
   }
 
 }
