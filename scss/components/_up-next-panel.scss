@@ -7,10 +7,9 @@
   background-color: rgba(22, 22, 22, 0.9);
   transition: bottom 0.5s;
 
-  position: absolute;
   width: 335px;
   height: 100px;
-  bottom: 100px;
+  left: calc(100% - 335px);
   opacity: 0.9;
   outline: 1px solid #666;
 
