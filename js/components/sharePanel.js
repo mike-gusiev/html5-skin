@@ -97,6 +97,7 @@ var SharePanel = React.createClass({
 
     try {
       var iframeURL = this.props.skinConfig.shareScreen.embed.source
+          .replace("<WEBSITE_HOST>", location.host)
           .replace("<WEBSITE_URL>", location.origin)
           .replace("<ASSET_ID>", this.props.assetId)
           .replace("<PLAYER_ID>", this.props.playerParam.playerBrandingId)
