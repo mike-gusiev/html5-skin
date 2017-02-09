@@ -8,7 +8,8 @@ var React = require('react'),
     Watermark = require('../components/watermark'),
     Icon = require('../components/icon'),
     ResizeMixin = require('../mixins/resizeMixin'),
-    Utils = require('../components/utils');
+    Utils = require('../components/utils'),
+    CONSTANTS = require('../constants/constants');
 
 var EndScreen = React.createClass({
   mixins: [ResizeMixin],
@@ -52,7 +53,11 @@ var EndScreen = React.createClass({
     var descriptionStyle = {
       color: this.props.skinConfig.startScreen.descriptionFont.color
     };
-
+    var posterImage = this.props.contentTree.promo_image;
+    posterImage = posterImage.replace(CONSTANTS.IMAGE_URLS.NATIVE, CONSTANTS.IMAGE_URLS.POSTER_CLOUDINARY);
+    var posterStyle = {
+      backgroundImage: "url('" + posterImage + "')"
+    };
     var actionIconClass = ClassNames({
       'oo-action-icon': true,
       'oo-hidden': !this.props.skinConfig.endScreen.showReplayButton
@@ -85,7 +90,7 @@ var EndScreen = React.createClass({
     var descriptionMetadata = (<div className={descriptionClass} ref="description" style={descriptionStyle}>{this.state.descriptionText}</div>);
 
     return (
-      <div className="oo-state-screen oo-end-screen">
+      <div className="oo-state-screen oo-end-screen" style={posterStyle}>
         <div className="oo-underlay-gradient"></div>
 
         <a className="oo-state-screen-selectable" onClick={this.handleClick}></a>

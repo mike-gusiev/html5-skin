@@ -73,6 +73,12 @@
     }
   }
 
+  &.oo-end-screen {
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+  }
+
   .oo-state-screen-info {
     pointer-events: none;
     position: absolute;
