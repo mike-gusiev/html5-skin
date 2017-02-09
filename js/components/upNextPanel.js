@@ -44,8 +44,10 @@ var UpNextPanel = React.createClass({
 
   render: function() {
     var upNextString = Utils.getLocalizedString(this.props.language, CONSTANTS.SKIN_TEXT.UP_NEXT, this.props.localizableStrings);
+    var thumb = this.props.upNextInfo.upNextData.preview_image_url;
+    thumb = thumb.replace(CONSTANTS.IMAGE_URLS.NATIVE, CONSTANTS.IMAGE_URLS.THUMB_CLOUDINARY);
     var thumbnailStyle = {
-      backgroundImage: "url('" + this.props.upNextInfo.upNextData.preview_image_url + "')"
+      backgroundImage: "url('" + thumb + "')"
     };
 
     var upNextClass = ClassNames({
