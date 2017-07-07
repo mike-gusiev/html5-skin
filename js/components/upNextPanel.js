@@ -98,7 +98,7 @@ UpNextPanel.propTypes = {
   }),
   skinConfig: React.PropTypes.shape({
     upNext: React.PropTypes.shape({
-      timeToShow: React.PropTypes.string
+      timeToShow: React.PropTypes.number
     }),
     icons: React.PropTypes.objectOf(React.PropTypes.object)
   })
@@ -107,7 +107,7 @@ UpNextPanel.propTypes = {
 UpNextPanel.defaultProps = {
   skinConfig: {
     upNext: {
-      timeToShow: "10"
+      timeToShow: 10
     },
     icons: {
       play:{fontStyleClass:'oo-icon oo-icon-play'},
