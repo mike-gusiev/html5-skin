@@ -25,10 +25,17 @@ var StartScreen = React.createClass({
     this.handleResize();
   },
 
-  handleResize: function() {
+  componentWillReceiveProps: function(nextProps) {
+    if (nextProps.contentTree.description != this.props.contentTree.description) {
+      this.handleResize(nextProps);
+    }
+  },
+
+  handleResize: function(nextProps) {
+    var description = nextProps ? nextProps.contentTree.description : this.props.contentTree.description;
     if (ReactDOM.findDOMNode(this.refs.description)){
       this.setState({
-        descriptionText: Utils.truncateTextToWidth(ReactDOM.findDOMNode(this.refs.description), this.props.contentTree.description)
+        descriptionText: Utils.truncateTextToWidth(ReactDOM.findDOMNode(this.refs.description), description)
       });
     }
   },
@@ -53,9 +60,10 @@ var StartScreen = React.createClass({
       opacity: this.props.skinConfig.startScreen.playIconStyle.opacity
     };
     var posterImageUrl = this.props.skinConfig.startScreen.showPromo ? this.props.contentTree.promo_image : '';
-    var posterStyle = {
-      backgroundImage: "url('" + posterImageUrl + "')"
-    };
+    var posterStyle = {};
+    if (Utils.isValidString(posterImageUrl)) {
+      posterStyle.backgroundImage = "url('" + posterImageUrl + "')";
+    }
 
     //CSS class manipulation from config/skin.json
     var stateScreenPosterClass = ClassNames({
@@ -92,9 +100,12 @@ var StartScreen = React.createClass({
     var descriptionMetadata = (<div className={descriptionClass} ref="description" style={descriptionStyle}>{this.state.descriptionText}</div>);
 
     var actionIcon = (
-      <a className={actionIconClass} onClick={this.handleClick}>
+      <button className={actionIconClass}
+        onClick={this.handleClick}
+        tabIndex="0"
+        aria-label={CONSTANTS.ARIA_LABELS.START_PLAYBACK}>
         <Icon {...this.props} icon={iconName} style={actionIconStyle}/>
-      </a>
+      </button>
     );
 
     return (

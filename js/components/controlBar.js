@@ -11,7 +11,7 @@ var React = require('react'),
     Popover = require('../views/popover'),
     VideoQualityPanel = require('./videoQualityPanel'),
     ClosedCaptionPopover = require('./closed-caption/closedCaptionPopover'),
-    Logo = require('./logo');
+    Logo = require('./logo'),
     Icon = require('./icon');
 
 var ControlBar = React.createClass({
@@ -95,6 +95,18 @@ var ControlBar = React.createClass({
     }
   },
 
+  /**
+   * Some browsers give focus to buttons after click, which leaves
+   * them highlighted. This overrides the browser's default behavior.
+   *
+   * @param {event} evt The mouse up event object
+   */
+  blurOnMouseUp: function(evt) {
+    if (evt.currentTarget) {
+      evt.currentTarget.blur();
+    }
+  },
+
   handlePlayClick: function() {
     this.props.controller.togglePlayPause();
   },
@@ -160,25 +172,31 @@ var ControlBar = React.createClass({
     }
   },
 
+  handlePlayPauseFocus: function() {
+    this.props.controller.state.playPauseButtonFocused = true;
+  },
+
+  handlePlayPauseBlur: function() {
+    this.props.controller.state.playPauseButtonFocused = false;
+  },
+
   //TODO(dustin) revisit this, doesn't feel like the "react" way to do this.
   highlight: function(evt) {
-    var color = this.props.skinConfig.controlBar.iconStyle.active.color ? this.props.skinConfig.controlBar.iconStyle.active.color : this.props.skinConfig.general.accentColor;
-    var opacity = this.props.skinConfig.controlBar.iconStyle.active.opacity;
-    Utils.highlight(evt.target, opacity, color);
+    var iconElement = Utils.getEventIconElement(evt);
+    if (iconElement) {
+      var color = this.props.skinConfig.controlBar.iconStyle.active.color ? this.props.skinConfig.controlBar.iconStyle.active.color : this.props.skinConfig.general.accentColor;
+      var opacity = this.props.skinConfig.controlBar.iconStyle.active.opacity;
+      Utils.highlight(iconElement, opacity, color);
+    }
   },
 
   removeHighlight: function(evt) {
-    var color = this.props.skinConfig.controlBar.iconStyle.inactive.color;
-    var opacity = this.props.skinConfig.controlBar.iconStyle.inactive.opacity;
-    Utils.removeHighlight(evt.target, opacity, color);
-  },
-
-  volumeHighlight:function() {
-    this.highlight({target: ReactDOM.findDOMNode(this.refs.volumeIcon)});
-  },
-
-  volumeRemoveHighlight:function() {
-    this.removeHighlight({target: ReactDOM.findDOMNode(this.refs.volumeIcon)});
+    var iconElement = Utils.getEventIconElement(evt);
+    if (iconElement) {
+      var color = this.props.skinConfig.controlBar.iconStyle.inactive.color;
+      var opacity = this.props.skinConfig.controlBar.iconStyle.inactive.opacity;
+      Utils.removeHighlight(iconElement, opacity, color);
+    }
   },
 
   changeVolumeSlider: function(event) {
@@ -191,23 +209,34 @@ var ControlBar = React.createClass({
 
   populateControlBar: function() {
     var dynamicStyles = this.setupItemStyle();
-    var playIcon = "";
+    var playIcon, playPauseAriaLabel;
     if (this.props.playerState == CONSTANTS.STATE.PLAYING) {
       playIcon = "pause";
+      playPauseAriaLabel = CONSTANTS.ARIA_LABELS.PAUSE;
     } else if (this.props.playerState == CONSTANTS.STATE.END) {
       playIcon = "replay";
+      playPauseAriaLabel = CONSTANTS.ARIA_LABELS.REPLAY;
     } else {
       playIcon = "play";
+      playPauseAriaLabel = CONSTANTS.ARIA_LABELS.PLAY;
     }
 
-    var volumeIcon = (this.props.controller.state.volumeState.muted ? "volumeOff" : "volume");
+    var volumeIcon, volumeAriaLabel;
+    if (this.props.controller.state.volumeState.muted) {
+      volumeIcon = "volumeOff";
+      volumeAriaLabel = CONSTANTS.ARIA_LABELS.UNMUTE;
+    } else {
+      volumeIcon = "volume";
+      volumeAriaLabel = CONSTANTS.ARIA_LABELS.MUTE;
+    }
 
-    var fullscreenIcon = "";
+    var fullscreenIcon, fullscreenAriaLabel;
     if (this.props.controller.state.fullscreen) {
-      fullscreenIcon = "compress"
-    }
-    else {
+      fullscreenIcon = "compress";
+      fullscreenAriaLabel = CONSTANTS.ARIA_LABELS.EXIT_FULLSCREEN;
+    } else {
       fullscreenIcon = "expand";
+      fullscreenAriaLabel = CONSTANTS.ARIA_LABELS.FULLSCREEN;
     }
 
     var totalTime = 0;
@@ -230,7 +259,8 @@ var ControlBar = React.createClass({
 
       volumeBars.push(<a data-volume={(i+1)/10} className={volumeClass} key={i}
         style={barStyle}
-        onClick={this.handleVolumeClick}></a>);
+        onClick={this.handleVolumeClick}
+        aria-hidden="true"></a>);
     }
 
     var volumeSlider = <div className="oo-volume-slider"><Slider value={parseFloat(this.props.controller.state.volumeState.volume)}
@@ -286,11 +316,19 @@ var ControlBar = React.createClass({
     selectedStyle["color"] = this.props.skinConfig.general.accentColor ? this.props.skinConfig.general.accentColor : null;
 
     var controlItemTemplates = {
-      "playPause": <a className="oo-play-pause oo-control-bar-item" onClick={this.handlePlayClick} key="playPause">
-        <Icon {...this.props} icon={playIcon}
-          style={dynamicStyles.iconCharacter}
-          onMouseOver={this.highlight} onMouseOut={this.removeHighlight}/>
-      </a>,
+      "playPause": <button className="oo-play-pause oo-control-bar-item"
+        onClick={this.handlePlayClick}
+        onMouseUp={this.blurOnMouseUp}
+        onMouseOver={this.highlight}
+        onMouseOut={this.removeHighlight}
+        onFocus={this.handlePlayPauseFocus}
+        onBlur={this.handlePlayPauseBlur}
+        key="playPause"
+        tabIndex="0"
+        aria-label={playPauseAriaLabel}
+        autoFocus={this.props.controller.state.playPauseButtonFocused}>
+        <Icon {...this.props} icon={playIcon} style={dynamicStyles.iconCharacter} />
+      </button>,
 
       "live": <a className={liveClass}
         ref="LiveButton"
@@ -300,10 +338,16 @@ var ControlBar = React.createClass({
       </a>,
 
       "volume": <div className="oo-volume oo-control-bar-item" key="volume">
-        <Icon {...this.props} icon={volumeIcon} ref="volumeIcon"
-          style={this.props.skinConfig.controlBar.iconStyle.inactive}
+        <button className="oo-mute-unmute oo-control-bar-item"
           onClick={this.handleVolumeIconClick}
-          onMouseOver={this.volumeHighlight} onMouseOut={this.volumeRemoveHighlight}/>
+          onMouseUp={this.blurOnMouseUp}
+          onMouseOver={this.highlight}
+          onMouseOut={this.removeHighlight}
+          tabIndex="0"
+          aria-label={volumeAriaLabel}>
+          <Icon {...this.props} icon={volumeIcon} ref="volumeIcon"
+            style={this.props.skinConfig.controlBar.iconStyle.inactive} />
+        </button>
         {volumeControls}
       </div>,
 
@@ -314,7 +358,7 @@ var ControlBar = React.createClass({
       "flexibleSpace": <div className="oo-flexible-space oo-control-bar-flex-space" key="flexibleSpace"></div>,
 
       "moreOptions": <a className="oo-more-options oo-control-bar-item"
-        onClick={this.handleMoreOptionsClick} key="moreOptions">
+        onClick={this.handleMoreOptionsClick} key="moreOptions" aria-hidden="true">
         <Icon {...this.props} icon="ellipsis" style={dynamicStyles.iconCharacter}
           onMouseOver={this.highlight} onMouseOut={this.removeHighlight}/>
       </a>,
@@ -322,7 +366,7 @@ var ControlBar = React.createClass({
       "quality": (
         <div className="oo-popover-button-container" key="quality">
           {videoQualityPopover}
-          <a className={qualityClass} onClick={this.handleQualityClick} style={selectedStyle}>
+          <a className={qualityClass} onClick={this.handleQualityClick} style={selectedStyle} aria-hidden="true">
             <Icon {...this.props} icon="quality" style={dynamicStyles.iconCharacter}
               onMouseOver={this.highlight} onMouseOut={this.removeHighlight}/>
           </a>
@@ -330,7 +374,7 @@ var ControlBar = React.createClass({
       ),
 
       "discovery": <a className="oo-discovery oo-control-bar-item"
-        onClick={this.handleDiscoveryClick} key="discovery">
+        onClick={this.handleDiscoveryClick} key="discovery" aria-hidden="true">
         <Icon {...this.props} icon="discovery" style={dynamicStyles.iconCharacter}
           onMouseOver={this.highlight} onMouseOut={this.removeHighlight}/>
       </a>,
@@ -338,7 +382,7 @@ var ControlBar = React.createClass({
       "closedCaption": (
         <div className="oo-popover-button-container" key="closedCaption">
           {closedCaptionPopover}
-          <a className={captionClass} onClick={this.handleClosedCaptionClick} style={selectedStyle}>
+          <a className={captionClass} onClick={this.handleClosedCaptionClick} style={selectedStyle} aria-hidden="true">
             <Icon {...this.props} icon="cc" style={dynamicStyles.iconCharacter}
               onMouseOver={this.highlight} onMouseOut={this.removeHighlight}/>
           </a>
@@ -346,16 +390,21 @@ var ControlBar = React.createClass({
       ),
 
       "share": <a className="oo-share oo-control-bar-item"
-        onClick={this.handleShareClick} key="share">
+        onClick={this.handleShareClick} key="share" aria-hidden="true">
         <Icon {...this.props} icon="share" style={dynamicStyles.iconCharacter}
           onMouseOver={this.highlight} onMouseOut={this.removeHighlight}/>
       </a>,
 
-      "fullscreen": <a className="oo-fullscreen oo-control-bar-item"
-        onClick={this.handleFullscreenClick} key="fullscreen">
-        <Icon {...this.props} icon={fullscreenIcon} style={dynamicStyles.iconCharacter}
-          onMouseOver={this.highlight} onMouseOut={this.removeHighlight}/>
-      </a>,
+      "fullscreen": <button className="oo-fullscreen oo-control-bar-item"
+        onClick={this.handleFullscreenClick}
+        onMouseUp={this.blurOnMouseUp}
+        onMouseOver={this.highlight}
+        onMouseOut={this.removeHighlight}
+        key="fullscreen"
+        tabIndex="0"
+        aria-label={fullscreenAriaLabel}>
+        <Icon {...this.props} icon={fullscreenIcon} style={dynamicStyles.iconCharacter} />
+      </button>,
 
       "logo": <Logo key="logo" imageUrl={this.props.skinConfig.controlBar.logo.imageResource.url}
         clickUrl={this.props.skinConfig.controlBar.logo.clickUrl}
@@ -392,23 +441,39 @@ var ControlBar = React.createClass({
 
     for (var k = 0; k < defaultItems.length; k++) {
 
-      // filter out unrecognized button names
+      //filter out unrecognized button names
       if (typeof controlItemTemplates[defaultItems[k].name] === "undefined") {
         continue;
       }
 
+      //filter out disabled buttons
+      if (defaultItems[k].location === "none") {
+        continue;
+      }
+
+      //do not show share button if not share options are available
+      if (defaultItems[k].name === "share") {
+        var shareContent = Utils.getPropertyValue(this.props.skinConfig, 'shareScreen.shareContent', []);
+        var socialContent = Utils.getPropertyValue(this.props.skinConfig, 'shareScreen.socialContent', []);
+        var onlySocialTab = shareContent.length === 1 && shareContent[0] === 'social';
+        //skip if no tabs were specified or if only the social tab is present but no social buttons are specified
+        if (this.props.controller.state.isOoyalaAds || !shareContent.length || (onlySocialTab && !socialContent.length)) {
+          continue;
+        }
+      }
+
       //do not show CC button if no CC available
-      if (!this.props.controller.state.closedCaptionOptions.availableLanguages && (defaultItems[k].name === "closedCaption")){
+      if ((this.props.controller.state.isOoyalaAds || !this.props.controller.state.closedCaptionOptions.availableLanguages) && (defaultItems[k].name === "closedCaption")){
         continue;
       }
 
       //do not show quality button if no bitrates available
-      if (!this.props.controller.state.videoQualityOptions.availableBitrates && (defaultItems[k].name === "quality")){
+      if ((this.props.controller.state.isOoyalaAds || !this.props.controller.state.videoQualityOptions.availableBitrates) && (defaultItems[k].name === "quality")){
         continue;
       }
 
       //do not show discovery button if no related videos available
-      if (!this.props.controller.state.discoveryData && (defaultItems[k].name === "discovery")){
+      if ((this.props.controller.state.isOoyalaAds || !this.props.controller.state.discoveryData) && (defaultItems[k].name === "discovery")){
         continue;
       }
 
@@ -421,7 +486,7 @@ var ControlBar = React.createClass({
         continue;
       }
 
-      // Not sure what to do when there are multi streams
+      //not sure what to do when there are multi streams
       if (defaultItems[k].name === "live" &&
         (typeof this.props.isLiveStream === 'undefined' ||
         !(this.props.isLiveStream))) {
@@ -439,7 +504,7 @@ var ControlBar = React.createClass({
     finalControlBarItems = [];
 
     for (var k = 0; k < collapsedControlBarItems.length; k++) {
-      if (collapsedControlBarItems[k].name === "moreOptions" && collapsedMoreOptionsItems.length === 0) {
+      if (collapsedControlBarItems[k].name === "moreOptions" && (this.props.controller.state.isOoyalaAds || collapsedMoreOptionsItems.length === 0)) {
         continue;
       }
 
