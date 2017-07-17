@@ -4,6 +4,7 @@
 var React = require('react'),
     ReactDOM = require('react-dom'),
     Utils = require('./components/utils'),
+    ClassNames = require('classnames'),
     CONSTANTS = require('./constants/constants'),
     AccessibilityControls = require('./components/accessibilityControls'),
     DeepMerge = require('deepmerge'),
