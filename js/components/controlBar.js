@@ -207,46 +207,6 @@ var ControlBar = React.createClass({
     });
   },
 
-  updateVolume: function (x, vol) {
-    var volume = ReactDOM.findDOMNode(this.refs.volumeBar);
-    var screenOffset = ReactDOM.findDOMNode(this).getBoundingClientRect() || { left: 0 };
-    var percentage, volume_level;
-    if (vol) {
-      percentage = parseInt(vol * 100, 10);
-      volume_level = parseFloat(vol);
-    } else {
-      var position = x - volume.offsetLeft - screenOffset.left;
-      percentage = parseInt(100 * position / volume.clientWidth, 10);
-      volume_level = parseFloat(position / volume.clientWidth);
-    }
-    if (percentage > 100) {
-      volume_level = 1;
-    }
-    if (percentage < 10) {
-      volume_level = 0;
-    }
-
-    this.props.controller.setVolume(volume_level);
-  },
-
-  onMouseDown: function (e) {
-    this.props.controller.state.volumeState.volumeDrag = true;
-    this.updateVolume(e.pageX);
-  },
-
-  onMouseUp: function (e) {
-    if (this.props.controller.state.volumeState.volumeDrag) {
-      this.props.controller.state.volumeState.volumeDrag = false;
-      this.updateVolume(e.pageX);
-    }
-  },
-
-  onMouseMove: function (e) {
-    if (this.props.controller.state.volumeState.volumeDrag) {
-      this.updateVolume(e.pageX);
-    }
-  },
-
   populateControlBar: function() {
     var dynamicStyles = this.setupItemStyle();
     var playIcon, playPauseAriaLabel;
@@ -299,7 +259,8 @@ var ControlBar = React.createClass({
 
       volumeBars.push(<a data-volume={(i+1)/10} className={volumeClass} key={i}
         style={barStyle}
-        onClick={this.handleVolumeClick}></a>);
+        onClick={this.handleVolumeClick}
+        aria-hidden="true"></a>);
     }
 
     var volumeSlider = <div className="oo-volume-slider"><Slider value={parseFloat(this.props.controller.state.volumeState.volume)}
@@ -310,24 +271,17 @@ var ControlBar = React.createClass({
                         maxValue={"1"}
                         step={"0.1"}/></div>;
 
-    var volumeControls;
-    if (!this.isMobile){
-      volumeControls = volumeBars;
-    }
-    else {
-      volumeControls = this.props.controller.state.volumeState.volumeSliderVisible ? volumeSlider : null;
-    }
+    var volumeControls = volumeSlider;
 
     var playheadTime = isFinite(parseInt(this.props.currentPlayhead)) ? Utils.formatSeconds(parseInt(this.props.currentPlayhead)) : null;
     var isLiveStream = this.props.isLiveStream;
-    var durationSetting = {color: this.props.skinConfig.controlBar.iconStyle.inactive.color ?
-                          this.props.skinConfig.controlBar.iconStyle.inactive.color : this.props.skinConfig.general.accentColor};
+    var durationSetting = {color: this.props.skinConfig.controlBar.iconStyle.inactive.color};
     var timeShift = this.props.currentPlayhead - this.props.duration;
     // checking timeShift < 1 seconds (not == 0) as processing of the click after we rewinded and then went live may take some time
     var isLiveNow = Math.abs(timeShift) < 1;
     var liveClick = isLiveNow ? null : this.handleLiveClick;
     var playheadTimeContent = isLiveStream ? (isLiveNow ? null : Utils.formatSeconds(timeShift)) : playheadTime;
-    var totalTimeContent = isLiveStream ? null : <span className="oo-total-time" style = {durationSetting}>{totalTime}</span>;
+    var totalTimeContent = isLiveStream ? null : <span className="oo-total-time">{totalTime}</span>;
 
     // TODO: Update when implementing localization
     var liveText = Utils.getLocalizedString(this.props.language, CONSTANTS.SKIN_TEXT.LIVE, this.props.localizableStrings);
@@ -536,7 +490,7 @@ var ControlBar = React.createClass({
       controlBarItems.push(defaultItems[k]);
     }
 
-    var collapsedResult = Utils.collapse(1000, controlBarItems, this.responsiveUIMultiple);
+    var collapsedResult = Utils.collapse(this.props.componentWidth + this.responsiveUIMultiple * (extraSpaceDuration + extraSpaceVolume - controlBarLeftRightPadding), controlBarItems, this.responsiveUIMultiple);
     var collapsedControlBarItems = collapsedResult.fit;
     var collapsedMoreOptionsItems = collapsedResult.overflow;
     this.moreOptionsItems = collapsedMoreOptionsItems;
