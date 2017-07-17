@@ -4,7 +4,6 @@
 var React = require('react'),
     ReactDOM = require('react-dom'),
     Utils = require('./components/utils'),
-    ClassNames = require('classnames'),
     CONSTANTS = require('./constants/constants'),
     AccessibilityControls = require('./components/accessibilityControls'),
     DeepMerge = require('deepmerge'),
@@ -23,7 +22,7 @@ OO.plugin("Html5Skin", function (OO, _, $, W) {
 
   if (OO.publicApi && OO.publicApi.VERSION) {
     // This variable gets filled in by the build script
-    OO.publicApi.VERSION.skin = {"releaseVersion": "<SKIN_VERSION>", "rev": "<SKIN_REV>"};
+    OO.publicApi.VERSION.skin = {"releaseVersion": "4.15.7", "rev": "<SKIN_REV>"};
   }
 
   var Html5Skin = function (mb, id) {
@@ -254,6 +253,10 @@ OO.plugin("Html5Skin", function (OO, _, $, W) {
       //initial DOM manipulation
       this.state.mainVideoContainer.addClass('oo-player-container');
       this.state.mainVideoInnerWrapper.addClass('oo-player');
+      this.state.mainVideoInnerWrapper.attr('aria-label', CONSTANTS.ARIA_LABELS.VIDEO_PLAYER);
+      // Setting the tabindex will let some screen readers recognize this element as a group
+      // identified with the ARIA label above. We set it to -1 in order to prevent actual keyboard focus
+      this.state.mainVideoInnerWrapper.attr('tabindex', '-1');
       this.state.mainVideoInnerWrapper.addClass(deviceClasses);
       this.state.mainVideoInnerWrapper.append("<div class='oo-player-skin'></div>");
 

@@ -95,6 +95,18 @@ var ControlBar = React.createClass({
     }
   },
 
+  /**
+   * Some browsers give focus to buttons after click, which leaves
+   * them highlighted. This overrides the browser's default behavior.
+   *
+   * @param {event} evt The mouse up event object
+   */
+  blurOnMouseUp: function(evt) {
+    if (evt.currentTarget) {
+      evt.currentTarget.blur();
+    }
+  },
+
   handlePlayClick: function() {
     this.props.controller.togglePlayPause();
   },
@@ -160,25 +172,31 @@ var ControlBar = React.createClass({
     }
   },
 
+  handlePlayPauseFocus: function() {
+    this.props.controller.state.playPauseButtonFocused = true;
+  },
+
+  handlePlayPauseBlur: function() {
+    this.props.controller.state.playPauseButtonFocused = false;
+  },
+
   //TODO(dustin) revisit this, doesn't feel like the "react" way to do this.
   highlight: function(evt) {
-    var color = this.props.skinConfig.controlBar.iconStyle.active.color ? this.props.skinConfig.controlBar.iconStyle.active.color : this.props.skinConfig.general.accentColor;
-    var opacity = this.props.skinConfig.controlBar.iconStyle.active.opacity;
-    Utils.highlight(evt.target, opacity, color);
+    var iconElement = Utils.getEventIconElement(evt);
+    if (iconElement) {
+      var color = this.props.skinConfig.controlBar.iconStyle.active.color ? this.props.skinConfig.controlBar.iconStyle.active.color : this.props.skinConfig.general.accentColor;
+      var opacity = this.props.skinConfig.controlBar.iconStyle.active.opacity;
+      Utils.highlight(iconElement, opacity, color);
+    }
   },
 
   removeHighlight: function(evt) {
-    var color = this.props.skinConfig.controlBar.iconStyle.inactive.color;
-    var opacity = this.props.skinConfig.controlBar.iconStyle.inactive.opacity;
-    Utils.removeHighlight(evt.target, opacity, color);
-  },
-
-  volumeHighlight:function() {
-    this.highlight({target: ReactDOM.findDOMNode(this.refs.volumeIcon)});
-  },
-
-  volumeRemoveHighlight:function() {
-    this.removeHighlight({target: ReactDOM.findDOMNode(this.refs.volumeIcon)});
+    var iconElement = Utils.getEventIconElement(evt);
+    if (iconElement) {
+      var color = this.props.skinConfig.controlBar.iconStyle.inactive.color;
+      var opacity = this.props.skinConfig.controlBar.iconStyle.inactive.opacity;
+      Utils.removeHighlight(iconElement, opacity, color);
+    }
   },
 
   changeVolumeSlider: function(event) {
@@ -231,23 +249,34 @@ var ControlBar = React.createClass({
 
   populateControlBar: function() {
     var dynamicStyles = this.setupItemStyle();
-    var playIcon = "";
+    var playIcon, playPauseAriaLabel;
     if (this.props.playerState == CONSTANTS.STATE.PLAYING) {
       playIcon = "pause";
+      playPauseAriaLabel = CONSTANTS.ARIA_LABELS.PAUSE;
     } else if (this.props.playerState == CONSTANTS.STATE.END) {
       playIcon = "replay";
+      playPauseAriaLabel = CONSTANTS.ARIA_LABELS.REPLAY;
     } else {
       playIcon = "play";
+      playPauseAriaLabel = CONSTANTS.ARIA_LABELS.PLAY;
     }
 
-    var volumeIcon = (this.props.controller.state.volumeState.muted ? "volumeOff" : "volume");
+    var volumeIcon, volumeAriaLabel;
+    if (this.props.controller.state.volumeState.muted) {
+      volumeIcon = "volumeOff";
+      volumeAriaLabel = CONSTANTS.ARIA_LABELS.UNMUTE;
+    } else {
+      volumeIcon = "volume";
+      volumeAriaLabel = CONSTANTS.ARIA_LABELS.MUTE;
+    }
 
-    var fullscreenIcon = "";
+    var fullscreenIcon, fullscreenAriaLabel;
     if (this.props.controller.state.fullscreen) {
-      fullscreenIcon = "compress"
-    }
-    else {
+      fullscreenIcon = "compress";
+      fullscreenAriaLabel = CONSTANTS.ARIA_LABELS.EXIT_FULLSCREEN;
+    } else {
       fullscreenIcon = "expand";
+      fullscreenAriaLabel = CONSTANTS.ARIA_LABELS.FULLSCREEN;
     }
 
     var totalTime = 0;
@@ -259,21 +288,20 @@ var ControlBar = React.createClass({
     }
 
     var volumeBars = [];
-    this.volumeDrag = false;
-    var turnedOn = this.props.controller.state.volumeState.volume >= 1 / 10;
-    var volumeClass = ClassNames({
-      "volume": true
-    });
-    var barStyle = turnedOn ? {backgroundColor: this.props.skinConfig.controlBar.volumeControl.color} : null;
-    var spanStyle = {width: this.props.controller.state.volumeState.volume * 100 + '%'};
-    volumeBars.push(<div className={volumeClass}
-                         style={barStyle}
-                         key="0"
-                         ref="volumeBar"
-                         onMouseDown={this.onMouseDown}
-                         onMouseUp={this.onMouseUp}
-                         onMouseMove={this.onMouseMove}
-    ><span style={spanStyle}></span></div>);
+    for (var i=0; i<10; i++) {
+      //create each volume tick separately
+      var turnedOn = this.props.controller.state.volumeState.volume >= (i+1) / 10;
+      var volumeClass = ClassNames({
+        "oo-volume-bar": true,
+        "oo-on": turnedOn
+      });
+      var barStyle = {backgroundColor: this.props.skinConfig.controlBar.volumeControl.color ? this.props.skinConfig.controlBar.volumeControl.color : this.props.skinConfig.general.accentColor};
+
+      volumeBars.push(<a data-volume={(i+1)/10} className={volumeClass} key={i}
+        style={barStyle}
+        onClick={this.handleVolumeClick}></a>);
+    }
+
     var volumeSlider = <div className="oo-volume-slider"><Slider value={parseFloat(this.props.controller.state.volumeState.volume)}
                         onChange={this.changeVolumeSlider}
                         className={"oo-slider oo-slider-volume"}
@@ -328,11 +356,19 @@ var ControlBar = React.createClass({
     selectedStyle["color"] = this.props.skinConfig.general.accentColor ? this.props.skinConfig.general.accentColor : null;
 
     var controlItemTemplates = {
-      "playPause": <a className="oo-play-pause oo-control-bar-item" onClick={this.handlePlayClick} key="playPause">
-        <Icon {...this.props} icon={playIcon}
-          style={dynamicStyles.iconCharacter}
-          onMouseOver={this.highlight} onMouseOut={this.removeHighlight}/>
-      </a>,
+      "playPause": <button className="oo-play-pause oo-control-bar-item"
+        onClick={this.handlePlayClick}
+        onMouseUp={this.blurOnMouseUp}
+        onMouseOver={this.highlight}
+        onMouseOut={this.removeHighlight}
+        onFocus={this.handlePlayPauseFocus}
+        onBlur={this.handlePlayPauseBlur}
+        key="playPause"
+        tabIndex="0"
+        aria-label={playPauseAriaLabel}
+        autoFocus={this.props.controller.state.playPauseButtonFocused}>
+        <Icon {...this.props} icon={playIcon} style={dynamicStyles.iconCharacter} />
+      </button>,
 
       "live": <a className={liveClass}
         ref="LiveButton"
@@ -342,10 +378,16 @@ var ControlBar = React.createClass({
       </a>,
 
       "volume": <div className="oo-volume oo-control-bar-item" key="volume">
-        <Icon {...this.props} icon={volumeIcon} ref="volumeIcon"
-          style={this.props.skinConfig.controlBar.iconStyle.inactive}
+        <button className="oo-mute-unmute oo-control-bar-item"
           onClick={this.handleVolumeIconClick}
-          onMouseOver={this.volumeHighlight} onMouseOut={this.volumeRemoveHighlight}/>
+          onMouseUp={this.blurOnMouseUp}
+          onMouseOver={this.highlight}
+          onMouseOut={this.removeHighlight}
+          tabIndex="0"
+          aria-label={volumeAriaLabel}>
+          <Icon {...this.props} icon={volumeIcon} ref="volumeIcon"
+            style={this.props.skinConfig.controlBar.iconStyle.inactive} />
+        </button>
         {volumeControls}
       </div>,
 
@@ -356,7 +398,7 @@ var ControlBar = React.createClass({
       "flexibleSpace": <div className="oo-flexible-space oo-control-bar-flex-space" key="flexibleSpace"></div>,
 
       "moreOptions": <a className="oo-more-options oo-control-bar-item"
-        onClick={this.handleMoreOptionsClick} key="moreOptions">
+        onClick={this.handleMoreOptionsClick} key="moreOptions" aria-hidden="true">
         <Icon {...this.props} icon="ellipsis" style={dynamicStyles.iconCharacter}
           onMouseOver={this.highlight} onMouseOut={this.removeHighlight}/>
       </a>,
@@ -364,7 +406,7 @@ var ControlBar = React.createClass({
       "quality": (
         <div className="oo-popover-button-container" key="quality">
           {videoQualityPopover}
-          <a className={qualityClass} onClick={this.handleQualityClick} style={selectedStyle}>
+          <a className={qualityClass} onClick={this.handleQualityClick} style={selectedStyle} aria-hidden="true">
             <Icon {...this.props} icon="quality" style={dynamicStyles.iconCharacter}
               onMouseOver={this.highlight} onMouseOut={this.removeHighlight}/>
           </a>
@@ -372,7 +414,7 @@ var ControlBar = React.createClass({
       ),
 
       "discovery": <a className="oo-discovery oo-control-bar-item"
-        onClick={this.handleDiscoveryClick} key="discovery">
+        onClick={this.handleDiscoveryClick} key="discovery" aria-hidden="true">
         <Icon {...this.props} icon="discovery" style={dynamicStyles.iconCharacter}
           onMouseOver={this.highlight} onMouseOut={this.removeHighlight}/>
       </a>,
@@ -380,7 +422,7 @@ var ControlBar = React.createClass({
       "closedCaption": (
         <div className="oo-popover-button-container" key="closedCaption">
           {closedCaptionPopover}
-          <a className={captionClass} onClick={this.handleClosedCaptionClick} style={selectedStyle}>
+          <a className={captionClass} onClick={this.handleClosedCaptionClick} style={selectedStyle} aria-hidden="true">
             <Icon {...this.props} icon="cc" style={dynamicStyles.iconCharacter}
               onMouseOver={this.highlight} onMouseOut={this.removeHighlight}/>
           </a>
@@ -388,16 +430,21 @@ var ControlBar = React.createClass({
       ),
 
       "share": <a className="oo-share oo-control-bar-item"
-        onClick={this.handleShareClick} key="share">
+        onClick={this.handleShareClick} key="share" aria-hidden="true">
         <Icon {...this.props} icon="share" style={dynamicStyles.iconCharacter}
           onMouseOver={this.highlight} onMouseOut={this.removeHighlight}/>
       </a>,
 
-      "fullscreen": <a className="oo-fullscreen oo-control-bar-item"
-        onClick={this.handleFullscreenClick} key="fullscreen">
-        <Icon {...this.props} icon={fullscreenIcon} style={dynamicStyles.iconCharacter}
-          onMouseOver={this.highlight} onMouseOut={this.removeHighlight}/>
-      </a>,
+      "fullscreen": <button className="oo-fullscreen oo-control-bar-item"
+        onClick={this.handleFullscreenClick}
+        onMouseUp={this.blurOnMouseUp}
+        onMouseOver={this.highlight}
+        onMouseOut={this.removeHighlight}
+        key="fullscreen"
+        tabIndex="0"
+        aria-label={fullscreenAriaLabel}>
+        <Icon {...this.props} icon={fullscreenIcon} style={dynamicStyles.iconCharacter} />
+      </button>,
 
       "logo": <Logo key="logo" imageUrl={this.props.skinConfig.controlBar.logo.imageResource.url}
         clickUrl={this.props.skinConfig.controlBar.logo.clickUrl}

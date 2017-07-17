@@ -105,9 +105,12 @@ var StartScreen = React.createClass({
     }
 
     var actionIcon = (
-      <a className={actionIconClass} onClick={this.handleClick}>
+      <button className={actionIconClass}
+        onClick={this.handleClick}
+        tabIndex="0"
+        aria-label={CONSTANTS.ARIA_LABELS.START_PLAYBACK}>
         <Icon {...this.props} icon={iconName} style={actionIconStyle}/>
-      </a>
+      </button>
     );
 
     return (
