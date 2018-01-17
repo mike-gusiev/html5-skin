@@ -63,7 +63,7 @@ var StartScreen = React.createClass({
       color: this.props.skinConfig.startScreen.playIconStyle.color,
       opacity: this.props.skinConfig.startScreen.playIconStyle.opacity
     };
-    var posterImageUrl = this.props.skinConfig.startScreen.showPromo ? this.props.contentTree.promo_image : '';
+    var posterImageUrl = this.props.skinConfig.startScreen.showPromo ? this.props.contentTree.promo_image || '' : '';
     posterImageUrl = posterImageUrl.replace(CONSTANTS.IMAGE_URLS.NATIVE, CONSTANTS.IMAGE_URLS.POSTER_CLOUDINARY);
     var posterStyle = {
       backgroundImage: "url('" + posterImageUrl + "')"
