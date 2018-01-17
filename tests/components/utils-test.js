@@ -1,5 +1,15 @@
 jest.dontMock('../../js/components/utils');
+jest.dontMock('../../js/constants/constants');
+jest.dontMock('deepmerge');
+jest.dontMock('../../config/skin');
+
 var Utils = require('../../js/components/utils');
+var CONSTANTS = require('../../js/constants/constants');
+var DeepMerge = require('deepmerge');
+var SkinJSON = require('../../config/skin');
+OO = {
+  log: function(a) {console.info(a);}
+};
 
 describe('Utils', function () {
   it('tests the utility functions', function () {
@@ -22,6 +32,163 @@ describe('Utils', function () {
 
     var browserSupportsTouch = Utils.browserSupportsTouch();
     expect(browserSupportsTouch).toBeFalsy();
+  });
+
+  describe('autoFocusFirstElement', function() {
+    var container, elem1, elem2, elem3;
+
+    beforeEach(function() {
+      container = document.createElement('div');
+
+      elem1 = document.createElement('div');
+      elem1.setAttribute(CONSTANTS.KEYBD_FOCUS_ID_ATTR, '1');
+      container.appendChild(elem1);
+
+      elem2 = document.createElement('div');
+      elem2.setAttribute(CONSTANTS.KEYBD_FOCUS_ID_ATTR, '2');
+      container.appendChild(elem2);
+
+      elem3 = document.createElement('div');
+      elem3.setAttribute(CONSTANTS.KEYBD_FOCUS_ID_ATTR, '3');
+      container.appendChild(elem3);
+    });
+
+    it('should focus on first focusable element', function() {
+      var focusCalled = false;
+      elem1.focus = function() {
+        focusCalled = true;
+      };
+      Utils.autoFocusFirstElement(container);
+      expect(focusCalled).toBe(true);
+    });
+
+    it('should focus on next focusable element if first is excluded by class', function() {
+      var focus1Called = false;
+      var focus2Called = false;
+      elem1.setAttribute('class', 'exclude');
+      elem1.focus = function() {
+        focus1Called = true;
+      };
+      elem2.focus = function() {
+        focus2Called = true;
+      };
+      Utils.autoFocusFirstElement(container, 'exclude');
+      expect(focus1Called).toBe(false);
+      expect(focus2Called).toBe(true);
+    });
+
+  });
+
+  describe('blurOnMouseUp', function() {
+
+    it('should call blur() on currentTarget', function() {
+      var blurCalled = false;
+      var event = {
+        currentTarget: {
+          blur: function() {
+            blurCalled = true;
+          }
+        }
+      };
+      Utils.blurOnMouseUp(event);
+      expect(blurCalled).toBe(true);
+    });
+
+  });
+
+  describe('ensureNumber', function() {
+
+    it('should return the Number equivalent of a string', function() {
+      expect(Utils.ensureNumber('233')).toBe(233);
+      expect(Utils.ensureNumber('10.233')).toBe(10.233);
+    });
+
+    it('should return null when the input value is not finite or a parsable Number', function() {
+      expect(Utils.ensureNumber('w00t233')).toBeNull();
+      expect(Utils.ensureNumber(Infinity)).toBeNull();
+      expect(Utils.ensureNumber({})).toBeNull();
+      expect(Utils.ensureNumber(NaN)).toBeNull();
+    });
+
+    it('should return defaultValue when provided if input value is not finite or a parsable Number', function() {
+      expect(Utils.ensureNumber('w00t233', 1)).toBe(1);
+      expect(Utils.ensureNumber(Infinity, 2)).toBe(2);
+      expect(Utils.ensureNumber({}, 'error')).toBe('error');
+      expect(Utils.ensureNumber(NaN, 3)).toBe(3);
+    });
+
+  });
+
+  describe('constrainToRange', function() {
+
+    it('should return the Number equivalent of value if it falls within range', function() {
+      expect(Utils.constrainToRange(5, 1, 10)).toBe(5);
+      expect(Utils.constrainToRange(0, -5, 5)).toBe(0);
+      expect(Utils.constrainToRange('50', '1', '100')).toBe(50);
+    });
+
+    it('should return min or max when value is outside of range', function() {
+      expect(Utils.constrainToRange(1, 5, 10)).toBe(5);
+      expect(Utils.constrainToRange(15, 5, 10)).toBe(10);
+      expect(Utils.constrainToRange(-10, 0, 100)).toBe(0);
+    });
+
+    it('should return the Number equivalent of input values', function() {
+      expect(Utils.constrainToRange(1, '5', 10)).toBe(5);
+      expect(Utils.constrainToRange(15, 5, '10')).toBe(10);
+      expect(Utils.constrainToRange(-10, '0', 100)).toBe(0);
+      expect(Utils.constrainToRange('50', '1', '100')).toBe(50);
+    });
+
+  });
+
+  describe('getTimeDisplayValues', function() {
+
+    it('should return formatted currentTime and totalTime for VOD', function() {
+      var values = Utils.getTimeDisplayValues(60, 120, false, false);
+      expect(values.currentTime).toEqual('01:00');
+      expect(values.totalTime).toEqual('02:00');
+      values = Utils.getTimeDisplayValues(0, 122, false, false);
+      expect(values.currentTime).toEqual('00:00');
+      expect(values.totalTime).toEqual('02:02');
+    });
+
+    it('should return empty currentTime and totalTime for Live videos with no DVR', function() {
+      var values = Utils.getTimeDisplayValues(0, -0, true, false);
+      expect(values.currentTime).toEqual('');
+      expect(values.totalTime).toEqual('');
+      values = Utils.getTimeDisplayValues(0, Infinity, true, false);
+      expect(values.currentTime).toEqual('');
+      expect(values.totalTime).toEqual('');
+    });
+
+    it('should return formatted negative currentTime and empty totalTime for Live DVR videos when useNegativeDvrOffset equals true', function() {
+      var values = Utils.getTimeDisplayValues(900, 1800, true, true);
+      expect(values.currentTime).toEqual('-15:00');
+      expect(values.totalTime).toEqual('');
+      values = Utils.getTimeDisplayValues(0, 1800, true, true);
+      expect(values.currentTime).toEqual('-30:00');
+      expect(values.totalTime).toEqual('');
+    });
+
+    it('should return empty currentTime for Live DVR videos when useNegativeDvrOffset equals true and playhead is at live position', function() {
+      var values = Utils.getTimeDisplayValues(1800, 1800, true, true);
+      expect(values.currentTime).toEqual(''); // Playhead is at live position so it's not displayed
+      expect(values.totalTime).toEqual('');
+    });
+
+    it('should return formatted currentTime and totalTime for Live DVR videos when useNegativeDvrOffset equals false', function() {
+      var values = Utils.getTimeDisplayValues(1800, 1800, true, false);
+      expect(values.currentTime).toEqual('30:00');
+      expect(values.totalTime).toEqual('30:00');
+      values = Utils.getTimeDisplayValues(0, 1800, true, false);
+      expect(values.currentTime).toEqual('00:00');
+      expect(values.totalTime).toEqual('30:00');
+      values = Utils.getTimeDisplayValues(900, 1800, true, false);
+      expect(values.currentTime).toEqual('15:00');
+      expect(values.totalTime).toEqual('30:00');
+    });
+
   });
 
   it('tests isSafari', function () {
@@ -143,6 +310,15 @@ describe('Utils', function () {
     expect(localizedString).toBe("");
   });
 
+  it('tests getStartCountdown', function () {
+    var text = "6 days, 5 hours, and 14 minutes"; 
+    var countDownText = Utils.getStartCountdown(537289879);
+    expect(countDownText).toBe(text);
+
+    localizedString = Utils.getStartCountdown(-100000000);
+    expect(localizedString).toBe("");
+  });
+
   it('tests getPropertyValue', function () {
     var defaultVal = Utils.getPropertyValue({}, 'property.nestedProp', 'default');
     expect(defaultVal).toEqual('default');
@@ -152,6 +328,39 @@ describe('Utils', function () {
 
     var existingVal = Utils.getPropertyValue({ property: { nestedProp: 'value' } }, 'property.nestedProp');
     expect(existingVal).toEqual('value');
+  });
+
+  it('tests elementHasClass', function() {
+    var element = document.createElement('div');
+    element.className = 'oo-icon';
+    expect(Utils.elementHasClass(element, 'oo-icon')).toBe(true);
+    element.className = 'fancy oo-icon pants';
+    expect(Utils.elementHasClass(element, 'oo-icon')).toBe(true);
+    element.className = 'fancy pants oo-icon';
+    expect(Utils.elementHasClass(element, 'oo-icon')).toBe(true);
+    element.className = 'fancy oo-icons pants';
+    expect(Utils.elementHasClass(element, 'oo-icon')).toBe(false);
+  });
+
+  it('tests getEventIconElement', function() {
+    var iconElement = document.createElement('span');
+    var buttonElement = document.createElement('button');
+    iconElement.className = 'oo-icon';
+    buttonElement.appendChild(iconElement);
+
+    var nestedIconElement = document.createElement('span');
+    var divElement = document.createElement('div');
+    var nestedDivElement = document.createElement('div');
+    nestedIconElement.className = 'oo-custom-icon';
+    divElement.appendChild(nestedDivElement);
+    nestedDivElement.appendChild(nestedIconElement);
+
+    var extractedElement1 = Utils.getEventIconElement({ currentTarget: buttonElement });
+    expect(extractedElement1).toBe(iconElement);
+    var extractedElement2 = Utils.getEventIconElement({ currentTarget: iconElement });
+    expect(extractedElement2).toBe(iconElement);
+    var extractedElement3 = Utils.getEventIconElement({ currentTarget: divElement }, 'oo-custom-icon');
+    expect(extractedElement3).toBe(nestedIconElement);
   });
 
   it('tests highlight', function () {
@@ -212,5 +421,113 @@ describe('Utils', function () {
     var markup = 'This is &quot;markup&quot;';
     var html = Utils.createMarkup(markup);
     expect(html.__html).toBe(markup);
+  });
+
+  it('tests isValidString', function () {
+    var src = null;
+    var isValidString = Utils.isValidString(src);
+    expect(isValidString).toBeFalsy();
+
+    src = '';
+    isValidString = Utils.isValidString(src);
+    expect(isValidString).toBeFalsy();
+
+    src = undefined;
+    isValidString = Utils.isValidString(src);
+    expect(isValidString).toBeFalsy();
+
+    src = 'http://cf.c.ooyala.com/RmZW4zcDo6KqkTIhn1LnowEZyUYn5Tb2/3Gduepif0T1UGY8H4xMDoxOmFkOxyVqc';
+    isValidString = Utils.isValidString(src);
+    expect(isValidString).toBeTruthy();
+  });
+
+  it('tests sanitizeConfigData', function () {
+    var data = null;
+    var sanitizedConfigData = Utils.sanitizeConfigData(data);
+    expect(sanitizedConfigData).toEqual({});
+
+    data = '';
+    sanitizedConfigData = Utils.sanitizeConfigData(data);
+    expect(sanitizedConfigData).toEqual({});
+
+    data = undefined;
+    sanitizedConfigData = Utils.sanitizeConfigData(data);
+    expect(sanitizedConfigData).toEqual({});
+
+    data = [];
+    sanitizedConfigData = Utils.sanitizeConfigData(data);
+    expect(sanitizedConfigData).toEqual({});
+
+    data = [1, 2, 3];
+    sanitizedConfigData = Utils.sanitizeConfigData(data);
+    expect(sanitizedConfigData).toEqual({});
+
+    data = 'inline: {data: 2}';
+    sanitizedConfigData = Utils.sanitizeConfigData(data);
+    expect(sanitizedConfigData).toBe(data);
+
+    data = 10;
+    sanitizedConfigData = Utils.sanitizeConfigData(data);
+    expect(sanitizedConfigData).toBe(data);
+
+    data = {skin: {config: "v4"}};
+    sanitizedConfigData = Utils.sanitizeConfigData(data);
+    expect(sanitizedConfigData).toBeTruthy();
+    expect(sanitizedConfigData.skin).toBeTruthy();
+    expect(sanitizedConfigData.skin.config).toBe("v4");
+  });
+
+  it('tests deep merge', function () {
+    var localSettings = {
+      "closedCaptionOptions":{"windowColor":"Yellow","enabled":true, "backgroundOpacity":"0.2","textOpacity":"1"}
+    };
+    var inlinePageParams = {
+      "closedCaptionOptions":{"textColor":"Blue", "backgroundColor":"Green","windowColor":"White","windowOpacity":0.5},
+      "buttons":{"desktopContent":[{"name":"ooyala","location":"ooyala","whenDoesNotFit":"ooyala","minWidth":85},{"name":"quality","location":"controlBar","whenDoesNotFit":"moveToMoreOptions","minWidth":85}]}
+    };
+    var customSkinJSON = {
+      "closedCaptionOptions":{"enabled":true,"language":"en","fontType":"Proportional Sans-Serif"},
+      "buttons":{"desktopContent":[{"name":"alice","location":"alice","whenDoesNotFit":"keep","minWidth":53},{"name":"volume","location":"controlBar","whenDoesNotFit":"keep","minWidth":240},{"name":"live","location":"controlBar","whenDoesNotFit":"keep","minWidth":65},{"name":"quality","location":"controlBar","whenDoesNotFit":"ooyala","minWidth":95,"alice":"video"}]},
+      "general":{"accentColor":"#448aff"}
+    };
+    var metaDataSettings = {
+      "closedCaptionOptions":{"fontSize":"Large","windowColor":"Green"},
+      "buttons":{"desktopContent":[{"name":"share","location":"controlBar","whenDoesNotFit":"moveToMoreOptions","minWidth":45,"enabled":true},{"name":"volume","location":"controlBar","whenDoesNotFit":"keep","minWidth":45,"enabled":true},{"name":"fullscreen","location":"controlBar","whenDoesNotFit":"keep","minWidth":55,"enabled":true},{"name":"quality","location":"controlBar","whenDoesNotFit":"moveToMoreOptions","minWidth":45,"enabled":true}]},"general":{"accentColor":"#ffbb00","watermark":{"imageResource":{"url":"http://ak.c.ooyala.com/Uzbm46asiensk3opIgwfFn5KFemv/watermark147585568"},"position":"top-left","clickUrl":"","transparency":0.51,"scalingOption":"none","scalingPercentage":0}},"shareScreen":{"shareContent":["social","ooyala"],"socialContent":["twitter","lisa","google+","jason"]}
+    };
+    var buttonArrayFusion = 'replace';
+
+    var mergedMetaData = DeepMerge(SkinJSON, metaDataSettings, {arrayMerge: Utils.arrayDeepMerge.bind(Utils), arrayUnionBy:'name', arrayFusion:'deepmerge'});
+    var finalConfig = DeepMerge.all([mergedMetaData, customSkinJSON, inlinePageParams, localSettings], {arrayMerge: Utils.arrayDeepMerge.bind(Utils), arrayUnionBy:'name', arrayFusion:'deepmerge', buttonArrayFusion:buttonArrayFusion});
+
+    // test merge hierarchy, keys from 5 objects should be merged into one object with correct priority
+    expect(finalConfig.closedCaptionOptions.textColor).toBe("Blue"); //from inlinePageParams
+    expect(finalConfig.closedCaptionOptions.windowOpacity).toBe(0.5); //from inlinePageParams
+    expect(finalConfig.closedCaptionOptions.backgroundColor).toBe("Green"); //from inlinePageParams
+    expect(finalConfig.closedCaptionOptions.windowColor).toBe("Yellow"); //from localSettings
+    expect(finalConfig.closedCaptionOptions.fontType).toBe("Proportional Sans-Serif"); //from customSkinJSON
+    expect(finalConfig.closedCaptionOptions.fontSize).toBe("Large"); //from metaDataSettings
+    expect(finalConfig.closedCaptionOptions.textEnhancement).toBe("Uniform"); //from SkinJSON
+
+    // test array merge for buttons (replace)
+    expect(finalConfig.buttons.desktopContent.length).toBe(inlinePageParams.buttons.desktopContent.length);
+    // test basic array merge
+    expect(finalConfig.shareScreen.shareContent[1]).toBe(SkinJSON.shareScreen.shareContent[1]);
+    expect(finalConfig.shareScreen.shareContent[2]).toBe(metaDataSettings.shareScreen.shareContent[1]);
+    expect(finalConfig.shareScreen.shareContent).toEqual(['social', 'embed', 'ooyala']);
+
+    buttonArrayFusion = 'prepend';
+    mergedMetaData = DeepMerge(SkinJSON, metaDataSettings, {arrayMerge: Utils.arrayDeepMerge.bind(Utils), arrayUnionBy:'name'});
+    finalConfig = DeepMerge.all([mergedMetaData, customSkinJSON, inlinePageParams, localSettings], {arrayMerge: Utils.arrayDeepMerge.bind(Utils), arrayUnionBy:'name', buttonArrayFusion:buttonArrayFusion});
+
+    // test basic array replace
+    expect(finalConfig.shareScreen.shareContent[1]).not.toBe(SkinJSON.shareScreen.shareContent[1]);
+    expect(finalConfig.shareScreen.shareContent).toEqual(['social', 'ooyala']);
+    // test array merge for buttons (prepend)
+    expect(finalConfig.buttons.desktopContent.length).toBe(16);
+    // test new buttons are placed after flexibleSpace
+    expect(finalConfig.buttons.desktopContent[4].name).toBe("flexibleSpace");
+    expect(finalConfig.buttons.desktopContent[5].name).toBe("ooyala");
+    expect(finalConfig.buttons.desktopContent[6].name).toBe("alice");
+    expect(finalConfig.buttons.desktopContent[10].alice).toBe("video");
   });
 });

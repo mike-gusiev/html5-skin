@@ -1,13 +1,24 @@
 button.oo-close-button {
   @include close($spacer-close-btn, $spacer-close-btn);
-  position:relative;
-  float:right;
+  position: relative;
+  float: right;
+}
+
+button.oo-close-button:focus {
+  opacity: 1;
 }
 
 button.oo-close-btn {
   top: $panel-padding;
   right: $panel-padding;
   @include close($spacer-close-btn, $spacer-close-btn);
+}
+
+// Workaround for Safari clipping text shadows
+// inside buttons
+button.oo-close-button .oo-icon {
+  display: inline-block;
+  @include vendor-prefixes(transform, translateZ(0));
 }
 
 button.oo-up-next-close-btn {
@@ -21,4 +32,13 @@ button.oo-up-next-close-btn {
   span {
     font-weight: bold !important;
   }
+}
+
+.oo-focusable-btn:focus {
+  outline: none;
+  @include highlight-tab();
+}
+
+.oo-focusable-btn:hover:active {
+  @include remove-highlight-tab();
 }

@@ -25,19 +25,30 @@ var StartScreen = React.createClass({
     this.handleResize();
   },
 
-  handleResize: function() {
+  componentWillReceiveProps: function(nextProps) {
+    if (nextProps.contentTree.description != this.props.contentTree.description) {
+      this.handleResize(nextProps);
+    }
+  },
+
+  handleResize: function(nextProps) {
+    var description = nextProps ? nextProps.contentTree.description : this.props.contentTree.description;
     if (ReactDOM.findDOMNode(this.refs.description)){
       this.setState({
-        descriptionText: Utils.truncateTextToWidth(ReactDOM.findDOMNode(this.refs.description), this.props.contentTree.description)
+        descriptionText: Utils.truncateTextToWidth(ReactDOM.findDOMNode(this.refs.description), description)
       });
     }
   },
 
   handleClick: function(event) {
-    event.preventDefault();
-    this.props.controller.togglePlayPause();
-    this.props.controller.state.accessibilityControlsEnabled = true;
-    this.setState({playButtonClicked: true});
+    // Avoid starting playback when player is initializing (play button is disabled
+    // in this state, but you can still click on the thumbnail)
+    if (!this.props.isInitializing) {
+      event.preventDefault();
+      this.props.controller.togglePlayPause();
+      this.props.controller.state.accessibilityControlsEnabled = true;
+      this.setState({playButtonClicked: true});
+    }
   },
 
   render: function() {
@@ -123,6 +134,7 @@ var StartScreen = React.createClass({
 });
 
 StartScreen.propTypes = {
+  isInitializing: React.PropTypes.bool,
   skinConfig: React.PropTypes.shape({
     startScreen: React.PropTypes.shape({
       playIconStyle: React.PropTypes.shape({
@@ -134,6 +146,7 @@ StartScreen.propTypes = {
 };
 
 StartScreen.defaultProps = {
+  isInitializing: false,
   skinConfig: {
     general: {
       loadingImage: {

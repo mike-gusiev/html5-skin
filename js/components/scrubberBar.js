@@ -4,8 +4,9 @@
 var React = require('react'),
     ReactDOM = require('react-dom'),
     ResizeMixin = require('../mixins/resizeMixin'),
-    Thumbnail = require('./thumbnail'),
-    ThumbnailCarousel = require('./thumbnailCarousel'),
+    ThumbnailsContainer = require('./thumbnailContainer'),
+    Utils = require('./utils'),
+    MACROS = require('../constants/macros'),
     CONSTANTS = require('../constants/constants');
 
 var ScrubberBar = React.createClass({
@@ -66,7 +67,10 @@ var ScrubberBar = React.createClass({
   },
 
   handlePlayheadMouseDown: function(evt) {
-    if (this.props.controller.state.screenToShow == CONSTANTS.SCREEN.AD_SCREEN) return;
+    if (this.props.controller.state.screenToShow === CONSTANTS.SCREEN.AD_SCREEN) {
+      evt.preventDefault();
+      return;
+    }
     this.props.controller.startHideControlBarTimer();
     if (evt.target.className.match("playhead") && evt.type !== "mousedown") {
         this.touchInitiated = true;
@@ -129,6 +133,12 @@ var ScrubberBar = React.createClass({
     evt.stopPropagation(); // W3C
     evt.cancelBubble = true; // IE
 
+    // Remove keyboard focus when clicking on scrubber bar
+    var scrubberBar = ReactDOM.findDOMNode(this.refs.scrubberBar);
+    if (scrubberBar && typeof scrubberBar.blur === 'function') {
+      scrubberBar.blur();
+    }
+
     this.lastScrubX = null;
     if (!this.touchInitiated){
       ReactDOM.findDOMNode(this).parentNode.removeEventListener("mousemove", this.handlePlayheadMouseMove);
@@ -149,8 +159,28 @@ var ScrubberBar = React.createClass({
     this.touchInitiated = false;
   },
 
+  handleScrubberBarKeyDown: function(evt) {
+    switch (evt.key) {
+      case CONSTANTS.KEY_VALUES.ARROW_UP:
+      case CONSTANTS.KEY_VALUES.ARROW_RIGHT:
+        evt.preventDefault();
+        this.props.controller.accessibilityControls.seekBy(CONSTANTS.A11Y_CTRLS.SEEK_DELTA, true);
+        break;
+      case CONSTANTS.KEY_VALUES.ARROW_DOWN:
+      case CONSTANTS.KEY_VALUES.ARROW_LEFT:
+        evt.preventDefault();
+        this.props.controller.accessibilityControls.seekBy(CONSTANTS.A11Y_CTRLS.SEEK_DELTA, false);
+        break;
+      default:
+        break;
+    }
+  },
+
   handleScrubberBarMouseDown: function(evt) {
-    if (this.props.controller.state.screenToShow == CONSTANTS.SCREEN.AD_SCREEN) return;
+    if (this.props.controller.state.screenToShow === CONSTANTS.SCREEN.AD_SCREEN) {
+      evt.preventDefault();
+      return;
+    }
     if (evt.target.className.match("oo-playhead")) { return; }
     if (this.touchInitiated && evt.type === "mousedown") { return; }
     var offsetX = 0;
@@ -189,6 +219,28 @@ var ScrubberBar = React.createClass({
     this.setState({
       hoveringX: 0
     });
+  },
+
+  /**
+   * Gets a string that describes the current status of the progress bar in a screen
+   * reader friendly format.
+   */
+  getAriaValueText: function() {
+    var ariaValueText;
+    var timeDisplayValues = Utils.getTimeDisplayValues(this.props.currentPlayhead, this.props.duration, this.props.isLiveStream);
+
+    if (this.props.isLiveStream) {
+      if (timeDisplayValues.totalTime) {
+        ariaValueText = CONSTANTS.ARIA_LABELS.TIME_DISPLAY_DVR.replace(MACROS.CURRENT_TIME, timeDisplayValues.currentTime);
+        ariaValueText = ariaValueText.replace(MACROS.TOTAL_TIME, timeDisplayValues.totalTime);
+      } else {
+        ariaValueText = CONSTANTS.ARIA_LABELS.TIME_DISPLAY_LIVE;
+      }
+    } else {
+      ariaValueText = CONSTANTS.ARIA_LABELS.TIME_DISPLAY.replace(MACROS.CURRENT_TIME, timeDisplayValues.currentTime);
+      ariaValueText = ariaValueText.replace(MACROS.TOTAL_TIME, timeDisplayValues.totalTime);
+    }
+    return ariaValueText;
   },
 
   render: function() {
@@ -243,24 +295,31 @@ var ScrubberBar = React.createClass({
       playedIndicatorStyle.backgroundColor = this.props.skinConfig.controlBar.adScrubberBar.playedColor;
     }
 
-    var thumbnailContainer = null;
-    var thumbnailCarousel = null;
     var hoverTime = 0;
     var hoverPosition = 0;
     var hoveredIndicatorStyle = null;
 
+    var thumbnailsContainer = null;
+
     if (this.props.controller.state.thumbnails && (this.state.scrubbingPlayheadX || this.lastScrubX || this.state.hoveringX)) {
+      var vrViewingDirection = { yaw: 0, roll: 0, pitch: 0 };
+      if (this.props.controller && this.props.controller.state && this.props.controller.state.vrViewingDirection) {
+        vrViewingDirection = this.props.controller.state.vrViewingDirection;
+      }
+      var fullscreen = false;
+      if (this.props.controller && this.props.controller.state && this.props.controller.state.fullscreen) {
+        fullscreen = this.props.controller.state.fullscreen;
+      }
+      var videoVr = false;
+      if (this.props.controller && this.props.controller.videoVr) {
+        videoVr = this.props.controller.videoVr;
+      }
+      var isCarousel = false;
       if (this.state.scrubbingPlayheadX) {
         hoverPosition = this.state.scrubbingPlayheadX;
         hoverTime = (this.state.scrubbingPlayheadX / this.state.scrubberBarWidth) * this.props.duration;
         playheadClassName += " oo-playhead-scrubbing";
-
-        thumbnailCarousel =
-          <ThumbnailCarousel
-           thumbnails={this.props.controller.state.thumbnails}
-           duration={this.props.duration}
-           hoverTime={hoverTime > 0 ? hoverTime : 0}
-           scrubberBarWidth={this.state.scrubberBarWidth}/>
+        isCarousel = true;
       } else if (this.lastScrubX) {//to show thumbnail when clicking on playhead
         hoverPosition = this.props.currentPlayhead * this.state.scrubberBarWidth / this.props.duration;
         hoverTime = this.props.currentPlayhead;
@@ -275,23 +334,39 @@ var ScrubberBar = React.createClass({
         scrubberBarClassName += " oo-scrubber-bar-hover";
         playheadClassName += " oo-playhead-hovering";
       }
-      if (!thumbnailCarousel) {
-        thumbnailContainer = (
-          <Thumbnail
-           thumbnails={this.props.controller.state.thumbnails}
-           hoverPosition={hoverPosition}
-           duration={this.props.duration}
-           hoverTime={hoverTime > 0 ? hoverTime : 0} />
-        )
-      }
+      thumbnailsContainer = (
+        <ThumbnailsContainer
+          isCarousel={isCarousel}
+          thumbnails={this.props.controller.state.thumbnails}
+          duration={this.props.duration}
+          hoverPosition={hoverPosition}
+          hoverTime={hoverTime > 0 ? hoverTime : 0}
+          scrubberBarWidth={this.state.scrubberBarWidth}
+          videoVr={videoVr}
+          fullscreen={fullscreen}
+          vrViewingDirection={vrViewingDirection}
+      />);
     }
+
+    var ariaValueText = this.getAriaValueText();
 
     return (
       <div className="oo-scrubber-bar-container" ref="scrubberBarContainer" onMouseOver={scrubberBarMouseOver} onMouseOut={scrubberBarMouseOut} onMouseMove={scrubberBarMouseMove}>
-        {thumbnailContainer}
-        {thumbnailCarousel}
+        {thumbnailsContainer}
         <div className="oo-scrubber-bar-padding" ref="scrubberBarPadding" onMouseDown={scrubberBarMouseDown} onTouchStart={scrubberBarMouseDown}>
-          <div ref="scrubberBar" className={scrubberBarClassName} style={scrubberBarStyle}>
+          <div
+            ref="scrubberBar"
+            className={scrubberBarClassName}
+            style={scrubberBarStyle}
+            role="slider"
+            aria-label={CONSTANTS.ARIA_LABELS.SEEK_SLIDER}
+            aria-valuemin="0"
+            aria-valuemax={this.props.duration}
+            aria-valuenow={Utils.ensureNumber(this.props.currentPlayhead, 0).toFixed(2)}
+            aria-valuetext={ariaValueText}
+            data-focus-id={CONSTANTS.FOCUS_IDS.SCRUBBER_BAR}
+            tabIndex="0"
+            onKeyDown={this.handleScrubberBarKeyDown}>
             <div className="oo-buffered-indicator" style={bufferedIndicatorStyle}></div>
             <div className="oo-hovered-indicator" style={hoveredIndicatorStyle}></div>
             <div className={playedIndicatorClassName} style={playedIndicatorStyle}></div>
