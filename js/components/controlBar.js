@@ -672,7 +672,7 @@ var ControlBar = React.createClass({
       }
 
       //do not show quality button if no bitrates available
-      if (!this.props.controller.state.videoQualityOptions.availableBitrates && (defaultItems[k].name === "quality")){
+      if (defaultItems[k].name === "quality"){
         continue;
       }
 
