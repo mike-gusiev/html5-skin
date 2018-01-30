@@ -126,7 +126,7 @@ var StartScreen = React.createClass({
           {this.props.skinConfig.startScreen.showDescription ? descriptionMetadata : null}
         </div>
 
-        {(this.state.playButtonClicked && this.props.controller.state.playerState == CONSTANTS.STATE.START) || this.props.controller.state.buffering || isPgatourAutorun ?
+        {(this.state.playButtonClicked && this.props.controller.state.playerState == CONSTANTS.STATE.START) || this.props.controller.state.buffering || this.props.showSpinner || isPgatourAutorun ?
           <Spinner loadingImage={this.props.skinConfig.general.loadingImage.imageResource.url}/> : actionIcon}
       </div>
     );
@@ -142,7 +142,8 @@ StartScreen.propTypes = {
       })
     }),
     icons: React.PropTypes.objectOf(React.PropTypes.object)
-  })
+  }),
+  showSpinner: React.PropTypes.bool
 };
 
 StartScreen.defaultProps = {
@@ -187,7 +188,8 @@ StartScreen.defaultProps = {
     promo_image: '',
     description:'',
     title:''
-  }
+  },
+  showSpinner: false
 };
 
 module.exports = StartScreen;

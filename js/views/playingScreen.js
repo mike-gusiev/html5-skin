@@ -33,7 +33,16 @@ var PlayingScreen = React.createClass({
     };
   },
 
+  componentWillMount: function() {
+    this.props.handleVrPlayerMouseUp();
+  },
+
   componentDidMount: function () {
+    document.addEventListener('mousemove', this.handlePlayerMouseMove, false);
+    document.addEventListener('touchmove', this.handlePlayerMouseMove, false);
+    document.addEventListener('mouseup', this.handlePlayerMouseUp, false);
+    document.addEventListener('touchend', this.handleTouchEnd, false);
+
     //for mobile or desktop fullscreen, hide control bar after 3 seconds
     if (this.isMobile || this.props.fullscreen || this.browserSupportsTouch){
       this.props.controller.startHideControlBarTimer();
@@ -62,6 +71,10 @@ var PlayingScreen = React.createClass({
 
   componentWillUnmount: function () {
     this.props.controller.cancelTimer();
+    document.removeEventListener('mousemove', this.handlePlayerMouseMove);
+    document.removeEventListener('touchmove', this.handlePlayerMouseMove);
+    document.removeEventListener('mouseup', this.handlePlayerMouseUp);
+    document.removeEventListener('touchend', this.handleTouchEnd);
   },
 
   /**
@@ -131,18 +144,30 @@ var PlayingScreen = React.createClass({
   },
 
   handleTouchEnd: function(event) {
-    event.preventDefault();//to prevent mobile from propagating click to discovery shown on pause
-    if (!this.state.controlBarVisible){
-      this.showControlBar(event);
-      this.props.controller.startHideControlBarTimer();
+    if (event.target.className === "oo-state-screen-selectable") {
+      event.preventDefault();//to prevent mobile from propagating click to discovery shown on pause
+      if (!this.state.controlBarVisible){
+        this.showControlBar(event);
+        this.props.controller.startHideControlBarTimer();
+      }
+      else {
+        var shouldToggle = false;
+        if (this.props.controller.videoVr) {
+          if (!this.props.isVrMouseMove) {
+            shouldToggle = true;
+          }
+        } else {
+          shouldToggle = true;
+        }
+        if (shouldToggle) {
+          this.props.controller.togglePlayPause(event);
+        }
+      }
     }
-    else if (!this.props.controller.videoVr) {
-      this.props.controller.togglePlayPause(event);
-    }
+    this.props.handleVrPlayerMouseUp(event);
   },
 
   handlePlayerMouseDown: function(e) {
-
     if (this.props.controller.videoVr) {
       e.persist();
     }
@@ -150,11 +175,6 @@ var PlayingScreen = React.createClass({
   },
 
   handlePlayerMouseMove: function(e) {
-    if (this.props.controller.videoVr) {
-      e.preventDefault();
-      e.persist();
-    }
-
     if(!this.isMobile && this.props.fullscreen) {
       this.showControlBar();
       this.props.controller.startHideControlBarTimer();
@@ -167,18 +187,14 @@ var PlayingScreen = React.createClass({
     if (!this.isMobile) {
       e.stopPropagation(); // W3C
       e.cancelBubble = true; // IE
-      this.props.controller.state.accessibilityControlsEnabled = true;
-      this.props.controller.state.isClickedOutside = false;
-      if (!this.props.controller.videoVr) {
+      if (!this.props.controller.videoVr && !this.props.controller.state.accessibilityControlsEnabled) {
         this.props.controller.togglePlayPause();
       }
+      this.props.controller.state.accessibilityControlsEnabled = true;
+      this.props.controller.state.isClickedOutside = false;
     }
-    this.props.handleVrPlayerMouseUp();
+    this.props.handleVrPlayerMouseUp(e);
     // for mobile, touch is handled in handleTouchEnd
-  },
-
-  handlePlayerMouseLeave: function () {
-    this.props.handleVrPlayerMouseLeave();
   },
 
   handlePlayerClicked: function (event) {
@@ -300,11 +316,6 @@ var PlayingScreen = React.createClass({
         className="oo-state-screen-selectable"
         onMouseDown={this.handlePlayerMouseDown}
         onTouchStart={this.handlePlayerMouseDown}
-        onMouseUp={this.handlePlayerMouseUp}
-        onMouseMove={this.handlePlayerMouseMove}
-        onTouchMove={this.handlePlayerMouseMove}
-        onMouseLeave={this.handlePlayerMouseLeave}
-        onTouchEnd={this.handleTouchEnd}
         onClick={this.handlePlayerClicked}
         onFocus={this.handlePlayerFocus}
       />
