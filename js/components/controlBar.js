@@ -110,6 +110,18 @@ var ControlBar = React.createClass({
     }
   },
 
+  handleTheaterModeClick: function (evt) {
+    evt.stopPropagation();
+    evt.cancelBubble = true;
+    evt.preventDefault();
+    if (this.props.controller) {
+      this.props.controller.toggleTheaterMode();
+      if (this.vr && this.isMobile && this.props.controller.isVrStereo) {
+        this.toggleStereoVr();
+      }
+    }
+  },
+
   handleStereoVrClick: function (evt) {
     if (this.vr) {
       evt.stopPropagation();
@@ -448,6 +460,7 @@ var ControlBar = React.createClass({
     }
 
     var volumeIcon = (this.props.controller.state.volumeState.muted ? "volumeOff" : "volume");
+    var theaterModeIcon = (this.props.controller.state.theatermode ? "theaterOff" : "theaterOn");
 
     var fullscreenIcon = "";
     if (this.props.controller.state.fullscreen) {
@@ -611,6 +624,12 @@ var ControlBar = React.createClass({
           onMouseOver={this.highlight} onMouseOut={this.removeHighlight}/>
       </a>,
 
+      "theater": <a className="oo-theater oo-control-bar-item"
+    onClick={this.handleTheaterModeClick} key="theater">
+      <Icon {...this.props} icon={theaterModeIcon} style={dynamicStyles.iconCharacter}
+    onMouseOver={this.highlight} onMouseOut={this.removeHighlight}/>
+    </a>,
+
       "fullscreen": <a className="oo-fullscreen oo-control-bar-item"
         onClick={this.handleFullscreenClick} key="fullscreen">
         <Icon {...this.props} icon={fullscreenIcon} style={dynamicStyles.iconCharacter}
@@ -625,6 +644,7 @@ var ControlBar = React.createClass({
     };
 
     var controlBarItems = [];
+
     var defaultItems = this.props.controller.state.isPlayingAd ? this.props.skinConfig.buttons.desktopAd : this.props.skinConfig.buttons.desktopContent;
 
     //if mobile and not showing the slider or the icon, extra space can be added to control bar width. If volume bar is shown instead of slider, add some space as well:
@@ -707,7 +727,7 @@ var ControlBar = React.createClass({
       controlBarItems.push(defaultItems[k]);
     }
 
-    var collapsedResult = Utils.collapse(1000, controlBarItems, this.responsiveUIMultiple);
+    var collapsedResult = Utils.collapse(this.props.componentWidth, controlBarItems, this.responsiveUIMultiple);
     var collapsedControlBarItems = collapsedResult.fit;
     var collapsedMoreOptionsItems = collapsedResult.overflow;
     this.moreOptionsItems = collapsedMoreOptionsItems;

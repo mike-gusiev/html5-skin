@@ -89,6 +89,7 @@ OO.plugin("Html5Skin", function (OO, _, $, W) {
       "mainVideoBuffered": null,
       "mainVideoPlayhead": 0,
       "adVideoPlayhead": 0,
+      "theatermode": false,
       "focusedElement": null,
       "focusedControl": null, // Stores the id of the control bar element that is currently focused
 
@@ -1396,6 +1397,16 @@ OO.plugin("Html5Skin", function (OO, _, $, W) {
       }
       this.state.fullscreen = !this.state.fullscreen;
       this.renderSkin();
+    },
+
+    //called when user select theater icon
+    //all UI changes are outside of ooyala player code
+    toggleTheaterMode: function () {
+      this.state.theatermode = !this.state.theatermode;
+      var event = new CustomEvent('ooyala-theater-mode', {
+        detail: {enabled: this.state.theatermode}
+      });
+      window.dispatchEvent(event);
     },
 
     // if fullscreen is not supported natively, "full window" style
