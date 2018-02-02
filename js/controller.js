@@ -1403,7 +1403,7 @@ OO.plugin("Html5Skin", function (OO, _, $, W) {
     //all UI changes are outside of ooyala player code
     toggleTheaterMode: function () {
       this.state.theatermode = !this.state.theatermode;
-      var event = new CustomEvent('ooyala-theater-mode', {
+      var event = new CustomEvent('onOoyalaTheaterMode', {
         detail: {enabled: this.state.theatermode}
       });
       window.dispatchEvent(event);
