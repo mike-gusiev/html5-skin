@@ -941,7 +941,7 @@ var Utils = {
       return true;
     }
     return false;
-  }
+  },
 };
 
 module.exports = Utils;
