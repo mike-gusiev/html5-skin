@@ -597,11 +597,27 @@ var ControlBar = React.createClass({
 
       "closedCaption": (
         <div className="oo-popover-button-container" key="closedCaption">
-          {closedCaptionPopover}
-          <a className={captionClass} onClick={this.handleClosedCaptionClick} style={selectedStyle}>
+          <AccessibleButton
+            ref={function(e) { this.toggleButtons[CONSTANTS.MENU_OPTIONS.CLOSED_CAPTIONS] = e }.bind(this)}
+            style={selectedStyle}
+            className={captionClass}
+            focusId={CONSTANTS.FOCUS_IDS.CLOSED_CAPTIONS}
+            ariaLabel={CONSTANTS.ARIA_LABELS.CLOSED_CAPTIONS}
+            ariaHasPopup={true}
+            ariaExpanded={this.props.controller.state.closedCaptionOptions.showPopover ? true : null}
+            onClick={this.handleClosedCaptionClick}>
             <Icon {...this.props} icon="cc" style={dynamicStyles.iconCharacter}
-              onMouseOver={this.highlight} onMouseOut={this.removeHighlight}/>
-          </a>
+                  onMouseOver={this.highlight} onMouseOut={this.removeHighlight}/>
+          </AccessibleButton>
+          {this.props.controller.state.closedCaptionOptions.showPopover &&
+            <Popover
+              popoverClassName="oo-popover oo-popover-pull-right"
+              autoFocus={this.props.controller.state.closedCaptionOptions.autoFocus}
+              closeActionEnabled={this.props.controller.state.accessibilityControlsEnabled}
+              closeAction={this.closeCaptionPopover}>
+              <ClosedCaptionPopover {...this.props} togglePopoverAction={this.closeCaptionPopover} />
+            </Popover>
+          }
         </div>
       ),
 
