@@ -675,6 +675,10 @@ var ControlBar = React.createClass({
 
     var defaultItems = this.props.controller.state.isPlayingAd ? this.props.skinConfig.buttons.desktopAd : this.props.skinConfig.buttons.desktopContent;
 
+    if (this.isMobile) {
+      defaultItems = this.props.controller.state.isPlayingAd ? this.props.skinConfig.buttons.mobileAd : this.props.skinConfig.buttons.mobileContent;
+    }
+
     //if mobile and not showing the slider or the icon, extra space can be added to control bar width. If volume bar is shown instead of slider, add some space as well:
     var volumeItem = null;
     var extraSpaceVolume = 0;
