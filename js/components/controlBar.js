@@ -244,6 +244,14 @@ var ControlBar = React.createClass({
     }
   },
 
+  changeVolumeSlider: function(event) {
+    var newVolume = parseFloat(event.target.value);
+    this.props.controller.setVolume(newVolume);
+    this.setState({
+      volumeSliderValue: event.target.value
+    });
+  },
+
   configureMenuAutofocus: function(menu) {
     var menuOptions = this.props.controller.state[menu] || {};
     var menuToggleButton = this.toggleButtons[menu];
@@ -504,14 +512,18 @@ var ControlBar = React.createClass({
                          onMouseDown={this.onMouseDown}
                          onMouseUp={this.onMouseUp}
                          onMouseMove={this.onMouseMove}
-    ><span style={spanStyle}></span></div>);
-    var volumeSlider = <div className="oo-volume-slider"><Slider value={parseFloat(this.props.controller.state.volumeState.volume)}
-                        onChange={this.changeVolumeSlider}
-                        className={"oo-slider oo-slider-volume"}
-                        itemRef={"volumeSlider"}
-                        minValue={"0"}
-                        maxValue={"1"}
-                        step={"0.1"}/></div>;
+    ><span style={spanStyle}/></div>);
+    var volumeSlider = (
+      <div className="oo-volume-slider">
+        <Slider value={parseFloat(this.props.controller.state.volumeState.volume)}
+          onChange={this.changeVolumeSlider}
+          className={"oo-slider oo-slider-volume"}
+          itemRef={"volumeSlider"}
+          minValue={0}
+          maxValue={1}
+          step={0.1}/>
+      </div>
+    );
 
     var volumeControls;
     if (!this.isMobile){
