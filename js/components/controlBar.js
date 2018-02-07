@@ -244,8 +244,8 @@ var ControlBar = React.createClass({
     }
   },
 
-  changeVolumeSlider: function(event) {
-    var newVolume = parseFloat(event.target.value);
+  changeVolumeSlider: function(value) {
+    var newVolume = parseFloat(value);
     this.props.controller.setVolume(newVolume);
     this.setState({
       volumeSliderValue: event.target.value
