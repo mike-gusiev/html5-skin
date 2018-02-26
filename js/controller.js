@@ -89,7 +89,6 @@ OO.plugin("Html5Skin", function (OO, _, $, W) {
       "mainVideoBuffered": null,
       "mainVideoPlayhead": 0,
       "adVideoPlayhead": 0,
-      "theatermode": false,
       "focusedElement": null,
       "focusedControl": null, // Stores the id of the control bar element that is currently focused
 
@@ -1406,10 +1405,7 @@ OO.plugin("Html5Skin", function (OO, _, $, W) {
     //called when user select theater icon
     //all UI changes are outside of ooyala player code
     toggleTheaterMode: function () {
-      this.state.theatermode = !this.state.theatermode;
-      var event = new CustomEvent('onOoyalaTheaterMode', {
-        detail: {enabled: this.state.theatermode}
-      });
+      var event = new CustomEvent('onOoyalaTheaterMode');
       window.dispatchEvent(event);
     },
 

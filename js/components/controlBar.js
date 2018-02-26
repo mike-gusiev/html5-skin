@@ -468,7 +468,6 @@ var ControlBar = React.createClass({
     }
 
     var volumeIcon = (this.props.controller.state.volumeState.muted ? "volumeOff" : "volume");
-    var theaterModeIcon = (this.props.controller.state.theatermode ? "theaterOff" : "theaterOn");
 
     var fullscreenIcon = "";
     if (this.props.controller.state.fullscreen) {
@@ -654,7 +653,7 @@ var ControlBar = React.createClass({
 
       "theater": <a className="oo-theater oo-control-bar-item"
     onClick={this.handleTheaterModeClick} key="theater">
-      <Icon {...this.props} icon={theaterModeIcon} style={dynamicStyles.iconCharacter}
+      <Icon {...this.props} icon="theater" style={dynamicStyles.iconCharacter}
     onMouseOver={this.highlight} onMouseOut={this.removeHighlight}/>
     </a>,
 
