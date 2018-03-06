@@ -651,11 +651,12 @@ var ControlBar = React.createClass({
           onMouseOver={this.highlight} onMouseOut={this.removeHighlight}/>
       </a>,
 
-      "theater": <a className="oo-theater oo-control-bar-item"
-    onClick={this.handleTheaterModeClick} key="theater">
-      <Icon {...this.props} icon="theater" style={dynamicStyles.iconCharacter}
-    onMouseOver={this.highlight} onMouseOut={this.removeHighlight}/>
-    </a>,
+      "theater": this.props.controller.state.fullscreen ? null : (
+        <a className="oo-theater oo-control-bar-item" onClick={this.handleTheaterModeClick} key="theater">
+          <Icon {...this.props} icon="theater" style={dynamicStyles.iconCharacter}
+            onMouseOver={this.highlight} onMouseOut={this.removeHighlight}/>
+        </a>
+      ),
 
       "fullscreen": <a className="oo-fullscreen oo-control-bar-item"
         onClick={this.handleFullscreenClick} key="fullscreen">
