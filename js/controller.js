@@ -825,6 +825,9 @@ OO.plugin("Html5Skin", function (OO, _, $, W) {
         this.state.screenToShow = CONSTANTS.SCREEN.SHARE_SCREEN;
       } else {
         this.state.screenToShow = CONSTANTS.SCREEN.END_SCREEN;
+        if (this.state.customSkinJSON.endScreen.screenToShowOnEnd === 'endCard') {
+            this.state.screenToShow = CONSTANTS.SCREEN.END_CARD;
+        }
         this.mb.publish(OO.EVENTS.END_SCREEN_SHOWN);
       }
       if (!Utils.canRenderSkin()) {

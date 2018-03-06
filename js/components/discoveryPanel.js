@@ -132,12 +132,13 @@ var DiscoveryPanel = React.createClass({
 
     // Build discovery content blocks
     var discoveryContentBlocks = [];
-    for (var i = 0; i < relatedVideoPage.length; i++) {
+    for (var i = 0; i < Math.min(relatedVideoPage.length, videosPerPage); i++) {
       discoveryContentBlocks.push(
         <DiscoverItem {...this.props}
           key={i}
           src={relatedVideoPage[i].preview_image_url}
           contentTitle={relatedVideoPage[i].name}
+          duration={relatedVideoPage[i].duration}
           contentTitleClassName={discoveryContentName}
           onClickAction={this.handleDiscoveryContentClick.bind(this, videosPerPage * (this.state.currentPage - 1) + i)}
         >
@@ -189,10 +190,10 @@ DiscoveryPanel.propTypes = {
 
 DiscoveryPanel.defaultProps = {
   videosPerPage: {
-    xs: 2,
-    sm: 4,
-    md: 6,
-    lg: 8
+    xs: 1,
+    sm: 1,
+    md: 3,
+    lg: 3
   },
   skinConfig: {
     discoveryScreen: {
