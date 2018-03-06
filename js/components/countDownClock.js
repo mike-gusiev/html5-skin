@@ -22,7 +22,7 @@ var CountDownClock = React.createClass({
     var tmpRemainSeconds = 0;
     var upNextTimeToShow = parseInt(this.props.controller.state.upNextInfo.timeToShow);
 
-    if(this.props.controller.state.screenToShow === CONSTANTS.SCREEN.DISCOVERY_SCREEN) {
+    if(this.props.controller.state.screenToShow === CONSTANTS.SCREEN.DISCOVERY_SCREEN || this.props.controller.state.screenToShow === CONSTANTS.SCREEN.END_CARD) {
       tmpFraction = 2 / this.props.timeToShow;
       tmpRemainSeconds = this.props.timeToShow;
     }
@@ -44,7 +44,7 @@ var CountDownClock = React.createClass({
       //since mobile would fire both click and touched events,
       //we need to make sure only one actually does the work
 
-      if(this.props.controller.state.screenToShow === CONSTANTS.SCREEN.DISCOVERY_SCREEN) {
+      if (this.props.controller.state.screenToShow === CONSTANTS.SCREEN.DISCOVERY_SCREEN || this.props.controller.state.screenToShow === CONSTANTS.SCREEN.END_CARD) {
         this.setState({hideClock: true});
         clearInterval(this.interval);
       }
@@ -89,7 +89,7 @@ var CountDownClock = React.createClass({
 
   updateClockSize: function(){
     var clockWidth = 75;
-    if (this.props.controller.state.screenToShow !== CONSTANTS.SCREEN.DISCOVERY_SCREEN){
+    if (this.props.controller.state.screenToShow !== CONSTANTS.SCREEN.DISCOVERY_SCREEN && this.props.controller.state.screenToShow !== CONSTANTS.SCREEN.END_CARD) {
       clockWidth = 24;
     }
     this.setState({
@@ -116,7 +116,7 @@ var CountDownClock = React.createClass({
   },
 
   tick: function() {
-    if(this.props.controller.state.screenToShow === CONSTANTS.SCREEN.DISCOVERY_SCREEN) {
+    if(this.props.controller.state.screenToShow === CONSTANTS.SCREEN.DISCOVERY_SCREEN || this.props.controller.state.screenToShow === CONSTANTS.SCREEN.END_CARD) {
       if(this.state.remainSeconds < 1) {
         this.setState({remainSeconds: 0});
         clearInterval(this.interval);
@@ -171,8 +171,8 @@ var CountDownClock = React.createClass({
   render: function() {
     var canvasClassName = ClassNames({
       'oo-countdown-clock': true,
-      'oo-up-next-count-down': this.props.controller.state.screenToShow !== CONSTANTS.SCREEN.DISCOVERY_SCREEN,
-      'oo-discovery-count-down': this.props.controller.state.screenToShow === CONSTANTS.SCREEN.DISCOVERY_SCREEN,
+      'oo-up-next-count-down': this.props.controller.state.screenToShow !== CONSTANTS.SCREEN.DISCOVERY_SCREEN && this.props.controller.state.screenToShow !== CONSTANTS.SCREEN.END_CARD,
+      'oo-discovery-count-down': this.props.controller.state.screenToShow === CONSTANTS.SCREEN.DISCOVERY_SCREEN || this.props.controller.state.screenToShow === CONSTANTS.SCREEN.END_CARD,
       'oo-hidden': this.state.hideClock
     });
 

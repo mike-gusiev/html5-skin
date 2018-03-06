@@ -71,7 +71,7 @@
         "screenToShowOnPause": "default"
     },
     "endScreen": {
-        "screenToShowOnEnd": "discovery",
+        "screenToShowOnEnd": "endCard",
         "showReplayButton": true,
         "replayIconStyle": {
             "color": "white",
@@ -79,7 +79,17 @@
         },
         "showTitle": true,
         "showDescription": false,
-        "infoPanelPosition": "topLeft"
+        "infoPanelPosition": "topLeft",
+        "contentDuration": {
+            "show": true,
+            "font": {
+                "fontSize": 12,
+                "fontFamily": "Arial-BoldMT",
+                "color": "white"
+            }
+        },
+        "showCountDownTimerOnEndScreen": true,
+        "countDownTime": 10
     },
     "adScreen": {
         "showAdMarquee": true,

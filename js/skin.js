@@ -13,6 +13,7 @@ var React = require('react'),
     MoreOptionsPanel = require('./components/moreOptionsPanel'),
     AdScreen = require('./views/adScreen'),
     EndScreen = require('./views/endScreen'),
+    EndCard = require('./views/endCard'),
     StartScreen = require('./views/startScreen'),
     PauseScreen = require('./views/pauseScreen'),
     PlayingScreen = require('./views/playingScreen'),
@@ -328,6 +329,33 @@ var Skin = React.createClass({
             />
           );
           break;
+        case CONSTANTS.SCREEN.END_CARD:
+            screen = (
+                <EndCard {...this.props}
+                           contentTree={this.state.contentTree}
+                           discoveryData={this.state.discoveryData}
+                           currentPlayhead={this.state.currentPlayhead}
+                           duration={this.state.duration}
+                           buffered={this.state.buffered}
+                           fullscreen={this.state.fullscreen}
+                           playerState={this.state.playerState}
+                           seeking={this.state.seeking}
+                           isLiveStream={this.state.isLiveStream}
+                           responsiveView={this.state.responsiveId}
+                           videoQualityOptions={this.state.videoQualityOptions}
+                           componentWidth={this.state.componentWidth}
+                           ref="endCard" >
+                    <DiscoveryPanel
+                        {...this.props}
+                        videosPerPage={{xs:1, sm:1, md:3, lg:3}}
+                        forceCountDownTimer={this.state.forceCountDownTimerOnEndScreen}
+                        discoveryData={this.state.discoveryData}
+                        playerState={this.state.playerState}
+                        responsiveView={this.state.responsiveId}
+                        componentWidth={this.state.componentWidth}/>
+                </EndCard>
+            );
+            break;
         case CONSTANTS.SCREEN.END_SCREEN:
           screen = (
             <EndScreen {...this.props}
