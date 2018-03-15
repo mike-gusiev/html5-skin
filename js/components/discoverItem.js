@@ -8,21 +8,6 @@ var DiscoverItem = React.createClass({
     };
   },
 
-  getVideoDuration: function() {
-      var seconds = this.props.duration;
-      var date = new Date(null);
-      for (var i = 0; i < 3; i++) {
-          seconds = Math.round(seconds / 10);
-      }
-      date.setSeconds(seconds);
-      if (seconds >= 3600) {
-          var duration = date.toISOString().substr(11, 8);
-      } else {
-          var duration = date.toISOString().substr(14, 5);
-      }
-      return duration;
-  },
-
   componentWillMount: function() {
     var img = new Image();
     img.src = this.props.src;
@@ -45,8 +30,6 @@ var DiscoverItem = React.createClass({
       backgroundImage: "url('" + this.props.src + "')"
     };
 
-    var duration = this.getVideoDuration();
-
     var itemTitleStyle = {
       color: Utils.getPropertyValue(this.props.skinConfig, 'discoveryScreen.contentTitle.font.color'),
       fontFamily: Utils.getPropertyValue(this.props.skinConfig, 'discoveryScreen.contentTitle.font.fontFamily')
@@ -57,7 +40,6 @@ var DiscoverItem = React.createClass({
         <div className="oo-discovery-wrapper">
           <a onClick={this.props.onClickAction}>
             <div className="oo-image-style" style={thumbnailStyle}></div>
-            <span className="elem-length">{duration}</span>
           </a>
           {this.props.children}
         </div>

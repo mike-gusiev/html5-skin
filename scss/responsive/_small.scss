@@ -174,4 +174,48 @@
       font-size: 100px;
     }
   }
+  .oo-end-card {
+    .oo-discovery-panel {
+      .oo-flexcontainer {
+        display: none;
+      }
+      .oo-first-elem {
+        width: 92%;
+        height: 100%;
+        left: 4%;
+        position: absolute;
+        .oo-discovery-image-wrapper-style {
+          padding: 5% 5% 10% 5%;
+          width: 100%;
+          height: 100%;
+          display: flex;
+          flex-direction: row;
+          background: $panel-bg;
+          z-index: 10;
+          .oo-discovery-wrapper {
+            .oo-icon-pause-slick {
+              font-size: 12px;
+            }
+            width: 78%;
+            height: 100%;
+            .oo-image-style {
+              height: 100%;
+              width: auto;
+            }
+          }
+          .oo-discovery-content-name {
+            padding-left: 5%;
+          }
+        }
+      }
+    }
+  }
+  .oo-state-screen button.oo-action-icon {
+    display: none;
+  }
+
+  .oo-content-panel {
+    top: 11%;
+    height: 52%;
+  }
 }

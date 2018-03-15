@@ -8,6 +8,7 @@ var React = require('react'),
     OnOffSwitch = require('./components/closed-caption/onOffSwitch'),
     ClosedCaptionPanel = require('./components/closed-caption/closedCaptionPanel'),
     DiscoveryPanel = require('./components/discoveryPanel'),
+    DiscoveryBar = require('./components/endCardComponents/discoveryBar'),
     VideoQualityPanel = require('./components/videoQualityPanel'),
     SharePanel = require('./components/sharePanel'),
     MoreOptionsPanel = require('./components/moreOptionsPanel'),
@@ -345,7 +346,7 @@ var Skin = React.createClass({
                            videoQualityOptions={this.state.videoQualityOptions}
                            componentWidth={this.state.componentWidth}
                            ref="endCard" >
-                    <DiscoveryPanel
+                    <DiscoveryBar
                         {...this.props}
                         videosPerPage={{xs:1, sm:1, md:3, lg:3}}
                         forceCountDownTimer={this.state.forceCountDownTimerOnEndScreen}

@@ -79,6 +79,12 @@
     background-position: center;
   }
 
+  &.oo-end-card {
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+  }
+
   .oo-state-screen-info {
     pointer-events: none;
     position: absolute;
@@ -118,7 +124,7 @@
 
   button.oo-action-icon {
     z-index: 10;
-    margin: 0;
+    margin-top: -2%;
     padding: 0;
     background: none;
     border: none;
@@ -130,7 +136,7 @@
     outline: none;
 
     span.oo-icon {
-      font-size: 150px;
+      font-size: 5em;
       opacity: 1;
       color: white;
     }

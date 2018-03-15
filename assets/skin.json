@@ -77,7 +77,7 @@
             "color": "white",
             "opacity": 1
         },
-        "showTitle": true,
+        "showTitle": false,
         "showDescription": false,
         "infoPanelPosition": "topLeft",
         "contentDuration": {
