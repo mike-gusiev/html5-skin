@@ -346,7 +346,8 @@ var Skin = React.createClass({
                            videoQualityOptions={this.state.videoQualityOptions}
                            componentWidth={this.state.componentWidth}
                            ref="endCard" >
-                    <DiscoveryBar
+                    {this.state.discoveryData && (
+                      <DiscoveryBar
                         {...this.props}
                         videosPerPage={{xs:1, sm:1, md:3, lg:3}}
                         forceCountDownTimer={this.state.forceCountDownTimerOnEndScreen}
@@ -354,6 +355,7 @@ var Skin = React.createClass({
                         playerState={this.state.playerState}
                         responsiveView={this.state.responsiveId}
                         componentWidth={this.state.componentWidth}/>
+                    )}
                 </EndCard>
             );
             break;
