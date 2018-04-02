@@ -12,7 +12,8 @@ var React = require('react'),
     Skin = require('./skin'),
     SkinJSON = require('../config/skin'),
     Bulk = require('bulk-require'),
-    Localization = Bulk('./config', ['languageFiles/*.json']);
+    Localization = Bulk('./config', ['languageFiles/*.json']),
+    DiscoveryMixin = require('./mixins/discoveryMixin');
 
 OO.plugin("Html5Skin", function (OO, _, $, W) {
   //Check if the player is at least v4. If not, the skin cannot load.
@@ -338,6 +339,14 @@ OO.plugin("Html5Skin", function (OO, _, $, W) {
       if (this.videoVr && this.state.isMobile) {
         this.state.mainVideoInnerWrapper.attr('style', 'touch-action: none');
       }
+    },
+
+    setDiscoveryVideos: function (relatedVideos) {
+        this.state.discoveryData = {
+          relatedVideos: relatedVideos
+        };
+        this.state.upNextInfo.upNextData = relatedVideos[0];
+        this.renderSkin();
     },
 
     onSetVideoVr: function(event, params) {
@@ -1341,10 +1350,10 @@ OO.plugin("Html5Skin", function (OO, _, $, W) {
 
     onRelatedVideosFetched: function(event, relatedVideos) {
       OO.log("onRelatedVideosFetched is called");
-      if (relatedVideos.videos) {
-        this.state.discoveryData = {relatedVideos: relatedVideos.videos};
-        this.state.upNextInfo.upNextData = relatedVideos.videos[0];
-        this.renderSkin();
+      if (playerParam.discoveryParams) {
+          DiscoveryMixin.getRelatedVideosByUrl(playerParam.discoveryParams, this.setDiscoveryVideos.bind(this));
+      } else if (relatedVideos.videos) {
+        this.setDiscoveryVideos(relatedVideos.videos);
       }
     },
 
