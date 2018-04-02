@@ -1,7 +1,6 @@
 var DiscoveryMixin = {
-    getRelatedVideosByUrl: function (discoveryParams, setDiscoveryVideos) {
+    getRelatedVideosByUrl: function (discoveryParams, videoId, setDiscoveryVideos) {
         var xhr = new XMLHttpRequest();
-        var videoId = 'FuaHNqNTE614YPccDXvI6jH7vLcd4fQK';
         var relatedUrl = '//api.ooyala.com/v2/discover/similar/assets/';
         var url = relatedUrl + videoId + '?' + DiscoveryMixin._generateParamString(discoveryParams);
         xhr.open('GET', url, true);
