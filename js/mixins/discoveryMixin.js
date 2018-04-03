@@ -25,8 +25,9 @@ var DiscoveryMixin = {
         var ids = results.map(function (res) {
             return res.embed_code;
         });
-        var url = discoveryUrl + '/videoIds='  + ids.join(',') + '&path=' + path;
-        xhr.open('GET', url, true);
+        discoveryUrl = discoveryUrl.replace('{videoIds}', ids.join(','));
+        discoveryUrl = discoveryUrl.replace('{path}', path);
+        xhr.open('GET', discoveryUrl, true);
         xhr.send();
         xhr.onreadystatechange = function() {
             if (xhr.readyState != 4) return;

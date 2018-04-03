@@ -39,8 +39,10 @@ var DiscoverItem = React.createClass({
             return null;
         }
 
+        var cloudinaryUrl = 'http://pga-tour-res.cloudinary.com/image/fetch/f_auto,q_50,w_710/' + this.props.src;
+
         var thumbnailStyle = {
-            backgroundImage: "url('" + this.props.src + "')"
+            backgroundImage: "url('" + cloudinaryUrl + "')"
         };
 
         var duration = this.getVideoDuration();
