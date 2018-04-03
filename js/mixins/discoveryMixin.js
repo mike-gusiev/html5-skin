@@ -1,5 +1,5 @@
 var DiscoveryMixin = {
-    getRelatedVideosByUrl: function (discoveryParams, videoId, setDiscoveryVideos) {
+    getRelatedVideosByUrl: function (discoveryParams, discoveryUrl, videoId, setDiscoveryVideos) {
         var xhr = new XMLHttpRequest();
         var relatedUrl = '//api.ooyala.com/v2/discover/similar/assets/';
         var url = relatedUrl + videoId + '?' + DiscoveryMixin._generateParamString(discoveryParams);
@@ -11,7 +11,33 @@ var DiscoveryMixin = {
                 console.log(xhr.status + ': ' + xhr.statusText);
             } else {
                 var relatedVideos = JSON.parse(xhr.response);
-                setDiscoveryVideos(relatedVideos.results);
+                var results = relatedVideos.results.sort(function (a, b) {
+                    return a.embed_code > b.embed_code ? -1 : 1;
+                }).slice(0, 10);
+                DiscoveryMixin.getFullVideoData(discoveryUrl, results, setDiscoveryVideos);
+            }
+        }
+    },
+
+    getFullVideoData: function (discoveryUrl, results, setDiscoveryVideos) {
+        var xhr = new XMLHttpRequest();
+        var path = '/content/pgatour';
+        var ids = results.map(function (res) {
+            return res.embed_code;
+        });
+        var url = discoveryUrl + '/videoIds='  + ids.join(',') + '&path=' + path;
+        xhr.open('GET', url, true);
+        xhr.send();
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState != 4) return;
+            if (xhr.status != 200) {
+                console.log(xhr.status + ': ' + xhr.statusText);
+            } else {
+                var fullVideosData = JSON.parse(xhr.response);
+                for (var i = 0; i < 10; i++) {
+                    results[i]['franchise'] = fullVideosData[i]['franchise'];
+                }
+                setDiscoveryVideos(results);
             }
         }
     },

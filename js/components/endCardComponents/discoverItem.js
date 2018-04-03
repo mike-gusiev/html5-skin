@@ -59,7 +59,9 @@ var DiscoverItem = React.createClass({
                     {this.props.children}
                 </div>
                 <div className={this.props.contentTitleClassName}>
-                    <div>FRANSHISE TAG</div>
+                    {this.props.franchise && (
+                        <div>{this.props.franchise.toUpperCase()}</div>
+                    )}
                     <div style={itemTitleStyle} dangerouslySetInnerHTML={Utils.createMarkup(this.props.contentTitle)}></div>
                 </div>
             </div>
