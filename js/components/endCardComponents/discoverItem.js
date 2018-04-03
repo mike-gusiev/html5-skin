@@ -40,6 +40,9 @@ var DiscoverItem = React.createClass({
         }
 
         var cloudinaryUrl = 'http://pga-tour-res.cloudinary.com/image/fetch/f_auto,q_50,w_710/' + this.props.src;
+        if (this.props.image) {
+            cloudinaryUrl = 'http://pga-tour-res.cloudinary.com/image/upload/f_auto,q_50,w_710/v1/' + this.props.image;
+        }
 
         var thumbnailStyle = {
             backgroundImage: "url('" + cloudinaryUrl + "')"
@@ -81,7 +84,14 @@ DiscoverItem.propTypes = {
                 })
             })
         })
-    })
+    }),
+    src: React.PropTypes.string,
+    image: React.PropTypes.string,
+    contentTitle: React.PropTypes.string,
+    franchise: React.PropTypes.string,
+    duration: React.PropTypes.number,
+    contentTitleClassName: React.PropTypes.string,
+    onClickAction: React.PropTypes.func
 };
 
 module.exports = DiscoverItem;

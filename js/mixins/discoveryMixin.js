@@ -37,6 +37,7 @@ var DiscoveryMixin = {
                 var fullVideosData = JSON.parse(xhr.response);
                 for (var i = 0; i < 10; i++) {
                     results[i]['franchise'] = fullVideosData[i]['franchise'];
+                    results[i]['image'] = fullVideosData[i]['image'];
                 }
                 setDiscoveryVideos(results);
             }
