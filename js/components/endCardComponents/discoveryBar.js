@@ -30,9 +30,9 @@ var DiscoverBar = React.createClass({
         this.detectHeight();
     },
 
-    handleDiscoveryContentClick: function(index) {
+    handleDiscoveryContentClick: function(video) {
         var eventData = {
-            "clickedVideo": this.props.discoveryData.relatedVideos[index],
+            "clickedVideo": video,
             "custom": this.props.discoveryData.custom
         };
         this.props.controller.sendDiscoveryClickEvent(eventData, false);
@@ -107,7 +107,7 @@ var DiscoverBar = React.createClass({
                               franchise={relatedVideoPage[i].franchise}
                               duration={relatedVideoPage[i].duration}
                               contentTitleClassName={discoveryContentName}
-                              onClickAction={this.handleDiscoveryContentClick.bind(this, videosPerPage + i)}>
+                              onClickAction={this.handleDiscoveryContentClick.bind(this, this.props.discoveryData.relatedVideos[i])}>
                     {(countDownClock && i === 0) ? countDownClock : null}
                 </DiscoverItem>
             );
