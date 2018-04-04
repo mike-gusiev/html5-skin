@@ -13,7 +13,7 @@ var DiscoveryMixin = {
                 var relatedVideos = JSON.parse(xhr.response);
                 var results = relatedVideos.results.sort(function (a, b) {
                     return a.embed_code > b.embed_code ? -1 : 1;
-                }).slice(0, 10);
+                }).slice(0, 3);
                 DiscoveryMixin.getFullVideoData(discoveryUrl, results, setDiscoveryVideos);
             }
         }
@@ -35,7 +35,7 @@ var DiscoveryMixin = {
                 console.log(xhr.status + ': ' + xhr.statusText);
             } else {
                 var fullVideosData = JSON.parse(xhr.response);
-                for (var i = 0; i < 10; i++) {
+                for (var i = 0; i < 3; i++) {
                     results[i]['franchise'] = fullVideosData[i]['franchise'];
                     results[i]['image'] = fullVideosData[i]['image'];
                 }
