@@ -21,12 +21,10 @@ var DiscoveryMixin = {
 
     getFullVideoData: function (discoveryUrl, results, setDiscoveryVideos) {
         var xhr = new XMLHttpRequest();
-        var path = '/content/pgatour';
         var ids = results.map(function (res) {
             return res.embed_code;
         });
         discoveryUrl = discoveryUrl.replace('{videoIds}', ids.join(','));
-        discoveryUrl = discoveryUrl.replace('{path}', path);
         xhr.open('GET', discoveryUrl, true);
         xhr.send();
         xhr.onreadystatechange = function() {
