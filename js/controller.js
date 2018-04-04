@@ -1351,12 +1351,7 @@ OO.plugin("Html5Skin", function (OO, _, $, W) {
     onRelatedVideosFetched: function(event, relatedVideos) {
       OO.log("onRelatedVideosFetched is called");
       if (playerParam.discoveryParams && playerParam.discoveryUrl) {
-          DiscoveryMixin.getRelatedVideosByUrl(
-              playerParam.discoveryParams,
-              playerParam.discoveryUrl,
-              this.state.assetId,
-              this.setDiscoveryVideos.bind(this)
-          );
+          DiscoveryMixin.getRelatedVideosByUrl(playerParam, this.state.assetId, this.setDiscoveryVideos.bind(this));
       } else if (relatedVideos.videos) {
         this.setDiscoveryVideos(relatedVideos.videos);
       }

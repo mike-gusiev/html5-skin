@@ -1,8 +1,8 @@
 var DiscoveryMixin = {
-    getRelatedVideosByUrl: function (discoveryParams, discoveryUrl, videoId, setDiscoveryVideos) {
+    getRelatedVideosByUrl: function (params, videoId, setDiscoveryVideos) {
         var xhr = new XMLHttpRequest();
         var relatedUrl = '//api.ooyala.com/v2/discover/similar/assets/';
-        var url = relatedUrl + videoId + '?' + DiscoveryMixin._generateParamString(discoveryParams);
+        var url = relatedUrl + videoId + '?' + DiscoveryMixin._generateParamString(params);
         xhr.open('GET', url, true);
         xhr.send();
         xhr.onreadystatechange = function() {
@@ -14,7 +14,7 @@ var DiscoveryMixin = {
                 var results = relatedVideos.results.sort(function (a, b) {
                     return a.embed_code > b.embed_code ? -1 : 1;
                 }).slice(0, 3);
-                DiscoveryMixin.getFullVideoData(discoveryUrl, results, setDiscoveryVideos);
+                DiscoveryMixin.getFullVideoData(params.discoveryUrl, results, setDiscoveryVideos);
             }
         }
     },
@@ -45,15 +45,15 @@ var DiscoveryMixin = {
     _generateParamString: function (params) {
         var defaultParams = {
             sign_version: 'player',
-            pcode:'FsaTIxOjRh-XoYreyerA2QjhxTMb',
-            discovery_profile_id: 'fc53804780f1456da1e7d5666406ea2c',
-            video_pcode: 'FsaTIxOjRh-XoYreyerA2QjhxTMb',
-            limit: 10,
-            device_id: 'muTiWJPuWEm3CVc6rLNXZXfGH4Qu3JrcbDwir%2BnwSR0',
+            pcode: params.pcode,
+            discovery_profile_id: params.playerBrandingId,
+            video_pcode: params.pcode,
+            limit: 3,
+            device_id: this.getGUID(),
             expected_bucket_info_version: 2,
             expires: Math.floor((new Date().getTime() / 1000) + 3600)
         };
-        var mergedParams = Object.assign({}, defaultParams, params || {});
+        var mergedParams = Object.assign({}, defaultParams, params.discoveryParams || {});
         var signature = encodeURIComponent(DiscoveryMixin.generateSignature(mergedParams));
         mergedParams.device_id = encodeURIComponent(mergedParams.device_id);
         return DiscoveryMixin.generateParamString(mergedParams, signature);
@@ -70,6 +70,15 @@ var DiscoveryMixin = {
 
     generateParamString: function (params, signature) {
         return 'signature='+ signature + DiscoveryMixin.hashToString(params, '&');
+    },
+
+    getGUID: function () {
+        const randomString = this.generateRandomString();
+        return new window.jsSHA(randomString, 'ASCII').getHash('SHA-256', 'B64');
+    },
+
+    generateRandomString: function () {
+        return new Date().getTime() + window.navigator.userAgent + Math.random().toString(16).split('.')[1];
     },
 
     hashToString: function (hash, delimiter, keys) {
