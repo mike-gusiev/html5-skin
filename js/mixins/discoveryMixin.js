@@ -42,6 +42,7 @@ var DiscoveryMixin = {
         for (var i = 0; i < fullVideosData.length; i++) {
             for (var j = 0; j < results.length; j++) {
                 if (fullVideosData[i]['videoId'] === results[j]['embed_code']) {
+                    results[j]['name'] = fullVideosData[i]['title'];
                     results[j]['franchise'] = fullVideosData[i]['franchise'];
                     results[j]['image'] = fullVideosData[i]['image'];
                     break;
