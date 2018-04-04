@@ -39,8 +39,13 @@ var DiscoverItem = React.createClass({
             return null;
         }
 
+        var cloudinaryUrl = 'http://pga-tour-res.cloudinary.com/image/fetch/f_auto,q_50,w_710/' + this.props.src;
+        if (this.props.image) {
+            cloudinaryUrl = 'http://pga-tour-res.cloudinary.com/image/upload/f_auto,q_50,w_710/' + this.props.image;
+        }
+
         var thumbnailStyle = {
-            backgroundImage: "url('" + this.props.src + "')"
+            backgroundImage: "url('" + cloudinaryUrl + "')"
         };
 
         var duration = this.getVideoDuration();
@@ -59,7 +64,9 @@ var DiscoverItem = React.createClass({
                     {this.props.children}
                 </div>
                 <div className={this.props.contentTitleClassName}>
-                    <div>FRANSHISE TAG</div>
+                    {this.props.franchise && (
+                        <div>{this.props.franchise.toUpperCase()}</div>
+                    )}
                     <div style={itemTitleStyle} dangerouslySetInnerHTML={Utils.createMarkup(this.props.contentTitle)}></div>
                 </div>
             </div>
@@ -77,7 +84,14 @@ DiscoverItem.propTypes = {
                 })
             })
         })
-    })
+    }),
+    src: React.PropTypes.string,
+    image: React.PropTypes.string,
+    contentTitle: React.PropTypes.string,
+    franchise: React.PropTypes.string,
+    duration: React.PropTypes.number,
+    contentTitleClassName: React.PropTypes.string,
+    onClickAction: React.PropTypes.func
 };
 
 module.exports = DiscoverItem;

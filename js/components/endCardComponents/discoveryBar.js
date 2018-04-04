@@ -102,7 +102,9 @@ var DiscoverBar = React.createClass({
                 <DiscoverItem {...this.props}
                               key={i}
                               src={relatedVideoPage[i].preview_image_url}
+                              image={relatedVideoPage[i].image}
                               contentTitle={relatedVideoPage[i].name}
+                              franchise={relatedVideoPage[i].franchise}
                               duration={relatedVideoPage[i].duration}
                               contentTitleClassName={discoveryContentName}
                               onClickAction={this.handleDiscoveryContentClick.bind(this, videosPerPage + i)}>

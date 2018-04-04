@@ -16,8 +16,12 @@
 <script>
   var playerParam = {
     "pcode": "FsaTIxOjRh-XoYreyerA2QjhxTMb",
-    "playerBrandingId": "86304b0649bd45fab19c6829b518596d",
-    "debug":true,
+    "playerBrandingId": "fc53804780f1456da1e7d5666406ea2c",
+    "debug": true,
+    "discoveryParams": {
+      "where": "metadata.language='en'"
+    },
+    "discoveryUrl": "https://cors-anywhere.herokuapp.com/https://beta61-www-pgatour.ctmsp.com/bin/data/feeds/video-details.json/videoIds={videoIds}&path=/content/pgatour",
     "skin": {
       "config": "/assets/skin.json"
     }
@@ -26,6 +30,5 @@
     window.pp = OO.Player.create('container', 'J1eTI4ZTE64ZY0jDnlxZ_xmooHpFpsNz', playerParam);
   });
 </script>
-
 </body>
 </html>
