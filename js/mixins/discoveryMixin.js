@@ -11,17 +11,17 @@ var DiscoveryMixin = {
                 console.log(xhr.status + ': ' + xhr.statusText);
             } else {
                 var relatedVideos = JSON.parse(xhr.response);
-                var results = DiscoveryMixin.sortVideosData(relatedVideos.results).slice(0, 3);
+                var results = relatedVideos.results.slice(0, 3);
                 DiscoveryMixin.getFullVideoData(params.discoveryUrl, results, setDiscoveryVideos);
             }
         }
     },
 
-    getFullVideoData: function (discoveryUrl, results, setDiscoveryVideos) {
+    getFullVideoData: function (discoveryUrl, videos, setDiscoveryVideos) {
         var xhr = new XMLHttpRequest();
-        var ids = results.map(function (res) {
+        var ids = videos.map(function (res) {
             return res.embed_code;
-        });
+        }).sort();
         discoveryUrl = discoveryUrl.replace('{videoIds}', ids.join(','));
         xhr.open('GET', discoveryUrl, true);
         xhr.send();
@@ -31,22 +31,24 @@ var DiscoveryMixin = {
                 console.log(xhr.status + ': ' + xhr.statusText);
             } else {
                 var fullVideosData = JSON.parse(xhr.response);
-                fullVideosData = DiscoveryMixin.sortVideosData(fullVideosData);
-                for (var i = 0; i < 3; i++) {
-                    results[i]['franchise'] = fullVideosData[i]['franchise'];
-                    results[i]['image'] = fullVideosData[i]['image'];
-                }
+                var results = DiscoveryMixin.mergeRelatedVideos(videos, fullVideosData);
                 setDiscoveryVideos(results);
             }
         }
     },
 
-    sortVideosData: function (VideosData) {
-        return VideosData.sort(function (a, b) {
-            var left = a.embed_code || a.videoId;
-            var right = b.embed_code || b.videoId;
-            return left > right ? -1 : 1;
-        });
+    mergeRelatedVideos: function (videos, fullVideosData) {
+        var results = [].concat(videos);
+        for (var i = 0; i < fullVideosData.length; i++) {
+            for (var j = 0; j < results.length; j++) {
+                if (fullVideosData[i]['videoId'] === results[j]['embed_code']) {
+                    results[j]['franchise'] = fullVideosData[i]['franchise'];
+                    results[j]['image'] = fullVideosData[i]['image'];
+                    break;
+                }
+            }
+        }
+        return results;
     },
 
     _generateParamString: function (params) {
