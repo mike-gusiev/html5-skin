@@ -12,18 +12,18 @@ var DiscoveryMixin = {
             } else {
                 var relatedVideos = JSON.parse(xhr.response);
                 var results = relatedVideos.results.slice(0, 3);
-                DiscoveryMixin.getFullVideoData(params.discoveryUrl, results, setDiscoveryVideos);
+                DiscoveryMixin.getFullVideoData(params.videoDetailsUrl, results, setDiscoveryVideos);
             }
         }
     },
 
-    getFullVideoData: function (discoveryUrl, videos, setDiscoveryVideos) {
+    getFullVideoData: function (videoDetailsUrl, videos, setDiscoveryVideos) {
         var xhr = new XMLHttpRequest();
         var ids = videos.map(function (res) {
             return res.embed_code;
         }).sort();
-        discoveryUrl = discoveryUrl.replace('{videoIds}', ids.join(','));
-        xhr.open('GET', discoveryUrl, true);
+        videoDetailsUrl = videoDetailsUrl.replace('{videoIds}', ids.join(','));
+        xhr.open('GET', videoDetailsUrl, true);
         xhr.send();
         xhr.onreadystatechange = function() {
             if (xhr.readyState != 4) return;

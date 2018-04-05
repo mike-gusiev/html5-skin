@@ -1350,7 +1350,7 @@ OO.plugin("Html5Skin", function (OO, _, $, W) {
 
     onRelatedVideosFetched: function(event, relatedVideos) {
       OO.log("onRelatedVideosFetched is called");
-      if (this.state.playerParam.discoveryParams && this.state.playerParam.discoveryUrl) {
+      if (this.state.playerParam.discoveryParams && this.state.playerParam.videoDetailsUrl) {
           DiscoveryMixin.getRelatedVideosByUrl(this.state.playerParam, this.state.assetId, this.setDiscoveryVideos.bind(this));
       } else if (relatedVideos.videos) {
         this.setDiscoveryVideos(relatedVideos.videos);
