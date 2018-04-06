@@ -50,24 +50,20 @@ var DiscoverItem = React.createClass({
 
         var duration = this.getVideoDuration();
 
-        var itemTitleStyle = {
-            color: Utils.getPropertyValue(this.props.skinConfig, 'discoveryScreen.contentTitle.font.color'),
-            fontFamily: Utils.getPropertyValue(this.props.skinConfig, 'discoveryScreen.contentTitle.font.fontFamily')
-        };
         return (
             <div className="oo-discovery-image-wrapper-style">
                 <span className="elem-length">{duration}</span>
                 <div className="oo-discovery-wrapper">
                     <a onClick={this.props.onClickAction}>
-                        <div className="oo-image-style" style={thumbnailStyle}></div>
+                        <div className="oo-image-style" style={thumbnailStyle}/>
                     </a>
                     {this.props.children}
                 </div>
                 <div className={this.props.contentTitleClassName}>
                     {this.props.franchise && (
-                        <div>{this.props.franchise.toUpperCase()}</div>
+                        <div className="end-card-franchise">{this.props.franchise.toUpperCase()}</div>
                     )}
-                    <div style={itemTitleStyle} dangerouslySetInnerHTML={Utils.createMarkup(this.props.contentTitle)}></div>
+                    <div className="end-card-title" dangerouslySetInnerHTML={Utils.createMarkup(this.props.contentTitle)}/>
                 </div>
             </div>
         );
