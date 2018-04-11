@@ -834,7 +834,7 @@ OO.plugin("Html5Skin", function (OO, _, $, W) {
         this.state.screenToShow = CONSTANTS.SCREEN.SHARE_SCREEN;
       } else {
         this.state.screenToShow = CONSTANTS.SCREEN.END_SCREEN;
-        if (this.state.customSkinJSON.endScreen.screenToShowOnEnd === 'endCard') {
+        if (this.state.config.endScreen.screenToShowOnEnd === 'endCard') {
             this.state.screenToShow = CONSTANTS.SCREEN.END_CARD;
         }
         this.mb.publish(OO.EVENTS.END_SCREEN_SHOWN);
@@ -1350,7 +1350,11 @@ OO.plugin("Html5Skin", function (OO, _, $, W) {
 
     onRelatedVideosFetched: function(event, relatedVideos) {
       OO.log("onRelatedVideosFetched is called");
-      if (this.state.playerParam.discoveryParams && this.state.playerParam.videoDetailsUrl) {
+      if (
+        this.state.config.endScreen.screenToShowOnEnd === 'endCard' &&
+        this.state.playerParam.discoveryParams &&
+        this.state.playerParam.videoDetailsUrl
+      ) {
           DiscoveryMixin.getRelatedVideosByUrl(this.state.playerParam, this.state.assetId, this.setDiscoveryVideos.bind(this));
       } else if (relatedVideos.videos) {
         this.setDiscoveryVideos(relatedVideos.videos);
