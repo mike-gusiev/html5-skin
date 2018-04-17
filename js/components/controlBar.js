@@ -697,7 +697,7 @@ var ControlBar = React.createClass({
     var extraSpaceDuration = (hours > 0) ? 0 : 45;
 
     var controlBarLeftRightPadding = CONSTANTS.UI.DEFAULT_SCRUBBERBAR_LEFT_RIGHT_PADDING * 2;
-
+    var contentTree = this.props.contentTree || {};
     for (var k = 0; k < defaultItems.length; k++) {
 
       //filter out unrecognized button names
@@ -722,7 +722,8 @@ var ControlBar = React.createClass({
       }
 
       //do not show CC button if no CC available
-      if (!this.props.controller.state.closedCaptionOptions.availableLanguages && (defaultItems[k].name === "closedCaption")){
+      if ((!this.props.controller.state.closedCaptionOptions.availableLanguages || !contentTree.closed_captions_vtt) &&
+        (defaultItems[k].name === "closedCaption")){
         continue;
       }
 
