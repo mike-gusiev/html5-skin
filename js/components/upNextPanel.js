@@ -1,4 +1,4 @@
-/********************************************************************
+/** ******************************************************************
   UP NEXT PANEL
 *********************************************************************/
 /**
@@ -32,11 +32,11 @@ var UpNextPanel = React.createClass({
     event.preventDefault();
     // Use the same way as sending out the click event on discovery content
     var eventData = {
-      "clickedVideo": this.props.upNextInfo.upNextData,
-      "custom": {
-        "source": CONSTANTS.SCREEN.UP_NEXT_SCREEN,
-        "countdown": 0,
-        "autoplay": true
+      'clickedVideo': this.props.upNextInfo.upNextData,
+      'custom': {
+        'source': CONSTANTS.SCREEN.UP_NEXT_SCREEN,
+        'countdown': 0,
+        'autoplay': true
       }
     };
     this.props.controller.sendDiscoveryClickEvent(eventData, false);
@@ -118,8 +118,8 @@ UpNextPanel.defaultProps = {
     upNextData: {}
   },
   controller: {
-    upNextDismissButtonClicked: function(){},
-    sendDiscoveryClickEvent: function(a,b){}
+    upNextDismissButtonClicked: function() {},
+    sendDiscoveryClickEvent: function(a,b) {}
   }
 };
 

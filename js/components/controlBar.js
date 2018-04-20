@@ -1,25 +1,26 @@
-/********************************************************************
+/** ******************************************************************
   CONTROL BAR
 *********************************************************************/
 var React = require('react'),
-  ReactDOM = require('react-dom'),
-  CONSTANTS = require('../constants/constants'),
-  ClassNames = require('classnames'),
-  ScrubberBar = require('./scrubberBar'),
-  Slider = require('./slider'),
-  Utils = require('./utils'),
-  Popover = require('../views/popover'),
-  AccessibleButton = require('./accessibleButton'),
-  VolumeControls = require('./volumeControls'),
-  VideoQualityPanel = require('./videoQualityPanel'),
-  ClosedCaptionPopover = require('./closed-caption/closedCaptionPopover'),
-  Logo = require('./logo'),
-  Icon = require('./icon'),
-  Tooltip = require('./tooltip');
+    ReactDOM = require('react-dom'),
+    CONSTANTS = require('../constants/constants'),
+    ClassNames = require('classnames'),
+    ScrubberBar = require('./scrubberBar'),
+    Slider = require('./slider'),
+    Utils = require('./utils'),
+    Popover = require('../views/popover'),
+    AccessibleButton = require('./accessibleButton'),
+    VolumeControls = require('./volumeControls'),
+    VideoQualityPanel = require('./videoQualityPanel'),
+    ClosedCaptionPopover = require('./closed-caption/closedCaptionPopover'),
+    ClosedCaptionMultiAudioMenu = require('./closed-caption-multi-audio-menu/closedCaptionMultiAudioMenu'),
+    Logo = require('./logo'),
+    Icon = require('./icon'),
+    Tooltip = require('./tooltip');
 
 
 var ControlBar = React.createClass({
-  getInitialState: function () {
+  getInitialState: function() {
     this.isMobile = this.props.controller.state.isMobile;
     this.domNode = null;
     this.toggleButtons = {};
@@ -32,28 +33,28 @@ var ControlBar = React.createClass({
     return {};
   },
 
-  componentDidMount: function () {
-    window.addEventListener('orientationchange', this.closePopovers);
-    window.addEventListener("orientationchange", this.setLandscapeScreenOrientation, false);
+  componentDidMount: function() {
+    window.addEventListener('orientationchange', this.closeOtherPopovers);
+    window.addEventListener('orientationchange', this.setLandscapeScreenOrientation, false);
     document.addEventListener('keydown', this.handleControlBarKeyDown);
     this.restoreFocusedControl();
   },
 
-  componentWillReceiveProps: function (nextProps) {
+  componentWillReceiveProps: function(nextProps) {
     // if responsive breakpoint changes
     if (nextProps.responsiveView != this.props.responsiveView) {
       this.responsiveUIMultiple = this.getResponsiveUIMultiple(nextProps.responsiveView);
     }
   },
 
-  componentWillUnmount: function () {
+  componentWillUnmount: function() {
     this.props.controller.cancelTimer();
-    this.closePopovers();
+    this.closeOtherPopovers();
     if (Utils.isAndroid()) {
       this.props.controller.hideVolumeSliderBar();
     }
-    window.removeEventListener('orientationchange', this.closePopovers);
-    window.removeEventListener("orientationchange", this.setLandscapeScreenOrientation);
+    window.removeEventListener('orientationchange', this.closeOtherPopovers);
+    window.removeEventListener('orientationchange', this.setLandscapeScreenOrientation);
     document.removeEventListener('keydown', this.handleControlBarKeyDown);
   },
 
@@ -81,13 +82,13 @@ var ControlBar = React.createClass({
     }
   },
 
-  getResponsiveUIMultiple: function (responsiveView) {
+  getResponsiveUIMultiple: function(responsiveView) {
     var multiplier = this.props.skinConfig.responsive.breakpoints[responsiveView].multiplier;
     return multiplier;
   },
 
-  handleControlBarMouseUp: function (evt) {
-    if (evt.type == 'touchend' || !this.isMobile) {
+  handleControlBarMouseUp: function(evt) {
+    if (evt.type === 'touchend' || !this.isMobile) {
       evt.stopPropagation(); // W3C
       evt.cancelBubble = true; // IE
       this.props.controller.state.accessibilityControlsEnabled = true;
@@ -95,7 +96,7 @@ var ControlBar = React.createClass({
     }
   },
 
-  handleFullscreenClick: function (evt) {
+  handleFullscreenClick: function(evt) {
     // On mobile, we get a following click event that fires after the Video
     // has gone full screen, clicking on a different UI element. So we prevent
     // the following click.
@@ -107,6 +108,11 @@ var ControlBar = React.createClass({
       if (this.vr && this.isMobile && this.props.controller.isVrStereo) {
         this.toggleStereoVr();
       }
+    }
+    if (this.props.controller &&
+      this.props.controller.state &&
+      !this.props.controller.state.fullscreen) {
+      this.closeOtherPopovers();
     }
   },
 
@@ -122,7 +128,7 @@ var ControlBar = React.createClass({
     }
   },
 
-  handleStereoVrClick: function (evt) {
+  handleStereoVrClick: function(evt) {
     if (this.vr) {
       evt.stopPropagation();
       evt.cancelBubble = true;
@@ -132,7 +138,7 @@ var ControlBar = React.createClass({
 
       if (this.props.controller) {
         var fullscreen = false;
-        //depends on the switching type
+        // depends on the switching type
 
         if (this.props.controller.state.isFullScreenSupported ||
           this.props.controller.state.isVideoFullScreenSupported) {
@@ -141,7 +147,7 @@ var ControlBar = React.createClass({
           fullscreen = this.props.controller.state.isFullWindow;
         }
 
-        if (!fullscreen && typeof this.props.controller.toggleFullscreen === "function") {
+        if (!fullscreen && typeof this.props.controller.toggleFullscreen === 'function') {
           this.props.controller.toggleFullscreen();
         }
 
@@ -184,12 +190,12 @@ var ControlBar = React.createClass({
   },
 
   toggleStereoVr: function() {
-    if (this.props.controller && typeof this.props.controller.toggleStereoVr === "function") {
+    if (this.props.controller && typeof this.props.controller.toggleStereoVr === 'function') {
       this.props.controller.toggleStereoVr();
     }
   },
 
-  handleLiveClick: function (evt) {
+  handleLiveClick: function(evt) {
     evt.stopPropagation();
     evt.cancelBubble = true;
     evt.preventDefault();
@@ -197,50 +203,62 @@ var ControlBar = React.createClass({
     this.props.controller.seek(this.props.duration);
   },
 
-  handleVolumeIconClick: function (evt) {
+  handleVolumeIconClick: function(evt) {
     if (this.isMobile) {
       this.props.controller.startHideControlBarTimer();
       evt.stopPropagation(); // W3C
       evt.cancelBubble = true; // IE
       if (!this.props.controller.state.volumeState.volumeSliderVisible) {
         this.props.controller.showVolumeSliderBar();
-      }
-      else {
+      } else {
         this.props.controller.handleMuteClick();
       }
-    }
-    else {
+    } else {
       this.props.controller.handleMuteClick();
     }
   },
 
-  handlePlayClick: function () {
+  handlePlayClick: function() {
     this.props.controller.togglePlayPause();
   },
 
-  handleShareClick: function () {
+  handleShareClick: function() {
     this.props.controller.toggleShareScreen();
   },
 
-  handleQualityClick: function () {
+  handleQualityClick: function() {
     this.configureMenuAutofocus(CONSTANTS.MENU_OPTIONS.VIDEO_QUALITY);
 
-    if (this.props.responsiveView == this.props.skinConfig.responsive.breakpoints.xs.id) {
+    if (this.props.responsiveView === this.props.skinConfig.responsive.breakpoints.xs.id) {
       this.props.controller.toggleScreen(CONSTANTS.SCREEN.VIDEO_QUALITY_SCREEN);
     } else {
       this.togglePopover(CONSTANTS.MENU_OPTIONS.VIDEO_QUALITY);
-      this.closeCaptionPopover();
+      this.closeOtherPopovers(CONSTANTS.MENU_OPTIONS.VIDEO_QUALITY);
     }
   },
 
-  handleClosedCaptionClick: function () {
+  handleClosedCaptionClick: function() {
     this.configureMenuAutofocus(CONSTANTS.MENU_OPTIONS.CLOSED_CAPTIONS);
 
-    if (this.props.responsiveView == this.props.skinConfig.responsive.breakpoints.xs.id) {
+    if (this.props.responsiveView === this.props.skinConfig.responsive.breakpoints.xs.id) {
       this.props.controller.toggleScreen(CONSTANTS.SCREEN.CLOSEDCAPTION_SCREEN);
     } else {
       this.togglePopover(CONSTANTS.MENU_OPTIONS.CLOSED_CAPTIONS);
-      this.closeQualityPopover();
+      this.closeOtherPopovers(CONSTANTS.MENU_OPTIONS.CLOSED_CAPTIONS);
+    }
+  },
+
+  handleMultiAudioClick: function() {
+    this.configureMenuAutofocus(CONSTANTS.MENU_OPTIONS.MULTI_AUDIO);
+
+    if (this.props.skinConfig.responsive &&
+      this.props.skinConfig.responsive.breakpoints &&
+      this.props.skinConfig.responsive.breakpoints.lg &&
+      (this.props.responsiveView === this.props.skinConfig.responsive.breakpoints.lg.id)) {
+      this.togglePopover(CONSTANTS.MENU_OPTIONS.MULTI_AUDIO);
+      this.closeOtherPopovers(CONSTANTS.MENU_OPTIONS.MULTI_AUDIO);
+    } else {
+      this.props.controller.toggleScreen(CONSTANTS.SCREEN.MULTI_AUDIO_SCREEN);
     }
   },
 
@@ -266,14 +284,6 @@ var ControlBar = React.createClass({
     }
   },
 
-  closeQualityPopover: function (params) {
-    this.closePopover(CONSTANTS.MENU_OPTIONS.VIDEO_QUALITY, params);
-  },
-
-  closeCaptionPopover: function (params) {
-    this.closePopover(CONSTANTS.MENU_OPTIONS.CLOSED_CAPTIONS, params);
-  },
-
   closePopover: function(menu, params) {
     params = params || {};
     var menuOptions = this.props.controller.state[menu];
@@ -293,7 +303,23 @@ var ControlBar = React.createClass({
     }
   },
 
-  togglePopover: function (menu) {
+  /**
+   * @description the function closes popovers (closedCaptionPopover, videoQualityPopover, multiAudioPopover);
+   * if the parameter specifies the name of the popover, then its state does not change
+   * @param {string} popoverName - the name of the popover that does not need to be closed
+   * @private
+   */
+  closeOtherPopovers: function(popoverName) {
+    var popoversNameList = [CONSTANTS.MENU_OPTIONS.CLOSED_CAPTIONS, CONSTANTS.MENU_OPTIONS.VIDEO_QUALITY, CONSTANTS.MENU_OPTIONS.MULTI_AUDIO];
+    for (var index = 0; index < popoversNameList.length; index++) {
+      var closedPopoverName = popoversNameList[index];
+      if (popoversNameList[index] !== popoverName) {
+        this.closePopover(closedPopoverName);
+      }
+    }
+  },
+
+  togglePopover: function(menu) {
     var menuOptions = this.props.controller.state[menu];
     var menuToggleButton = this.toggleButtons[menu];
     // Reset button flag that tracks keyboard interaction
@@ -307,21 +333,16 @@ var ControlBar = React.createClass({
     this.props.controller.togglePopover(menu);
   },
 
-  closePopovers: function () {
-    this.closeCaptionPopover();
-    this.closeQualityPopover();
-  },
-
-  handleDiscoveryClick: function () {
+  handleDiscoveryClick: function() {
     this.props.controller.toggleDiscoveryScreen();
   },
 
-  handleMoreOptionsClick: function () {
+  handleMoreOptionsClick: function() {
     this.props.controller.toggleMoreOptionsScreen(this.moreOptionsItems);
   },
 
-  //TODO(dustin) revisit this, doesn't feel like the "react" way to do this.
-  highlight: function (evt) {
+  // TODO(dustin) revisit this, doesn't feel like the "react" way to do this.
+  highlight: function(evt) {
     if (!this.isMobile) {
       var iconElement = Utils.getEventIconElement(evt);
       if (iconElement) {
@@ -332,7 +353,7 @@ var ControlBar = React.createClass({
     }
   },
 
-  removeHighlight: function (evt) {
+  removeHighlight: function(evt) {
     var iconElement = Utils.getEventIconElement(evt);
     if (iconElement) {
       var color = this.props.skinConfig.controlBar.iconStyle.inactive.color;
@@ -344,8 +365,8 @@ var ControlBar = React.createClass({
   /**
    * Fires whenever an item is focused inside the control bar. Stores the id of
    * the focused control.
+   * @param {FocusEvent} evt - Focus event object
    * @private
-   * @param {type} evt Focus event.
    */
   handleControlBarFocus: function(evt) {
     var focusId = evt.target ? evt.target.getAttribute(CONSTANTS.KEYBD_FOCUS_ID_ATTR) : null;
@@ -358,7 +379,7 @@ var ControlBar = React.createClass({
    * Clears the currently focused control.
    * @private
    */
-  handleControlBarBlur: function(evt) {
+  handleControlBarBlur: function() {
     this.props.controller.state.focusedControl = null;
   },
 
@@ -480,10 +501,10 @@ var ControlBar = React.createClass({
 
     var stereoIcon, stereoAriaLabel;
     if (this.vr) {
-      stereoIcon = "stereoOff";
+      stereoIcon = 'stereoOff';
       stereoAriaLabel = CONSTANTS.ARIA_LABELS.STEREO_OFF;
       if (this.props.controller && this.props.controller.isVrStereo) {
-        stereoIcon = "stereoOn";
+        stereoIcon = 'stereoOn';
         stereoAriaLabel = CONSTANTS.ARIA_LABELS.STEREO_ON;
       }
     }
@@ -491,8 +512,7 @@ var ControlBar = React.createClass({
     var totalTime = 0;
     if (this.props.duration == null || typeof this.props.duration == 'undefined' || this.props.duration == ""){
       totalTime = Utils.formatSeconds(0);
-    }
-    else {
+    } else {
       totalTime = Utils.formatSeconds(this.props.duration);
     }
 
@@ -535,7 +555,7 @@ var ControlBar = React.createClass({
     var playheadTime = isFinite(parseInt(this.props.currentPlayhead)) ? Utils.formatSeconds(parseInt(this.props.currentPlayhead)) : null;
     var isLiveStream = this.props.isLiveStream;
     var durationSetting = {color: this.props.skinConfig.controlBar.iconStyle.inactive.color ?
-                          this.props.skinConfig.controlBar.iconStyle.inactive.color : this.props.skinConfig.general.accentColor};
+     this.props.skinConfig.controlBar.iconStyle.inactive.color : this.props.skinConfig.general.accentColor};
     var timeShift = this.props.currentPlayhead - this.props.duration;
     // checking timeShift < 1 seconds (not == 0) as processing of the click after we rewinded and then went live may take some time
     var isLiveNow = Math.abs(timeShift) < 1;
@@ -547,8 +567,8 @@ var ControlBar = React.createClass({
     var liveText = Utils.getLocalizedString(this.props.language, CONSTANTS.SKIN_TEXT.LIVE, this.props.localizableStrings);
 
     var liveClass = ClassNames({
-      "oo-control-bar-item oo-live oo-live-indicator": true,
-      "oo-live-nonclickable": isLiveNow
+      'oo-control-bar-item oo-live oo-live-indicator': true,
+      'oo-live-nonclickable': isLiveNow
     });
 
     var videoQualityPopover = this.props.controller.state.videoQualityOptions.showVideoQualityPopover ? <Popover><VideoQualityPanel{...this.props} togglePopoverAction={this.toggleQualityPopover} popover={true}/></Popover> : null;
@@ -566,8 +586,14 @@ var ControlBar = React.createClass({
       "oo-selected": this.props.controller.state.closedCaptionOptions.showClosedCaptionPopover
     });
 
+    var multiAudioClass = ClassNames({
+      'oo-multiaudio': true,
+      'oo-control-bar-item': true,
+      'oo-selected': this.props.controller.state.multiAudioOptions.showPopover
+    });
+
     var selectedStyle = {};
-    selectedStyle["color"] = this.props.skinConfig.general.accentColor ? this.props.skinConfig.general.accentColor : null;
+    selectedStyle['color'] = this.props.skinConfig.general.accentColor ? this.props.skinConfig.general.accentColor : null;
 
     var controlItemTemplates = {
       "playPause": <a className="oo-play-pause oo-control-bar-item" onClick={this.handlePlayClick} key="playPause">
@@ -645,6 +671,67 @@ var ControlBar = React.createClass({
         </div>
       ),
 
+      'audioAndCC': (function(alignment) {
+        var closedCaptionsList =  [];
+        var multiAudioList = [];
+
+        if (this.props.controller.state.closedCaptionOptions.availableLanguages &&
+          this.props.controller.state.closedCaptionOptions.availableLanguages.languages) {
+          closedCaptionsList =  this.props.controller.state.closedCaptionOptions.availableLanguages.languages;
+        }
+
+        if (this.props.controller.state.multiAudio &&
+          this.props.controller.state.multiAudio.tracks) {
+          multiAudioList = this.props.controller.state.multiAudio.tracks;
+        }
+
+        if (closedCaptionsList.length === 0 && multiAudioList.length === 0) {
+          return null;
+        }
+
+        return (
+          <div className="oo-popover-button-container" key="multiAudio">
+            <AccessibleButton
+              ref={function(e) { this.toggleButtons[CONSTANTS.MENU_OPTIONS.MULTI_AUDIO] = e; }.bind(this)}
+              style={selectedStyle}
+              className={multiAudioClass}
+              focusId={CONSTANTS.FOCUS_IDS.MULTI_AUDIO}
+              ariaLabel={CONSTANTS.ARIA_LABELS.MULTI_AUDIO}
+              ariaHasPopup={true}
+              ariaExpanded={this.props.controller.state.multiAudioOptions.showPopover ? true : null}
+              onClick={this.handleMultiAudioClick}
+            >
+              <Icon {...this.props} icon="audioAndCC" style={dynamicStyles.iconCharacter}
+                    onMouseOver={this.highlight} onMouseOut={this.removeHighlight} />
+              <Tooltip
+                enabled={isTooltipEnabled}
+                text={Utils.getLocalizedString(
+                  this.props.language,
+                  CONSTANTS.SKIN_TEXT.MULTI_AUDIO,
+                  this.props.localizableStrings)
+                }
+                responsivenessMultiplier={this.responsiveUIMultiple}
+                bottom={this.responsiveUIMultiple * this.props.skinConfig.controlBar.height}
+                alignment={alignment}
+              />
+            </AccessibleButton>
+            {this.props.controller.state.multiAudioOptions.showPopover &&
+            <Popover
+              popoverClassName="oo-popover oo-popover-pull-right oo-cc-ma-container"
+              autoFocus={this.props.controller.state.multiAudioOptions.autoFocus}
+              closeActionEnabled={this.props.controller.state.accessibilityControlsEnabled}
+              closeAction={this.closePopover.bind(this, CONSTANTS.MENU_OPTIONS.MULTI_AUDIO)}>
+              <ClosedCaptionMultiAudioMenu
+                menuClassName={"oo-cc-ma-menu--popover"}
+                togglePopoverAction={this.closePopover.bind(this, CONSTANTS.MENU_OPTIONS.MULTI_AUDIO)}
+                {...this.props}
+              />
+            </Popover>
+            }
+          </div>
+        );
+      }).bind(this),
+
       "share": <a className="oo-share oo-control-bar-item"
         onClick={this.handleShareClick} key="share">
         <Icon {...this.props} icon="share" style={dynamicStyles.iconCharacter}
@@ -675,12 +762,12 @@ var ControlBar = React.createClass({
 
     var defaultItems = this.props.controller.state.isPlayingAd ? this.props.skinConfig.buttons.desktopAd : this.props.skinConfig.buttons.desktopContent;
 
-    //if mobile and not showing the slider or the icon, extra space can be added to control bar width. If volume bar is shown instead of slider, add some space as well:
+    // if mobile and not showing the slider or the icon, extra space can be added to control bar width. If volume bar is shown instead of slider, add some space as well:
     var volumeItem = null;
     var extraSpaceVolume = 0;
 
     for (var j = 0; j < defaultItems.length; j++) {
-      if (defaultItems[j].name == "volume") {
+      if (defaultItems[j].name === 'volume') {
         volumeItem = defaultItems[j];
 
         var extraSpaceVolumeSlider = (((volumeItem && this.isMobile && !this.props.controller.state.volumeState.volumeSliderVisible) || volumeItem && Utils.isIos()) ? parseInt(volumeItem.minWidth) : 0);
@@ -691,7 +778,6 @@ var ControlBar = React.createClass({
       }
     }
 
-
     //if no hours, add extra space to control bar width:
     var hours = parseInt(this.props.duration / 3600, 10);
     var extraSpaceDuration = (hours > 0) ? 0 : 45;
@@ -700,22 +786,22 @@ var ControlBar = React.createClass({
     var contentTree = this.props.contentTree || {};
     for (var k = 0; k < defaultItems.length; k++) {
 
-      //filter out unrecognized button names
-      if (typeof controlItemTemplates[defaultItems[k].name] === "undefined") {
+      // filter out unrecognized button names
+      if (typeof controlItemTemplates[defaultItems[k].name] === 'undefined') {
         continue;
       }
 
-      //filter out disabled buttons
-      if (defaultItems[k].location === "none") {
+      // filter out disabled buttons
+      if (defaultItems[k].location === 'none') {
         continue;
       }
 
-      //do not show share button if not share options are available
-      if (defaultItems[k].name === "share") {
+      // do not show share button if not share options are available
+      if (defaultItems[k].name === 'share') {
         var shareContent = Utils.getPropertyValue(this.props.skinConfig, 'shareScreen.shareContent', []);
         var socialContent = Utils.getPropertyValue(this.props.skinConfig, 'shareScreen.socialContent', []);
         var onlySocialTab = shareContent.length === 1 && shareContent[0] === 'social';
-        //skip if no tabs were specified or if only the social tab is present but no social buttons are specified
+        // skip if no tabs were specified or if only the social tab is present but no social buttons are specified
         if (this.props.controller.state.isOoyalaAds || !shareContent.length || (onlySocialTab && !socialContent.length)) {
           continue;
         }
@@ -742,14 +828,19 @@ var ControlBar = React.createClass({
         continue;
       }
 
-      if (Utils.isIos() && (defaultItems[k].name === "volume") && !this.vr) {
+      if (Utils.isIos() && (defaultItems[k].name === 'volume') && !this.vr) {
         continue;
       }
 
-      //not sure what to do when there are multi streams
-      if (defaultItems[k].name === "live" &&
+      // not sure what to do when there are multi streams
+      if (defaultItems[k].name === 'live' &&
         (typeof this.props.isLiveStream === 'undefined' ||
           !(this.props.isLiveStream))) {
+        continue;
+      }
+
+      if (defaultItems[k].name === 'audioAndCC' &&
+        !this.props.controller.state.multiAudio) {
         continue;
       }
 
@@ -785,10 +876,10 @@ var ControlBar = React.createClass({
     return returnStyles;
   },
 
-  render: function () {
+  render: function() {
     var controlBarClass = ClassNames({
-      "oo-control-bar": true,
-      "oo-control-bar-hidden": !this.props.controlBarVisible
+      'oo-control-bar': true,
+      'oo-control-bar-hidden': !this.props.controlBarVisible
     });
 
     var controlBarItems = this.populateControlBar();
