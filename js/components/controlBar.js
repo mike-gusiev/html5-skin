@@ -664,8 +664,11 @@ var ControlBar = React.createClass({
               popoverClassName="oo-popover oo-popover-pull-right"
               autoFocus={this.props.controller.state.closedCaptionOptions.autoFocus}
               closeActionEnabled={this.props.controller.state.accessibilityControlsEnabled}
-              closeAction={this.closeCaptionPopover}>
-              <ClosedCaptionPopover {...this.props} togglePopoverAction={this.closeCaptionPopover} />
+              closeAction={this.closePopover.bind(this, CONSTANTS.MENU_OPTIONS.CLOSED_CAPTIONS)}>
+              <ClosedCaptionPopover
+                {...this.props}
+                togglePopoverAction={this.closePopover.bind(this, CONSTANTS.MENU_OPTIONS.CLOSED_CAPTIONS)}
+              />
             </Popover>
           }
         </div>
