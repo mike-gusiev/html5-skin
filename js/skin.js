@@ -10,7 +10,6 @@ var React = require('react'),
     DiscoveryPanel = require('./components/discoveryPanel'),
     DiscoveryBar = require('./components/endCardComponents/discoveryBar'),
     VideoQualityPanel = require('./components/videoQualityPanel'),
-    ClosedCaptionMultiAudioMenu = require('./components/closed-caption-multi-audio-menu/closedCaptionMultiAudioMenu'),
     SharePanel = require('./components/sharePanel'),
     MoreOptionsPanel = require('./components/moreOptionsPanel'),
     AdScreen = require('./views/adScreen'),
@@ -461,21 +460,6 @@ var Skin = React.createClass({
               fullscreen={this.state.fullscreen}
               videoQualityOptions={this.state.videoQualityOptions}
               responsiveView={this.state.responsiveId}/>
-          </ContentScreen>
-        );
-        break;
-      case CONSTANTS.SCREEN.MULTI_AUDIO_SCREEN:
-        screen = (
-          <ContentScreen
-            {...this.props}
-            cssClass="oo-close-button oo-close-button--ma"
-            dataItemsPerPage={{xs: 1, sm: 4, md: 8, lg: 8}}
-            screen={CONSTANTS.SCREEN.MULTI_AUDIO_SCREEN}
-            screenClassName="oo-content-screen oo-cc-ma-container"
-            autoFocus={this.state.multiAudioOptions.autoFocus}
-            icon="cc"
-          >
-            <ClosedCaptionMultiAudioMenu {...this.props}/>
           </ContentScreen>
         );
         break;
