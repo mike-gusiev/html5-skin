@@ -1574,9 +1574,6 @@ OO.plugin('Html5Skin', function(OO, _, $, W) {
         this.state.forceCountDownTimerOnEndScreen = true;
         this.sendDiscoveryDisplayEvent("endScreen");
         this.state.pluginsElement.addClass("oo-overlay-blur");
-        if (this.state.screenToShow !== CONSTANTS.SCREEN.END_CARD) {
-          this.state.screenToShow = CONSTANTS.SCREEN.DISCOVERY_SCREEN;
-        }
         this.renderSkin();
         this.state.forceCountDownTimerOnEndScreen = false;
       }
