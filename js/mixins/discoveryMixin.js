@@ -18,15 +18,15 @@ var DiscoveryMixin = {
     },
 
     getNonPlayedVideos: function (relatedVideos, params) {
-        var limit = 3;
+        var limit = params.responsiveId === 'xs' || params.responsiveId === 'sm' ? 1 : 3;
+        if (relatedVideos.length <= limit) {
+            return DiscoveryMixin.shuffleArray(relatedVideos);
+        }
         var results = [];
-        for (var i = 0; i < relatedVideos.length; i++) {
+        for (var i = 0; i < relatedVideos.length && limit; i++) {
             if (params.playedVideos.indexOf(relatedVideos[i]['embed_code']) === -1) {
                 results.push(relatedVideos[i]);
                 limit--;
-            }
-            if (!limit) {
-                break;
             }
         }
         return results;
@@ -114,6 +114,18 @@ var DiscoveryMixin = {
                  return delimiter + key + '=' + hash[key]
              })
             .join('');
+    },
+
+    shuffleArray: function (array) {
+        var counter = array.length;
+        while (counter > 0) {
+            var index = Math.floor(Math.random() * counter);
+            counter--;
+            var temp = array[counter];
+            array[counter] = array[index];
+            array[index] = temp;
+        }
+        return array;
     }
 };
 

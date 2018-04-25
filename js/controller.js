@@ -1358,6 +1358,7 @@ OO.plugin("Html5Skin", function (OO, _, $, W) {
         this.state.playerParam.videoDetailsUrl
       ) {
           this.state.playerParam.playedVideos = this.state.playedVideos;
+          this.state.playerParam.responsiveId = this.skin.state.responsiveId;
           DiscoveryMixin.getRelatedVideosByUrl(this.state.playerParam, this.state.assetId, this.setDiscoveryVideos.bind(this));
       } else if (relatedVideos.videos) {
         this.setDiscoveryVideos(relatedVideos.videos);
