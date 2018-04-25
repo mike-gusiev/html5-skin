@@ -11,10 +11,25 @@ var DiscoveryMixin = {
                 console.log(xhr.status + ': ' + xhr.statusText);
             } else {
                 var relatedVideos = JSON.parse(xhr.response);
-                var results = relatedVideos.results.slice(0, 3);
+                var results = DiscoveryMixin.getNonPlayedVideos(relatedVideos.results, params);
                 DiscoveryMixin.getFullVideoData(params.videoDetailsUrl, results, setDiscoveryVideos);
             }
         }
+    },
+
+    getNonPlayedVideos: function (relatedVideos, params) {
+        var limit = 3;
+        var results = [];
+        for (var i = 0; i < relatedVideos.length; i++) {
+            if (params.playedVideos.indexOf(relatedVideos[i]['embed_code']) === -1) {
+                results.push(relatedVideos[i]);
+                limit--;
+            }
+            if (!limit) {
+                break;
+            }
+        }
+        return results;
     },
 
     getFullVideoData: function (videoDetailsUrl, videos, setDiscoveryVideos) {
@@ -58,7 +73,7 @@ var DiscoveryMixin = {
             pcode: params.pcode,
             discovery_profile_id: params.playerBrandingId,
             video_pcode: params.pcode,
-            limit: 3,
+            limit: 20,
             device_id: this.getGUID(),
             expected_bucket_info_version: 2,
             expires: Math.floor((new Date().getTime() / 1000) + 3600)
