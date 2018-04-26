@@ -23,13 +23,18 @@ var DiscoveryMixin = {
             return DiscoveryMixin.shuffleArray(relatedVideos);
         }
         var results = [];
-        for (var i = 0; i < relatedVideos.length && limit; i++) {
+        var deleted = [];
+        for (var i = 0; i < relatedVideos.length; i++) {
             if (params.playedVideos.indexOf(relatedVideos[i]['embed_code']) === -1) {
                 results.push(relatedVideos[i]);
-                limit--;
+            } else {
+                deleted.push(relatedVideos[i]);
             }
         }
-        return results;
+        if (results.length < limit) {
+            results = results.concat(deleted);
+        }
+        return results.slice(0, limit);
     },
 
     getFullVideoData: function (videoDetailsUrl, videos, setDiscoveryVideos) {
