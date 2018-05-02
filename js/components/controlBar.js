@@ -635,7 +635,7 @@ var ControlBar = React.createClass({
       "closedCaption": (
         <div className="oo-popover-button-container" key="closedCaption">
           <AccessibleButton
-            ref={function(e) { this.toggleButtons[CONSTANTS.MENU_OPTIONS.CLOSED_CAPTIONS] = e }.bind(this)}
+            ref={function(e) { this.setToggleButtons(CONSTANTS.MENU_OPTIONS.CLOSED_CAPTIONS, e)}.bind(this)}
             style={selectedStyle}
             className={captionClass}
             focusId={CONSTANTS.FOCUS_IDS.CLOSED_CAPTIONS}
