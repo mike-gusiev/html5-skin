@@ -1,16 +1,21 @@
 var React = require('react');
-var iso639 = require('iso-639-3');
 
 var Tab = require('./tab');
 var helpers = require('./helpers');
 var CONSTANTS = require('../../constants/constants');
+var LANGUAGE_LIST = require('../../constants/languages');
 
 var MultiAudioTab = React.createClass({
   render: function() {
     // transform tracks to human readable format
     var readableTracksList = this.props.audioTracksList.map(
       function(audioTrack) {
-        var displayLanguage = helpers.getDisplayLanguage(iso639, audioTrack.lang);
+        var displayLanguage = '';
+        if (audioTrack.lang === CONSTANTS.LANGUAGE.NO_LINGUISTIC_CONTENT) {
+          displayLanguage = CONSTANTS.SKIN_TEXT.NO_LINGUISTIC_CONTENT;
+        } else {
+          displayLanguage = helpers.getDisplayLanguage(LANGUAGE_LIST, audioTrack.lang);
+        }
         var displayLabel = helpers.getDisplayLabel(audioTrack);
 
         var languageElement = {
