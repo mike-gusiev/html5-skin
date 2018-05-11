@@ -103,7 +103,7 @@ var DiscoveryMixin = {
     },
 
     getGUID: function () {
-        const randomString = this.generateRandomString();
+        var randomString = this.generateRandomString();
         return new window.jsSHA(randomString, 'ASCII').getHash('SHA-256', 'B64');
     },
 
