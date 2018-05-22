@@ -217,7 +217,8 @@
             {"name":"logo", "location":"controlBar", "whenDoesNotFit":"keep", "minWidth":125 },
             {"name":"theater", "location":"controlBar", "whenDoesNotFit":"keep", "minWidth":44 },
             {"name":"fullscreen", "location":"controlBar", "whenDoesNotFit":"keep", "minWidth":44 },
-            {"name":"moreOptions", "location":"controlBar", "whenDoesNotFit":"keep", "minWidth":25 }
+            {"name":"moreOptions", "location":"controlBar", "whenDoesNotFit":"keep", "minWidth":25 },
+            {"name":"arrowsBlack", "location": "mainView", "whenDoesNotFit":"keep", "minWidth":45 }
         ],
         "desktopAd": [
             {"name":"playPause", "location":"controlBar", "whenDoesNotFit":"keep", "minWidth":45 },
