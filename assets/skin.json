@@ -33,9 +33,9 @@
     "responsive": {
         "breakpoints": {
             "xs": {"id": "xs", "name": "oo-xsmall", "maxWidth": 559, "multiplier": 0.7},
-            "sm": {"id": "sm", "name": "oo-small", "minWidth": 560, "maxWidth": 839, "multiplier": 1},
-            "md": {"id": "md", "name": "oo-medium", "minWidth": 840, "maxWidth": 1279, "multiplier": 1},
-            "lg": {"id": "lg", "name": "oo-large", "minWidth": 1280, "multiplier": 1.2}
+            "sm": {"id": "sm", "name": "oo-small", "minWidth": 560, "maxWidth": 767, "multiplier": 1},
+            "md": {"id": "md", "name": "oo-medium", "minWidth": 768, "maxWidth": 979, "multiplier": 1},
+            "lg": {"id": "lg", "name": "oo-large", "minWidth": 980, "multiplier": 1.2}
         },
         "aspectRatio": "auto"
     },
@@ -71,7 +71,7 @@
         "screenToShowOnPause": "default"
     },
     "endScreen": {
-        "screenToShowOnEnd": "discovery",
+        "screenToShowOnEnd": "endCard",
         "showReplayButton": true,
         "replayIconStyle": {
             "color": "white",
@@ -79,7 +79,17 @@
         },
         "showTitle": false,
         "showDescription": false,
-        "infoPanelPosition": "topLeft"
+        "infoPanelPosition": "topLeft",
+        "contentDuration": {
+            "show": true,
+            "font": {
+                "fontSize": 12,
+                "fontFamily": "Arial-BoldMT",
+                "color": "white"
+            }
+        },
+        "showCountDownTimerOnEndScreen": true,
+        "countDownTime": 10
     },
     "adScreen": {
         "showAdMarquee": true,
@@ -149,7 +159,7 @@
         "textEnhancement": "Uniform"
     },
     "upNext": {
-        "showUpNext": true,
+        "showUpNext": false,
         "timeToShow": "5"
     },
     "controlBar": {
@@ -197,25 +207,28 @@
     "buttons": {
         "desktopContent": [
             {"name":"playPause", "location":"controlBar", "whenDoesNotFit":"keep", "minWidth":45 },
-            {"name":"volume", "location":"controlBar", "whenDoesNotFit":"keep", "minWidth":240 },
+            {"name":"volume", "location":"controlBar", "whenDoesNotFit":"keep", "minWidth":145 },
             {"name":"live", "location":"controlBar", "whenDoesNotFit":"keep", "minWidth":45},
-            {"name":"timeDuration", "location":"controlBar", "whenDoesNotFit":"drop", "minWidth":145 },
+            {"name":"timeDuration", "location":"controlBar", "whenDoesNotFit":"drop", "minWidth":115 },
             {"name":"flexibleSpace", "location":"controlBar", "whenDoesNotFit":"keep", "minWidth":1 },
-            {"name":"share", "location":"controlBar", "whenDoesNotFit":"moveToMoreOptions", "minWidth":45 },
-            {"name":"closedCaption", "location":"controlBar", "whenDoesNotFit":"moveToMoreOptions", "minWidth":45 },
+            {"name":"share", "location":"controlBar", "whenDoesNotFit":"moveToMoreOptions", "minWidth":50 },
+            {"name":"closedCaption", "location":"controlBar", "whenDoesNotFit":"moveToMoreOptions", "minWidth":33 },
             {"name":"quality", "location":"controlBar", "whenDoesNotFit":"moveToMoreOptions", "minWidth":45 },
             {"name":"logo", "location":"controlBar", "whenDoesNotFit":"keep", "minWidth":125 },
-            {"name":"fullscreen", "location":"controlBar", "whenDoesNotFit":"keep", "minWidth":45 },
-            {"name":"moreOptions", "location":"controlBar", "whenDoesNotFit":"keep", "minWidth":45 }
+            {"name":"theater", "location":"controlBar", "whenDoesNotFit":"keep", "minWidth":44 },
+            {"name":"fullscreen", "location":"controlBar", "whenDoesNotFit":"keep", "minWidth":44 },
+            {"name":"moreOptions", "location":"controlBar", "whenDoesNotFit":"keep", "minWidth":25 },
+            {"name":"arrowsBlack", "location": "mainView", "whenDoesNotFit":"keep", "minWidth":45 }
         ],
         "desktopAd": [
             {"name":"playPause", "location":"controlBar", "whenDoesNotFit":"keep", "minWidth":45 },
-            {"name":"volume", "location":"controlBar", "whenDoesNotFit":"keep", "minWidth":240 },
-            {"name":"timeDuration", "location":"controlBar", "whenDoesNotFit":"drop", "minWidth":145 },
+            {"name":"volume", "location":"controlBar", "whenDoesNotFit":"keep", "minWidth":145 },
+            {"name":"timeDuration", "location":"controlBar", "whenDoesNotFit":"drop", "minWidth":115 },
             {"name":"flexibleSpace", "location":"controlBar", "whenDoesNotFit":"keep", "minWidth":1 },
             {"name":"logo", "location":"controlBar", "whenDoesNotFit":"keep", "minWidth":125 },
+            {"name":"theater", "location":"controlBar", "whenDoesNotFit":"keep", "minWidth":44 },
             {"name":"fullscreen", "location":"controlBar", "whenDoesNotFit":"keep", "minWidth":45 },
-            {"name":"moreOptions", "location":"controlBar", "whenDoesNotFit":"keep", "minWidth":45 }
+            {"name":"moreOptions", "location":"controlBar", "whenDoesNotFit":"keep", "minWidth":25 }
         ],
         "mobileContent": [
             {"name":"volume", "location":"controlBar", "whenDoesNotFit":"keep", "minWidth":50 },
@@ -242,6 +255,7 @@
         "volumeOff": {"fontFamilyName": "ooyala-slick-type", "fontString": "\u0070", "fontStyleClass": "oo-icon oo-icon-volume-mute-ooyala-default"},
         "expand": {"fontFamilyName": "ooyala-slick-type", "fontString": "\u0069", "fontStyleClass": "oo-icon oo-icon-system-fullscreen"},
         "compress": {"fontFamilyName": "ooyala-slick-type", "fontString": "\u006a", "fontStyleClass": "oo-icon oo-icon-system-minimizescreen"},
+        "theater": {"fontFamilyName": "ooyala-slick-type", "fontString": "\u0069", "fontStyleClass": "oo-icon oo-icon-system-fullscreen"},
         "ellipsis": {"fontFamilyName": "ooyala-slick-type", "fontString": "\u0066", "fontStyleClass": "oo-icon oo-icon-system-menu"},
         "replay": {"fontFamilyName": "ooyala-slick-type", "fontString": "\u0063", "fontStyleClass": "oo-icon oo-icon-system-replay"},
         "share": {"fontFamilyName": "ooyala-slick-type", "fontString": "\u006f", "fontStyleClass": "oo-icon oo-icon-share"},

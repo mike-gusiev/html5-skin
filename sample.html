@@ -2,12 +2,13 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no"/>
-  <script src="//player.ooyala.com/static/v4/stable/4.10.4/core.min.js"></script>
-  <script src="//player.ooyala.com/static/v4/stable/4.10.4/video-plugin/main_html5.min.js"></script>
-  <script src="//player.ooyala.com/static/v4/stable/4.10.4/other-plugin/discovery_api.min.js"></script>
+  <script src="//player.ooyala.com/static/v4/production/latest/core.min.js"></script>
+  <script src="//player.ooyala.com/static/v4/production/latest/video-plugin/main_html5.min.js"></script>
+  <script src="//player.ooyala.com/static/v4/production/latest/video-plugin/osmf_flash.min.js"></script>
+  <script src="//player.ooyala.com/static/v4/production/latest/video-plugin/bit_wrapper.min.js"></script>
+  <script src="//player.ooyala.com/static/v4/production/latest/other-plugin/discovery_api.min.js"></script>
   <script src="/build/html5-skin.js"></script>
-  <link rel="stylesheet" href="/build/html5-skin.css"/>
+  <link rel="stylesheet" href="/build/html5-skin.min.css"/>
 </head>
 
 <body>
@@ -15,16 +16,19 @@
 <script>
   var playerParam = {
     "pcode": "FsaTIxOjRh-XoYreyerA2QjhxTMb",
-    "playerBrandingId": "86304b0649bd45fab19c6829b518596d",
-    "debug":true,
+    "playerBrandingId": "fc53804780f1456da1e7d5666406ea2c",
+    "debug": true,
+    "discoveryParams": {
+      "where": "metadata.language='en'"
+    },
+    "videoDetailsUrl": "https://cors-anywhere.herokuapp.com/https://beta61-www-pgatour.ctmsp.com/bin/data/feeds/video-details.json/videoIds={videoIds}&path=/content/pgatour",
     "skin": {
       "config": "/assets/skin.json"
     }
   };
   OO.ready(function() {
-    window.pp = OO.Player.create('container', 'AzcDBwNzE6p0sonYZRWAA3x2oB0aIlMD', playerParam);
+    window.pp = OO.Player.create('container', 'J1eTI4ZTE64ZY0jDnlxZ_xmooHpFpsNz', playerParam);
   });
 </script>
-
 </body>
 </html>

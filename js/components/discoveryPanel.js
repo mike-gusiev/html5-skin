@@ -17,18 +17,18 @@ var DiscoveryPanel = React.createClass({
 
   getInitialState: function() {
     return {
-      showDiscoveryCountDown: this.props.skinConfig.discoveryScreen.showCountDownTimerOnEndScreen,
+      showDiscoveryCountDown: this.props.skinConfig.discoveryScreen.showCountDownTimerOnEndScreen || this.props.forceCountDownTimer,
       currentPage: 1,
       componentHeight: null
     };
   },
 
-  componentDidMount: function () {
+  componentDidMount: function() {
     this.detectHeight();
   },
 
   handleResize: function(nextProps) {
-    //If we are changing view sizes, adjust the currentPage number to reflect the new number of items per page.
+    // If we are changing view sizes, adjust the currentPage number to reflect the new number of items per page.
     var currentViewSize = this.props.responsiveView;
     var nextViewSize = nextProps.responsiveView;
     var firstDiscoverIndex = this.state.currentPage * this.props.videosPerPage[currentViewSize] - this.props.videosPerPage[currentViewSize];
@@ -55,8 +55,8 @@ var DiscoveryPanel = React.createClass({
 
   handleDiscoveryContentClick: function(index) {
     var eventData = {
-      "clickedVideo": this.props.discoveryData.relatedVideos[index],
-      "custom": this.props.discoveryData.custom
+      'clickedVideo': this.props.discoveryData.relatedVideos[index],
+      'custom': this.props.discoveryData.custom
     };
     // TODO: figure out countdown value
     // eventData.custom.countdown = 0;
@@ -91,7 +91,7 @@ var DiscoveryPanel = React.createClass({
       // TODO: get msg if no discovery related videos
     }
 
-    //pagination
+    // pagination
     var currentViewSize = this.props.responsiveView;
     var videosPerPage = this.props.videosPerPage[currentViewSize];
     var startAt = videosPerPage * (this.state.currentPage - 1);
@@ -120,7 +120,7 @@ var DiscoveryPanel = React.createClass({
       'oo-right-button': true,
       'oo-hidden': endAt >= relatedVideos.length
     });
-    var countDownClock = (
+    var countDownClock = this.shouldShowCountdownTimer() ? (
       <div className={discoveryCountDownWrapperStyle}>
         <a className="oo-discovery-count-down-icon-style" onClick={this.handleDiscoveryCountDownClick}>
           <CountDownClock {...this.props} timeToShow={this.props.skinConfig.discoveryScreen.countDownTime}
@@ -128,7 +128,7 @@ var DiscoveryPanel = React.createClass({
           <Icon {...this.props} icon="pause"/>
         </a>
       </div>
-    );
+    ) : null;
 
     // Build discovery content blocks
     var discoveryContentBlocks = [];
@@ -141,7 +141,7 @@ var DiscoveryPanel = React.createClass({
           contentTitleClassName={discoveryContentName}
           onClickAction={this.handleDiscoveryContentClick.bind(this, videosPerPage * (this.state.currentPage - 1) + i)}
         >
-          {(this.shouldShowCountdownTimer() && i === 0 && this.state.currentPage <= 1) ? countDownClock : null}
+          {(countDownClock && i === 0 && this.state.currentPage <= 1) ? countDownClock : null}
         </DiscoverItem>
       );
     }
@@ -175,7 +175,7 @@ DiscoveryPanel.propTypes = {
   skinConfig: React.PropTypes.shape({
     discoveryScreen: React.PropTypes.shape({
       showCountDownTimerOnEndScreen: React.PropTypes.bool,
-      countDownTime: React.PropTypes.string,
+      countDownTime: React.PropTypes.number,
       contentTitle: React.PropTypes.shape({
         show: React.PropTypes.bool
       })
@@ -197,7 +197,7 @@ DiscoveryPanel.defaultProps = {
   skinConfig: {
     discoveryScreen: {
       showCountDownTimerOnEndScreen: true,
-      countDownTime: "10",
+      countDownTime: 10,
       contentTitle: {
         show: true
       }
@@ -221,7 +221,7 @@ DiscoveryPanel.defaultProps = {
     relatedVideos: []
   },
   controller: {
-    sendDiscoveryClickEvent: function(a,b){}
+    sendDiscoveryClickEvent: function(a,b) {}
   },
   responsiveView: 'md'
 };

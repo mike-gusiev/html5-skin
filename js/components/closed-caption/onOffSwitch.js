@@ -1,5 +1,6 @@
 var React = require('react'),
     Utils = require('./../utils'),
+    AccessibleButton = require('../accessibleButton'),
     CONSTANTS = require('../../constants/constants'),
     ClassNames = require('classnames');
 
@@ -8,7 +9,7 @@ var OnOffSwitch = React.createClass({
     this.props.controller.toggleClosedCaptionEnabled();
   },
 
-  render: function(){
+  render: function() {
     var switchThumbClassName = ClassNames({
       'oo-switch-thumb': true,
       'oo-switch-thumb-on': this.props.closedCaptionOptions.enabled,
@@ -38,7 +39,13 @@ var OnOffSwitch = React.createClass({
           <span className={switchThumbClassName}></span>
         </div>
         <span className={onCaptionClassName}>{onString}</span>
-        <a className="oo-switch-container-selectable" onClick={this.handleOnOffSwitch}></a>
+        <AccessibleButton
+          className="oo-switch-container-selectable"
+          ariaLabel={this.props.ariaLabel}
+          ariaChecked={this.props.closedCaptionOptions.enabled}
+          role={this.props.role || CONSTANTS.ARIA_ROLES.CHECKBOX}
+          onClick={this.handleOnOffSwitch}>
+        </AccessibleButton>
       </div>
     );
   }

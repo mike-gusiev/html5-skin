@@ -4,11 +4,12 @@ var ReactDOM = require('react-dom'),
 
 var ResponsiveManagerMixin = {
   getInitialState: function() {
-      return {
-        componentWidth: null,
-        responsiveClass: null,
-        responsiveId: null
-      };
+    return {
+      componentWidth: null,
+      componentHeight: null,
+      responsiveClass: null,
+      responsiveId: null
+    };
   },
 
   componentDidMount: function() {
@@ -31,35 +32,45 @@ var ResponsiveManagerMixin = {
   },
 
   generateResponsiveData: function() {
-    var componentWidth = ReactDOM.findDOMNode(this).getBoundingClientRect().width;
+    var componentWidth = 0;
+    var componentHeight = 1;
+    var dom = ReactDOM.findDOMNode(this);
+    if (dom) {
+      componentWidth = Math.ceil(dom.getBoundingClientRect().width);
+      componentHeight = dom.parentNode ?
+        dom.parentNode.getBoundingClientRect().height
+        :
+        componentHeight;
+    }
     var breakpoints = this.props.skinConfig.responsive.breakpoints;
     var breakpointData = {
       classes: {},
       ids: {}
     };
 
-    //loop through breakpoints from skinConfig
-    //generate Classname object with name and min/max width
+    // loop through breakpoints from skinConfig
+    // generate Classname object with name and min/max width
     for (var key in breakpoints) {
       if (breakpoints.hasOwnProperty(key)) {
-        //min width only, 1st breakpoint
-        if(breakpoints[key].minWidth && !breakpoints[key].maxWidth) {
+        // min width only, 1st breakpoint
+        if (breakpoints[key].minWidth && !breakpoints[key].maxWidth) {
           breakpointData.classes[breakpoints[key].name] = breakpointData.ids[breakpoints[key].id] = componentWidth >= breakpoints[key].minWidth;
         }
-        //min and max, middle breakpoints
-        else if(breakpoints[key].minWidth && breakpoints[key].maxWidth) {
+        // min and max, middle breakpoints
+        else if (breakpoints[key].minWidth && breakpoints[key].maxWidth) {
           breakpointData.classes[breakpoints[key].name] = breakpointData.ids[breakpoints[key].id] = componentWidth >= breakpoints[key].minWidth && componentWidth <= breakpoints[key].maxWidth;
         }
-        //max width only, last breakpoint
-        else if(breakpoints[key].maxWidth && !breakpoints[key].minWidth) {
+        // max width only, last breakpoint
+        else if (breakpoints[key].maxWidth && !breakpoints[key].minWidth) {
           breakpointData.classes[breakpoints[key].name] = breakpointData.ids[breakpoints[key].id] = componentWidth <= breakpoints[key].maxWidth;
         }
       }
     }
 
-    //set responsive data to state
+    // set responsive data to state
     this.setState({
       componentWidth: componentWidth,
+      componentHeight: componentHeight,
       responsiveClass: ClassNames(breakpointData.classes),
       responsiveId: ClassNames(breakpointData.ids)
     });

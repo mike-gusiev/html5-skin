@@ -1,5 +1,6 @@
 var React = require('react'),
     DataSelector = require('../dataSelector'),
+    CONSTANTS = require('../../constants/constants'),
     values = require('lodash.values');
 
 var LanguageTab = React.createClass({
@@ -9,7 +10,7 @@ var LanguageTab = React.createClass({
     };
   },
 
-  changeLanguage: function(language){
+  changeLanguage: function(language) {
     var availableLanguages = this.props.closedCaptionOptions.availableLanguages;
     var invertedLocale = {};
     for (var i = 0; i < availableLanguages.languages.length; i++) {
@@ -26,11 +27,12 @@ var LanguageTab = React.createClass({
     });
   },
 
-  render: function(){
-    return(
+  render: function() {
+    return (
       <div className="oo-language-tab">
         <DataSelector
           {...this.props}
+          ariaLabel={CONSTANTS.ARIA_LABELS.LANGUAGE_MENU}
           viewSize={this.props.responsiveView}
           dataItemsPerPage={this.props.dataItemsPerPage}
           selectedData={this.state.selectedLanguage}

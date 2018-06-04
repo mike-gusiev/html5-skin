@@ -2,13 +2,20 @@
 
   // Content Screens
   .oo-content-screen {
-    padding: xs($panel-padding);
+    &:not(.oo-cc-ma-container) {
+      padding: xs($panel-padding);
+    }
   }
   .oo-content-screen-title {
     font-size: $font-size-sm-screen-title;
     span.oo-icon {
       font-size: 0.7em;
     }
+  }
+  .oo-content-screen .oo-close-button {
+    position: absolute;
+    top: xs($panel-padding);
+    right: xs($panel-padding);
   }
 
   // State Screens
@@ -65,7 +72,7 @@
       }
     }
     .captions-navbar {
-      margin-top: 10px;
+      margin-top: 8px;
     }
     .tabs-menu {
       width: 775px;
@@ -295,11 +302,11 @@
         height: $bitrate-horizontal-height - 30px;
         li {
           margin: 0 14px;
-          a.oo-quality-btn {
+          .oo-quality-btn {
             padding: 8px 6px;
             font-size: 0.8em;
           }
-          a.oo-quality-auto-btn {
+          .oo-quality-auto-btn {
             .oo-quality-auto-icon {
               font-size: 1.4em;
               padding:4px;
@@ -309,9 +316,6 @@
               font-size: 0.8em;
             }
           }
-        }
-        li.oo-auto-li {
-          top:14px;
         }
       }
     }
@@ -354,18 +358,43 @@
     }
   }
 
+  //Volume Controls
+  .oo-volume-controls:focus::before {
+    $focus-padding: 2px;
+    top: -$focus-padding;
+    right: -($focus-padding + 1);
+    bottom: $focus-padding;
+    left: $focus-padding - 2;
+    padding: $focus-padding;
+  }
+
   //Volume Slider
   .oo-volume-bar {
-    width: 7px * $xsmall-multiple;
-    height: 14px * $xsmall-multiple;
-    padding-left: 4px * $xsmall-multiple;
+    width: round(7px * $xsmall-multiple);
+    height: 7px * $xsmall-multiple;
+    padding-left: 5px * $xsmall-multiple;
     margin-bottom: 4px;
   }
 
-  .oo-volume-bar.oo-on{
+  .oo-volume-bar.oo-on {
+    position: relative;
     background-color: rgba($blue-light, 1.0);
     height: 14px * $xsmall-multiple;
     padding-bottom: 0;
+  }
+
+  // This is a transparent element inside the volume bar that
+  // will increase the clickable area when the bar is collapsed
+  .oo-volume-bar .oo-click-extender {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 14px * $xsmall-multiple;
+  }
+
+  .oo-volume-bar.oo-on .oo-click-extender {
+    display: none;
   }
 
   .oo-volume-slider {
@@ -590,5 +619,61 @@
 
   .oo-watermark-bottom.oo-watermark-bottom-cb {
     bottom: $control-bar-height-small;
+  }
+
+  .oo-state-screen-vr-notification {
+    font-size: 1em;
+  }
+
+  .oo-state-screen-vr {
+    &-bg {
+      width: 140px;
+      height: 140px;
+    }
+    &-icon {
+      top: -2px;
+      font-size: 79px;
+    }
+  }
+  .oo-end-card {
+    .oo-discovery-panel {
+      .oo-first-elem {
+        position: absolute;
+        width: 92%;
+        height: 100%;
+        left: 4%;
+        .oo-discovery-image-wrapper-style {
+          display: flex;
+          flex-direction: row;
+          padding: 5% 5% 10% 5%;
+          width: 100%;
+          height: 100%;
+          background: $panel-bg;
+          z-index: 10;
+          .oo-discovery-wrapper {
+            .oo-icon-pause-slick {
+              font-size: 12px;
+            }
+            width: 78%;
+            height: 100%;
+            .oo-image-style {
+              height: 100%;
+              width: auto;
+            }
+          }
+          .oo-discovery-content-name {
+            padding-left: 5%;
+            font-size: 0.6em;
+          }
+        }
+      }
+    }
+    button.oo-action-icon {
+      display: none;
+    }
+    .oo-content-panel {
+      top: 11%;
+      height: 52%;
+    }
   }
 }

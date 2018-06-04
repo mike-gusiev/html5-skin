@@ -1,11 +1,12 @@
 var React = require('react'),
+    CONSTANTS = require('../../constants/constants'),
     DataSelector = require('../dataSelector');
 
 var FontTypeTab = React.createClass({
   getInitialState: function() {
     return {
       selectedFontType: this.props.closedCaptionOptions.fontType,
-      availableFontTypes: ["Monospaced Serif", "Proportional Serif", "Monospaced Sans-Serif", "Proportional Sans-Serif", "Casual", "Cursive", "Small Capitals"]
+      availableFontTypes: ['Monospaced Serif', 'Proportional Serif', 'Monospaced Sans-Serif', 'Proportional Sans-Serif', 'Casual', 'Cursive', 'Small Capitals']
     };
   },
 
@@ -19,11 +20,12 @@ var FontTypeTab = React.createClass({
     });
   },
 
-  render: function(){
-    return(
+  render: function() {
+    return (
       <div className="oo-font-type-tab">
         <DataSelector
           {...this.props}
+          ariaLabel={CONSTANTS.ARIA_LABELS.FONT_TYPE_MENU}
           viewSize={this.props.responsiveView}
           dataItemsPerPage={this.props.dataItemsPerPage}
           selectedData={this.state.selectedFontType}
