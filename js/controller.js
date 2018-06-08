@@ -632,6 +632,29 @@ OO.plugin('Html5Skin', function(OO, _, $, W) {
         this.skin.updatePlayhead(null, duration);
       }
       this.renderSkin({ contentTree: contentTree });
+      if (this.state.playerParam.videoDetailsUrl && this.state.playerParam.requestLocalizableData) {
+        this.requestLocalData();
+      }
+    },
+
+    requestLocalData: function () {
+      var xhr = new XMLHttpRequest();
+      var url = this.state.playerParam.videoDetailsUrl.replace('{videoIds}', this.state.assetId);
+      xhr.open('GET', url, true);
+      xhr.send();
+      xhr.onreadystatechange = function() {
+        if (xhr.readyState != 4) return;
+        if (xhr.status != 200) {
+          console.log(xhr.status + ': ' + xhr.statusText);
+        } else {
+          var videoData = JSON.parse(xhr.response);
+          if (videoData && videoData.length) {
+            this.state.contentTree.title = videoData[0].title;
+            this.state.contentTree.description = videoData[0].description;
+            this.state.contentTree.hostedAtURL = videoData[0].link;
+          }
+        }
+      }.bind(this);
     },
 
     onSkinMetaDataFetched: function(event, skinMetaData) {
