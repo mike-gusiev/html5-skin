@@ -58,6 +58,15 @@ var SharePanel = React.createClass({
       iframeURL = iframeURL.replace(/">(\s)*<\/iframe>/, this.state.embedLink + '"></iframe>');
     }
 
+    // putting locale and videoDetailsUrl into iframe URL
+    var iframeString = iframeURL;
+    if (Utils.isIframe()) {
+      iframeString = this.props.skinConfig.shareScreen.embed.source.replace(/src=\'[^\']*'/, 'src=\'' + location.href + '\'')
+    } else if (window.moment && moment.locale() && this.props.playerParam.videoDetailsUrl) {
+      var videoDetailsUrl = this.props.playerParam.videoDetailsUrl.replace(/{videoIds}/, this.props.assetId);
+      iframeString = iframeURL.replace(/iframe.html\?/, 'iframe.html?locale=' + moment.locale() + '&videoDetailsUrl=' + encodeURIComponent(videoDetailsUrl) + '&');
+    }
+
     return (
       <div className="oo-share-tab-panel pgatour">
         <div className="oo-social-action-text oo-text-uppercase" >{titleString}</div>
@@ -85,7 +94,7 @@ var SharePanel = React.createClass({
           </div>
           <div className="oo-share-url-line">
             <input className="oo-share-link-copy" type="button" value="Copy" />
-            <input className="oo-share-link-input" type="text" readOnly value={iframeURL} />
+            <input className="oo-share-link-input" type="text" readOnly value={iframeString} />
           </div>
         </div>
       </div>
