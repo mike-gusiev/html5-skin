@@ -51,6 +51,22 @@ var SharePanel = React.createClass({
     return minutes + ':' + seconds;
   },
 
+  getPgatourIframeString: function (iframeURL, playerParam) {
+    var optionsUrl = 'iframe.html?';
+    if (playerParam.videoDetailsUrl) {
+      optionsUrl += 'options[videoDetailsUrl]=' + encodeURIComponent(playerParam.videoDetailsUrl) + '&';
+    }
+    if (playerParam.requestLocalizableData) {
+      optionsUrl += 'options[requestLocalizableData]=' + playerParam.requestLocalizableData + '&';
+    }
+    if (playerParam.discoveryParams) {
+      for (var key in playerParam.discoveryParams) {
+        optionsUrl += 'options[discoveryParams.' + key + ']=' + encodeURIComponent(playerParam.discoveryParams[key]) + '&';
+      }
+    }
+    return iframeURL.replace(/iframe.html\?/, optionsUrl);
+  },
+
   getPgatourPanel: function (titleString, iframeURL) {
     var shareLink = this.props.contentTree.hostedAtURL + this.state.startLink;
     if (this.state.embedLink) {
@@ -61,10 +77,9 @@ var SharePanel = React.createClass({
     // putting locale and videoDetailsUrl into iframe URL
     var iframeString = iframeURL;
     if (Utils.isIframe()) {
-      iframeString = this.props.skinConfig.shareScreen.embed.source.replace(/src=\'[^\']*'/, 'src=\'' + location.href + '\'')
-    } else if (window.moment && moment.locale() && this.props.playerParam.videoDetailsUrl) {
-      var videoDetailsUrl = this.props.playerParam.videoDetailsUrl.replace(/{videoIds}/, this.props.assetId);
-      iframeString = iframeURL.replace(/iframe.html\?/, 'iframe.html?locale=' + moment.locale() + '&videoDetailsUrl=' + encodeURIComponent(videoDetailsUrl) + '&');
+      iframeString = this.props.skinConfig.shareScreen.embed.source.replace(/src=\'[^\']*'/, 'src=\'' + location.href + '\'');
+    } else {
+      iframeString = this.getPgatourIframeString(iframeURL, this.props.playerParam);
     }
 
     return (
