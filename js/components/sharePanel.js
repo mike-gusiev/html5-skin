@@ -61,7 +61,7 @@ var SharePanel = React.createClass({
     }
     if (playerParam.discoveryParams) {
       for (var key in playerParam.discoveryParams) {
-        optionsUrl += 'options[discoveryParams.' + key + ']=' + encodeURIComponent(playerParam.discoveryParams[key]).replace(/'/g, "\\'") + '&';
+        optionsUrl += 'options[discoveryParams.' + key + ']=' + encodeURIComponent(playerParam.discoveryParams[key]).replace(/'/g, '%27') + '&';
       }
     }
     return iframeURL.replace(/iframe.html\?/, optionsUrl);
