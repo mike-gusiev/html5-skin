@@ -51,11 +51,35 @@ var SharePanel = React.createClass({
     return minutes + ':' + seconds;
   },
 
+  getPgatourIframeString: function (iframeURL, playerParam) {
+    var optionsUrl = 'iframe.html?';
+    if (playerParam.videoDetailsUrl) {
+      optionsUrl += 'options[videoDetailsUrl]=' + encodeURIComponent(playerParam.videoDetailsUrl) + '&';
+    }
+    if (playerParam.requestLocalizableData) {
+      optionsUrl += 'options[requestLocalizableData]=' + playerParam.requestLocalizableData + '&';
+    }
+    if (playerParam.discoveryParams) {
+      for (var key in playerParam.discoveryParams) {
+        optionsUrl += 'options[discoveryParams.' + key + ']=' + encodeURIComponent(playerParam.discoveryParams[key]).replace(/'/g, '%27') + '&';
+      }
+    }
+    return iframeURL.replace(/iframe.html\?/, optionsUrl);
+  },
+
   getPgatourPanel: function (titleString, iframeURL) {
     var shareLink = this.props.contentTree.hostedAtURL + this.state.startLink;
     if (this.state.embedLink) {
       iframeURL = iframeURL.replace(/'>(\s)*<\/iframe>/, this.state.embedLink + "'></iframe>");
       iframeURL = iframeURL.replace(/">(\s)*<\/iframe>/, this.state.embedLink + '"></iframe>');
+    }
+
+    // putting locale and videoDetailsUrl into iframe URL
+    var iframeString = iframeURL;
+    if (Utils.isIframe()) {
+      iframeString = this.props.skinConfig.shareScreen.embed.source.replace(/src=\'[^\']*'/, 'src=\'' + location.href + '\'');
+    } else {
+      iframeString = this.getPgatourIframeString(iframeURL, this.props.playerParam);
     }
 
     return (
@@ -85,7 +109,7 @@ var SharePanel = React.createClass({
           </div>
           <div className="oo-share-url-line">
             <input className="oo-share-link-copy" type="button" value="Copy" />
-            <input className="oo-share-link-input" type="text" readOnly value={iframeURL} />
+            <input className="oo-share-link-input" type="text" readOnly value={iframeString} />
           </div>
         </div>
       </div>
