@@ -139,7 +139,6 @@ var SharePanel = React.createClass({
           <div className="oo-social-action-text oo-text-uppercase">{titleString}</div>
           <a className="oo-twitter" onClick={this.handleTwitterClick}> </a>
           <a className="oo-facebook" onClick={this.handleFacebookClick}> </a>
-          <a className="oo-google-plus" onClick={this.handleGPlusClick}> </a>
           <a className="oo-email-share" onClick={this.handleEmailClick}> </a>
           <textarea className="oo-form-control oo-embed-form" rows="3" value={iframeURL} readOnly />
         </div>
@@ -227,12 +226,6 @@ var SharePanel = React.createClass({
     var facebookUrl = "http://www.facebook.com/sharer.php";
     facebookUrl += "?u=" + encodeURIComponent(this.refs.startValue.value);
     window.open(facebookUrl, "facebook window", "height=315,width=780");
-  },
-
-  handleGPlusClick: function() {
-    var gPlusUrl = 'https://plus.google.com/share';
-    gPlusUrl += '?url=' + encodeURIComponent(location.href);
-    window.open(gPlusUrl, 'google+ window', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=600,width=600');
   },
 
   handleTwitterClick: function() {
