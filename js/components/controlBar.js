@@ -702,7 +702,7 @@ var ControlBar = createReactClass({
           className="oo-theater"
           focusId={CONSTANTS.CONTROL_BAR_KEYS.THEATER}
           ariaLabel={CONSTANTS.ARIA_LABELS.THEATER}
-          icon={fullscreenIcon}
+          icon="theater"
           tooltip={CONSTANTS.SKIN_TEXT.THEATER}
           onClick={this.handleTheaterModeClick}>
         </ControlButton>
