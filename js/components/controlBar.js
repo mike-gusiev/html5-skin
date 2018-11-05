@@ -92,6 +92,19 @@ var ControlBar = createReactClass({
     }
   },
 
+  handleTheaterModeClick: function (evt) {
+    console.log('toggleTheaterMode');
+    evt.stopPropagation();
+    evt.cancelBubble = true;
+    evt.preventDefault();
+    if (this.props.controller) {
+      this.props.controller.toggleTheaterMode();
+      if (this.vr && this.isMobile && this.props.controller.isVrStereo) {
+        this.toggleStereoVr();
+      }
+    }
+  },
+
   handleStereoVrClick: function(evt) {
     if (this.vr) {
       evt.stopPropagation();
@@ -679,6 +692,19 @@ var ControlBar = createReactClass({
           ariaLabel={stereoAriaLabel}
           icon={stereoIcon}
           onClick={this.handleStereoVrClick}>
+        </ControlButton>
+      ),
+
+      theater: this.props.controller.state.fullscreen ? null : (
+        <ControlButton
+          {...commonButtonProps}
+          key={CONSTANTS.CONTROL_BAR_KEYS.THEATER}
+          className="oo-theater"
+          focusId={CONSTANTS.CONTROL_BAR_KEYS.THEATER}
+          ariaLabel={CONSTANTS.ARIA_LABELS.THEATER}
+          icon={fullscreenIcon}
+          tooltip={CONSTANTS.SKIN_TEXT.THEATER}
+          onClick={this.handleTheaterModeClick}>
         </ControlButton>
       ),
 

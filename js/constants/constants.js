@@ -122,7 +122,8 @@ var CONSTANTS = {
     NO_LINGUISTIC_CONTENT: 'No linguistic content',
     UNCODED_LANGUAGES: 'Uncoded languages',
     MULTIPLE_LANGUAGES: 'Multiple languages',
-    CHROMECAST: 'Chromecast'
+    CHROMECAST: 'Chromecast',
+    THEATER: 'Theater mode'
   },
 
   ARIA_LABELS: {
@@ -171,7 +172,8 @@ var CONSTANTS = {
     PLAYBACK_SPEED: MACROS.RATE + 'x Playback Speed',
     PLAYBACK_SPEED_OPTION: 'Speed',
     NORMAL_SPEED: 'Normal Speed',
-    CHROMECAST: 'Chromecast'
+    CHROMECAST: 'Chromecast',
+    THEATER: 'Theater mode'
   },
 
   CONTROL_BAR_KEYS: {
@@ -191,7 +193,8 @@ var CONSTANTS = {
     FULLSCREEN: 'fullscreen',
     LOGO: 'logo',
     CHROMECAST: 'chromecast',
-    SKIP_CONTROLS: 'skipControls'
+    SKIP_CONTROLS: 'skipControls',
+    THEATER: 'theater',
   },
 
   ARIA_ROLES: {
