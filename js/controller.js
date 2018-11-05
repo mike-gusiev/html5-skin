@@ -49,6 +49,7 @@ OO.plugin('Html5Skin', function(OO, _, $, W) {
     this.isVrStereo = false;
     this.toggleButtons = {};
     this.handleVrMobileOrientation = this.handleVrMobileOrientation.bind(this);
+    this.languageList = [];
     this.state = {
       playerParam: {},
       skinMetaData: {},
@@ -87,6 +88,11 @@ OO.plugin('Html5Skin', function(OO, _, $, W) {
       mainVideoDuration: 0,
       adVideoDuration: 0,
       adStartTime: 0,
+      adPausedTime: 0,
+      adEndTime: 0,
+      adWasPaused: false,
+      adPauseDuration: 0,
+      adRemainingTime: 0,
       elementId: null,
       mainVideoContainer: null,
       mainVideoInnerWrapper: null,
@@ -101,7 +107,7 @@ OO.plugin('Html5Skin', function(OO, _, $, W) {
       mainVideoPlayhead: 0,
       adVideoPlayhead: 0,
       focusedElement: null,
-      focusedControl: null, // Stores the id of the control bar element that is currently focused
+      focusedControl: null, // Stores the id of the control button element that is currently focused
 
       currentAdsInfo: {
         currentAdItem: null,
@@ -138,6 +144,7 @@ OO.plugin('Html5Skin', function(OO, _, $, W) {
       volumeState: {
         volume: 1,
         muted: false,
+        volumeSliderVisible: false,
         mutingForAutoplay: false,
         unmuteIconCollapsed: false,
         oldVolume: 1,
@@ -152,6 +159,22 @@ OO.plugin('Html5Skin', function(OO, _, $, W) {
         showing: false,
         delayedSetEmbedCodeEvent: false,
         delayedContentData: null
+      },
+
+      scrubberBar: {
+        isHovering: false
+      },
+
+      skipControls: {
+        hasPreviousVideos: false,
+        hasNextVideos: false,
+        requestPreviousTimestamp: 0
+      },
+
+      playbackSpeedOptions: {
+        currentSpeed: CONSTANTS.PLAYBACK_SPEED.DEFAULT_VALUE,
+        showPopover: false,
+        autoFocus: false,
       },
 
       moreOptionsItems: null,
@@ -175,13 +198,17 @@ OO.plugin('Html5Skin', function(OO, _, $, W) {
       isClickedOutside: false,
       vrViewingDirection: { yaw: 0, roll: 0, pitch: 0 },
 
-      showMultiAudioIcon: false,
+      hideMultiAudioIcon: false,
       multiAudio: null,
       multiAudioOptions: {
         enabled: null,
         showPopover: false,
         autoFocus: false
-      }
+      },
+
+      enableChromecast: false,
+
+      audioOnly: false
     };
 
     this.init();
@@ -399,7 +426,7 @@ OO.plugin('Html5Skin', function(OO, _, $, W) {
       this.state.isMobile = Utils.isMobile();
       this.state.browserSupportsTouch = Utils.browserSupportsTouch();
 
-      this.state.showMultiAudioIcon = !!params.showMultiAudioIcon;
+      this.state.hideMultiAudioIcon = !!params.hideMultiAudioIcon;
 
       // initial DOM manipulation
       this.state.mainVideoContainer.addClass('oo-player-container');
@@ -1071,13 +1098,21 @@ OO.plugin('Html5Skin', function(OO, _, $, W) {
      * The function is called when event MULTI_AUDIO_FETCHED was caught;
      * The function sets value for this.state.multiAudio
      * @param {String} event  name of a event
-     * @param {Object} multiAudio  - audio which fetched for the current video
+     * @param {Object} multiAudio - audio which fetched for the current video
      * @param {Array} multiAudio.tracks - list of objects with data for each audio
+     * @param {Array} multiAudio.languageList - list of objects with all languages
      */
     onMultiAudioFetched: function(event, multiAudio) {
-      if (this.state.showMultiAudioIcon) {
-        // if param showMultiAudioIcon is set to true
-        this.state.multiAudio = multiAudio;
+      if (!this.state.hideMultiAudioIcon) {
+        // if param hideMultiAudioIcon is set to false
+        if (typeof multiAudio !== 'undefined') {
+          let multiAudioValue = null;
+          if (this.containsMultiAudio(multiAudio)) {
+            multiAudioValue = { tracks: multiAudio.tracks };
+          }
+          this.state.multiAudio = multiAudioValue;
+          this.languageList = multiAudio.languageList || this.languageList;
+        }
         this.renderSkin();
       }
     },
@@ -1090,10 +1125,25 @@ OO.plugin('Html5Skin', function(OO, _, $, W) {
      * @param {Array} multiAudio.tracks - list of objects with data for each audio
      */
     onMultiAudioChanged: function(event, multiAudio) {
-      if (this.state.showMultiAudioIcon) {
-        this.state.multiAudio = multiAudio;
+      if (!this.state.hideMultiAudioIcon) {
+        if (this.containsMultiAudio(multiAudio)) {
+          this.state.multiAudio = multiAudio;
+        } else {
+          this.state.multiAudio = null;
+        }
+
         this.renderSkin();
       }
+    },
+
+    /**
+     * Checks to see if we have multiple audio tracks
+     * @param {Object} multiAudio The multiAudio object that is fetched from the current video
+     * @returns {boolean} True if the provided object contains more than one track, false otherwise
+     */
+    containsMultiAudio: function(multiAudio) {
+      var hasMoreThanOneTrack = !!(multiAudio && multiAudio.tracks && multiAudio.tracks.length > 1);
+      return hasMoreThanOneTrack;
     },
 
     /**
@@ -1106,7 +1156,7 @@ OO.plugin('Html5Skin', function(OO, _, $, W) {
       var currentAudioTrack = JSON.stringify(currentTrack);
       OO.setItem(OO.CONSTANTS.SELECTED_AUDIO, currentAudioTrack);
 
-      this.mb.publish(OO.EVENTS.SET_CURRENT_AUDIO, currentTrack);
+      this.mb.publish(OO.EVENTS.SET_CURRENT_AUDIO, this.state.currentVideoId, currentTrack);
     },
 
     onSeeked: function(event) {
@@ -1260,7 +1310,11 @@ OO.plugin('Html5Skin', function(OO, _, $, W) {
 
     onAdsPlayed: function(event) {
       OO.log('onAdsPlayed is called from event = ' + event);
-      this.state.screenToShow = CONSTANTS.SCREEN.PLAYING_SCREEN;
+      if (this.state.playerState === CONSTANTS.STATE.END) {
+        this.state.screenToShow = CONSTANTS.SCREEN.END_SCREEN;
+      } else {
+        this.state.screenToShow = CONSTANTS.SCREEN.PLAYING_SCREEN;
+      }
       this.skin.updatePlayhead(
         this.state.mainVideoPlayhead,
         this.state.mainVideoDuration,
@@ -1274,6 +1328,12 @@ OO.plugin('Html5Skin', function(OO, _, $, W) {
       this.trySetAnamorphicFixState(true);
       // In case ad was skipped or errored while stalled
       this.setBufferingState(false);
+
+      // Set current position for video 360 after Ads.
+      if (this.videoVr && this.state.isMobile) { // only for vr on mobile
+        this.setControllerVrViewingDirection();
+      }
+
       this.renderSkin();
     },
 
@@ -1287,9 +1347,18 @@ OO.plugin('Html5Skin', function(OO, _, $, W) {
         height: '',
         width: ''
       });
-      this.state.forceControlBarVisible = false;
+      this.cancelTimer();
+      this.hideControlBar();
       if (this.state.mainVideoPlayhead > 0) {
         this.isNewVrVideo = false;
+      }
+      this.state.adPausedTime = 0;
+
+      if (this.videoVr && this.state.isMobile) { // only for vr on mobile
+        // Check current a vr video position (an user could change position using tilting)
+        // for setting this value after Ads in onAdsPlayed
+        const useVrViewingDirection = true;
+        this.checkVrDirection(useVrViewingDirection);
       }
     },
 
@@ -1302,16 +1371,17 @@ OO.plugin('Html5Skin', function(OO, _, $, W) {
     onWillPlaySingleAd: function(event, adItem) {
       OO.log('onWillPlaySingleAd is called with adItem = ' + adItem);
       if (adItem !== null) {
-        this.state.adVideoDuration = adItem.duration;
+        this.state.adVideoDuration = adItem.duration * 1000;
         this.state.screenToShow = CONSTANTS.SCREEN.AD_SCREEN;
         this.state.isPlayingAd = true;
         this.state.currentAdsInfo.currentAdItem = adItem;
         this.state.playerState = CONSTANTS.STATE.PLAYING;
         if (adItem.isLive) {
-          this.state.adStartTime = new Date().getTime();
+          this.state.adStartTime = Date.now();
         } else {
           this.state.adStartTime = 0;
         }
+        this.state.adEndTime = this.state.adStartTime + this.state.adVideoDuration;
         this.skin.state.currentPlayhead = 0;
         this.removeBlur();
         this.renderSkin();
@@ -1330,15 +1400,20 @@ OO.plugin('Html5Skin', function(OO, _, $, W) {
       this.renderSkin();
     },
 
-    onShowAdControls: function(event, showAdControls) {
+    onShowAdControls: function(event, showAdControls, autoHide) {
       this.state.showAdControls = showAdControls;
+      this.state.forceControlBarVisible = false;
       if (showAdControls && this.state.config.adScreen.showControlBar) {
         this.state.pluginsElement.removeClass('oo-full');
         this.state.pluginsClickElement.removeClass('oo-full');
+        if (typeof autoHide === 'boolean') {
+          this.state.forceControlBarVisible = !autoHide;
+        }
       } else {
         this.state.pluginsElement.addClass('oo-full');
         this.state.pluginsClickElement.addClass('oo-full');
       }
+
       this.renderSkin();
     },
 
@@ -1414,6 +1489,7 @@ OO.plugin('Html5Skin', function(OO, _, $, W) {
         this.state.pluginsElement.removeClass('oo-showing');
         this.state.pluginsClickElement.removeClass('oo-showing');
       }
+      this.state.currentVideoId = source;
     },
 
     closeNonlinearAd: function(event) {
@@ -1448,6 +1524,39 @@ OO.plugin('Html5Skin', function(OO, _, $, W) {
     showNonlinearAdCloseButton: function(event) {
       this.state.showAdOverlayCloseButton = true;
       this.renderSkin();
+    },
+
+    /**
+     * Returns ad remaining time that will be displayed in ad marquee
+     * when playing ads.
+     * @private
+     * @returns {Number} remainingTime
+     */
+    getAdRemainingTime: function() {
+      var remainingTime = 0;
+
+      var isLive = this.state.currentAdsInfo.currentAdItem ?
+        this.state.currentAdsInfo.currentAdItem.isLive
+        :
+        false;
+      var isSSAI = this.state.currentAdsInfo.currentAdItem ?
+        this.state.currentAdsInfo.currentAdItem.ssai
+        :
+        false;
+
+      if (isLive) {
+        remainingTime = parseInt((this.state.adStartTime + this.state.adVideoDuration - Date.now()) / 1000);
+        if (isSSAI) {
+          if (this.state.playerState !== CONSTANTS.STATE.PAUSE) {
+            remainingTime = (this.state.adEndTime - Date.now()) / 1000;
+          } else {
+            remainingTime = (this.state.adEndTime - this.state.adPausedTime) / 1000;
+          }
+        }
+      } else {
+        remainingTime = parseInt(this.state.adVideoDuration - this.state.adVideoPlayhead);
+      }
+      return remainingTime;
     },
 
     /** ******************************************************************
@@ -1502,12 +1611,18 @@ OO.plugin('Html5Skin', function(OO, _, $, W) {
         this.state.config.discoveryScreen.countDownTime
       );
 
+      var uiLanguage = Utils.getLanguageToUse(this.state.config);
+      this.mb.publish(OO.EVENTS.SKIN_UI_LANGUAGE, uiLanguage);
+
+      this.state.audioOnly = params.playerType === OO.CONSTANTS.PLAYER_TYPE.AUDIO;
+      this.state.enableChromecast = this.isChromecastEnabled(params);
+
       // load player
       this.skin = ReactDOM.render(
         React.createElement(Skin, {
           skinConfig: this.state.config,
           localizableStrings: Localization.languageFiles,
-          language: Utils.getLanguageToUse(this.state.config),
+          language: uiLanguage,
           controller: this,
           closedCaptionOptions: this.state.closedCaptionOptions,
           pauseAnimationDisabled: this.state.pauseAnimationDisabled
@@ -1516,6 +1631,19 @@ OO.plugin('Html5Skin', function(OO, _, $, W) {
       );
 
       this.state.configLoaded = true;
+
+      if (!this.state.audioOnly) {
+        this.state.mainVideoInnerWrapper.addClass('oo-video-player');
+      } else {
+        this.state.mainVideoInnerWrapper.removeClass('oo-video-player');
+        //If height was not provided for an audio only player, set a height of 138px.
+        //Note that our debug page that QA uses does not currently set a height
+        //138px was the value recommended by Fernando. See JIRA ticket PLAYER-4170
+        var containerHeight = this.state.mainVideoContainer.height();
+        if (!containerHeight) {
+          this.state.mainVideoContainer.height(CONSTANTS.UI.AUDIO_ONLY_DEFAULT_HEIGHT);
+        }
+      }
 
       this.mb.publish(OO.EVENTS.SKIN_CONFIG_LOADED, this.state.config);
 
@@ -1574,12 +1702,18 @@ OO.plugin('Html5Skin', function(OO, _, $, W) {
           this.hideControlBar();
         }.bind(this)
       );
-      this.state.pluginsClickElement.click(
-        function() {
-          this.state.pluginsClickElement.removeClass('oo-showing');
-          this.mb.publish(OO.EVENTS.PLAY);
-        }.bind(this)
-      );
+
+      //PLAYER-4041: It seems like 'click' events started when a div's pointerEvents is initially 'none' but is changed to
+      //'auto' prior to the 'click' event ending will trigger 'click' event listeners on Android. We'll instead listen to
+      //'touchend' and 'touchcancel' on Android.
+      if (OO.isAndroid) {
+        this.state.pluginsClickElement.on('touchend touchcancel',
+          this.resumePlaybackAfterClickthrough.bind(this)
+        );
+      } else {
+        this.state.pluginsClickElement.click(this.resumePlaybackAfterClickthrough.bind(this));
+      }
+
       this.state.pluginsClickElement.mouseover(
         function() {
           this.showControlBar();
@@ -1596,6 +1730,16 @@ OO.plugin('Html5Skin', function(OO, _, $, W) {
         videoWrapperClass: 'innerWrapper',
         pluginsClass: 'oo-player-skin-plugins'
       });
+    },
+
+    /**
+     * Resumes playback and hides the plugins click element. To be called after an ad clickthrough
+     * was handled by the player.
+     * @private
+     */
+    resumePlaybackAfterClickthrough: function() {
+      this.state.pluginsClickElement.removeClass('oo-showing');
+      this.mb.publish(OO.EVENTS.PLAY);
     },
 
     onBitrateInfoAvailable: function(event, bitrates) {
@@ -1700,15 +1844,15 @@ OO.plugin('Html5Skin', function(OO, _, $, W) {
     /**
      * @description the function closes popovers (closedCaptionPopover, videoQualityPopover, multiAudioPopover);
      * if the parameter specifies the name of the popover, then its state does not change
-     * @param {string} popoverName - the name of the popover that does not need to be closed
+     * @param {string} popoverOptionsName - the name of the popover that does not need to be closed
      * @public
      */
-    closeOtherPopovers: function(popoverName) {
-      var popoversNameList = [CONSTANTS.MENU_OPTIONS.CLOSED_CAPTIONS, CONSTANTS.MENU_OPTIONS.VIDEO_QUALITY, CONSTANTS.MENU_OPTIONS.MULTI_AUDIO];
-      for (var index = 0; index < popoversNameList.length; index++) {
-        var closedPopoverName = popoversNameList[index];
-        if (closedPopoverName !== popoverName) {
-          this.closePopover(closedPopoverName);
+    closeOtherPopovers: function(popoverOptionsName) {
+      for (var menuName in CONSTANTS.MENU_OPTIONS) {
+        var currentOptionsName = CONSTANTS.MENU_OPTIONS[menuName];
+
+        if (currentOptionsName !== popoverOptionsName) {
+          this.closePopover(currentOptionsName);
         }
       }
     },
@@ -1727,7 +1871,8 @@ OO.plugin('Html5Skin', function(OO, _, $, W) {
       if (menuOptions && menuOptions.showPopover) {
         // Re-focus on toggle button when closing the menu popover if the latter
         // was originally opened with a key press.
-        if (params.restoreToggleButtonFocus &&
+        if (
+          params.restoreToggleButtonFocus &&
           menuToggleButton &&
           menuToggleButton.wasTriggeredWithKeyboard()
         ) {
@@ -1769,6 +1914,14 @@ OO.plugin('Html5Skin', function(OO, _, $, W) {
       if (this.state.fullscreen) {
         this.state.mainVideoElement.webkitExitFullscreen();
       } else {
+        // PLAYER-4216
+        // iOS will only recognize active text tracks and show the selected state
+        // checkmark if these are set to "showing" mode prior to entering fullscreen.
+        // The isGoingFullScreen flag will ensure that the correct mode is set on the
+        // active track (if existent) right before entering fullscreen
+        this.setClosedCaptionsLanguage({
+          isGoingFullScreen: true
+        });
         this.state.mainVideoElement.webkitEnterFullscreen();
       }
     },
@@ -1834,8 +1987,9 @@ OO.plugin('Html5Skin', function(OO, _, $, W) {
       // is configured, we wait until the user exits fullscreen and then we display it.
       if (showUpNext && this.state.playerState === CONSTANTS.STATE.END) {
         this.state.forceCountDownTimerOnEndScreen = true;
-        this.sendDiscoveryDisplayEvent("endScreen");
-        this.state.pluginsElement.addClass("oo-overlay-blur");
+        this.sendDiscoveryDisplayEvent('endScreen');
+        this.state.pluginsElement.addClass('oo-overlay-blur');
+        this.state.screenToShow = CONSTANTS.SCREEN.DISCOVERY_SCREEN;
         this.renderSkin();
         this.state.forceCountDownTimerOnEndScreen = false;
       }
@@ -1876,6 +2030,7 @@ OO.plugin('Html5Skin', function(OO, _, $, W) {
       this.mb.unsubscribe(OO.EVENTS.ERROR, 'customerUi');
       this.mb.unsubscribe(OO.EVENTS.SET_EMBED_CODE_AFTER_OOYALA_AD, 'customerUi');
       this.mb.unsubscribe(OO.EVENTS.SET_EMBED_CODE, 'customerUi');
+      this.mb.unsubscribe(OO.EVENTS.POSITION_IN_PLAYLIST_DETERMINED, 'customerUi');
     },
 
     unsubscribeBasicPlaybackEvents: function() {
@@ -1895,6 +2050,7 @@ OO.plugin('Html5Skin', function(OO, _, $, W) {
       this.mb.unsubscribe(OO.EVENTS.CLOSED_CAPTION_CUE_CHANGED, 'customerUi');
       this.mb.unsubscribe(OO.EVENTS.CHANGE_CLOSED_CAPTION_LANGUAGE, 'customerUi');
       this.mb.unsubscribe(OO.EVENTS.VOLUME_CHANGED, 'customerUi');
+      this.mb.unsubscribe(OO.EVENTS.PLAYBACK_SPEED_CHANGED, 'customerUi');
       this.mb.unsubscribe(OO.EVENTS.PLAYBACK_READY, 'customerUi');
       this.mb.unsubscribe(OO.EVENTS.CHECK_VR_DIRECTION, 'customerUi');
       this.mb.unsubscribe(OO.EVENTS.TOUCH_MOVE, 'customerUi');
@@ -2060,8 +2216,7 @@ OO.plugin('Html5Skin', function(OO, _, $, W) {
         this.closeScreen();
       } else {
         if (
-          this.state.playerState === CONSTANTS.STATE.PLAYING ||
-          this.state.playerState === CONSTANTS.STATE.START
+          this.state.playerState === CONSTANTS.STATE.PLAYING
         ) {
           this.pausedCallback = function() {
             this.state.pluginsElement.addClass('oo-overlay-blur');
@@ -2077,19 +2232,29 @@ OO.plugin('Html5Skin', function(OO, _, $, W) {
       }
     },
 
-    toggleScreen: function(screen) {
+    /**
+     * Toggles the provided screen. Will switch to the provided screen
+     * if that screen is not active, otherwise it will close the screen.
+     * @param screen The screen to toggle
+     * @param {boolean} doNotPause Set to true to avoid pausing when toggling the screen
+     */
+    toggleScreen: function(screen, doNotPause) {
       this.isNewVrVideo = false;
       if (this.state.screenToShow === screen) {
         this.closeScreen();
-      }
-      else {
+      } else {
         if (this.state.playerState === CONSTANTS.STATE.PLAYING) {
           this.pausedCallback = function() {
             this.state.pluginsElement.addClass('oo-overlay-blur');
             this.state.screenToShow = screen;
             this.renderSkin();
           }.bind(this);
-          this.mb.publish(OO.EVENTS.PAUSE);
+          if (doNotPause) {
+            this.pausedCallback();
+            this.pausedCallback = null;
+          } else {
+            this.mb.publish(OO.EVENTS.PAUSE);
+          }
         } else {
           this.state.screenToShow = screen;
           this.state.pluginsElement.addClass('oo-overlay-blur');
@@ -2116,13 +2281,89 @@ OO.plugin('Html5Skin', function(OO, _, $, W) {
       this.renderSkin();
     },
 
+    /**
+     * Handler for the POSITION_IN_PLAYLIST_DETERMINED event, which controls whether
+     * the Previous/Next video buttons are displayed.
+     * @private
+     * @param {type} eventName The name of the event
+     * @param {type} params The event's parameters
+     */
+    onPositionInPlaylistDetermined: function(eventName, params) {
+      params = params || {};
+      this.state.skipControls.hasPreviousVideos = !!params.hasPreviousVideos;
+      this.state.skipControls.hasNextVideos = !!params.hasNextVideos;
+    },
+
+    /**
+     * Update the scrubber bar hover state for other components that react to it.
+     * Called by the scrubber bar component when its hover state changes.
+     * @private
+     * @param {boolean} isHovering True if the control bar is hovered, false otherwise
+     */
+    setScrubberBarHoverState: function(isHovering) {
+      if (this.state.scrubberBar.isHovering !== isHovering) {
+        this.state.scrubberBar.isHovering = isHovering;
+        this.renderSkin();
+      }
+    },
+
+    /**
+     * "Previous video" button handler. Either rewinds the video or requests the
+     * previous video if the playhead is close to the beginning of the video or the
+     * button is clicked repeatedly in quick succession.
+     * @private
+     */
+    rewindOrRequestPreviousVideo: function() {
+      var currentTimestamp = Utils.getCurrentTimestamp();
+      var timeElapsed = currentTimestamp - this.state.skipControls.requestPreviousTimestamp;
+      // Button has been clicked once more in a short amount of time, playhead
+      // is below a certain threshold, or player is stalled after seeking, request previous video.
+      if (
+        this.state.seeking ||
+        timeElapsed < CONSTANTS.UI.REQUEST_PREVIOUS_TIME_THRESHOLD ||
+        this.state.mainVideoPlayhead < CONSTANTS.UI.REQUEST_PREVIOUS_PLAYHEAD_THRESHOLD
+      ) {
+        this.mb.publish(OO.EVENTS.REQUEST_PREVIOUS_VIDEO);
+      } else {
+        this.updateSeekingPlayhead(0);
+        this.seek(0);
+      }
+      this.state.skipControls.requestPreviousTimestamp = currentTimestamp;
+    },
+
+    /**
+     * Requests the next video from either the Playlists or Discovery plugins.
+     * @private
+     */
+    requestNextVideo: function() {
+      this.mb.publish(OO.EVENTS.REQUEST_NEXT_VIDEO);
+    },
+
+    /**
+     * Requests that the player set its playback speed to the specified value.
+     * @private
+     * @param {Number} playbackSpeed A number representing the rate by which playback should advance
+     */
+    setPlaybackSpeed: function(playbackSpeed) {
+      this.mb.publish(OO.EVENTS.SET_PLAYBACK_SPEED, playbackSpeed);
+    },
+
+    /**
+     * Stores the focus id of the currently focused element in the controller's state.
+     * @private
+     * @param {String} focusedControl The value of the focusId property of the currently focused control or null if no control is focused
+     */
+    setFocusedControl: function(focusedControl) {
+      this.state.focusedControl = focusedControl;
+    },
+
     sendDiscoveryClickEvent: function(selectedContentData, isAutoUpNext) {
       if (this.state.playerParam.discoveryRedirect && selectedContentData.clickedVideo.hostedAtURL && window.pgatour) {
         pgatour.setWindowLocation(selectedContentData.clickedVideo.hostedAtURL);
         return;
       }
-      this.state.pluginsElement.removeClass("oo-overlay-blur");
-      if (isAutoUpNext){
+      this.state.pluginsElement.removeClass('oo-overlay-blur');
+      if (isAutoUpNext) {
         this.state.upNextInfo.delayedContentData = selectedContentData;
         this.state.upNextInfo.delayedSetEmbedCodeEvent = true;
       } else {
@@ -2207,7 +2448,17 @@ OO.plugin('Html5Skin', function(OO, _, $, W) {
       }
     },
 
-    setClosedCaptionsLanguage: function() {
+    /**
+     * Requests that closed captions either be set with the currently active
+     * language or be disabled.
+     * @private
+     * @param {Object} An object with properties that provide additional information
+     * about the requested operation.
+     *  - isGoingFullScreen: {Boolean} Determines whether or not the player is about
+     * to enter fullscreen mode when this operation is requested.
+     */
+    setClosedCaptionsLanguage: function(params) {
+      var params = params || {};
       var availableLanguages = this.state.closedCaptionOptions.availableLanguages;
       // if saved language not in available languages, set to first available language
       if (
@@ -2223,7 +2474,8 @@ OO.plugin('Html5Skin', function(OO, _, $, W) {
         : OO.CONSTANTS.CLOSED_CAPTIONS.DISABLED;
       this.mb.publish(OO.EVENTS.SET_CLOSED_CAPTIONS_LANGUAGE, language, {
         mode: mode,
-        isFullScreen: this.state.fullscreen
+        isFullScreen: this.state.fullscreen,
+        isGoingFullScreen: !!params.isGoingFullScreen
       });
     },
 
@@ -2236,14 +2488,26 @@ OO.plugin('Html5Skin', function(OO, _, $, W) {
       this.state.pauseAnimationDisabled = true;
       if (this.state.playerState === CONSTANTS.STATE.PAUSE) {
         this.state.screenToShow = CONSTANTS.SCREEN.PAUSE_SCREEN;
-      }
-      else if (this.state.playerState === CONSTANTS.STATE.END) {
+      } else if (this.state.playerState === CONSTANTS.STATE.END) {
         this.state.screenToShow = CONSTANTS.SCREEN.END_SCREEN;
+      } else if (this.state.playerState === CONSTANTS.STATE.START) {
+        this.state.screenToShow = CONSTANTS.SCREEN.START_SCREEN;
+      } else {
+        this.state.screenToShow = CONSTANTS.SCREEN.PLAYING_SCREEN;
       }
       this.renderSkin();
     },
 
-    onChangeClosedCaptionLanguage: function(event, language) {
+    /**
+     * Handles the CHANGE_CLOSED_CAPTION_LANGUAGE event. Fired by the core when
+     * a change in closed captions language is requested.
+     * @private
+     * @param {String} eventName The name of the event that was fired
+     * @param {String} language The new closed captions language to set, or 'none' if captions are to be disabled
+     * @param {Object} params An object with additional options for this operation
+     *  - forceEnabled: {Boolean} If true this will ensure that captions are also turned on after the new language is set
+     */
+    onChangeClosedCaptionLanguage: function(event, language, params = {}) {
       if (language === CONSTANTS.CLOSED_CAPTIONS.NO_LANGUAGE) {
         if (this.state.closedCaptionOptions.enabled) {
           this.toggleClosedCaptionEnabled();
@@ -2254,6 +2518,14 @@ OO.plugin('Html5Skin', function(OO, _, $, W) {
 
       // validate language is available before update and save
       if (language && availableLanguages && _.contains(availableLanguages.languages, language)) {
+        // The act of changing the CC language doesn't currently enable captions
+        // automatically. The core will set the forceEnabled parameter to true when
+        // it is necessary to also enable captions themselves
+        if (params.forceEnabled) {
+          this.state.closedCaptionOptions.enabled = true;
+          this.state.persistentSettings.closedCaptionOptions.enabled = true;
+        }
+
         this.state.closedCaptionOptions.language =
           this.state.persistentSettings.closedCaptionOptions.language = language;
         var captionLanguage = this.state.closedCaptionOptions.enabled ? language : '';
@@ -2427,7 +2699,7 @@ OO.plugin('Html5Skin', function(OO, _, $, W) {
     },
 
     startHideControlBarTimer: function() {
-      if (this.skin.props.skinConfig.controlBar.autoHide === true) {
+      if (this.skin.props.skinConfig.controlBar.autoHide === true && !this.state.audioOnly) {
         this.cancelTimer();
         var timer = setTimeout(
           function() {
@@ -2442,13 +2714,23 @@ OO.plugin('Html5Skin', function(OO, _, $, W) {
     },
 
     showControlBar: function() {
+      var oldState = this.state.controlBarVisible;
       this.state.controlBarVisible = true;
+      if (this.state.controlBarVisible !== oldState) {
+        this.renderSkin();
+      }
     },
 
     hideControlBar: function() {
-      this.state.controlBarVisible = false;
-      if (Utils.isAndroid()) {
-        this.hideVolumeSliderBar();
+      if (!this.state.audioOnly) {
+        var oldState = this.state.controlBarVisible;
+        this.state.controlBarVisible = false;
+        if (Utils.isAndroid()) {
+          this.hideVolumeSliderBar();
+        }
+        if (this.state.controlBarVisible !== oldState) {
+          this.renderSkin();
+        }
       }
     },
 
@@ -2479,7 +2761,7 @@ OO.plugin('Html5Skin', function(OO, _, $, W) {
 
     // set Main Video Element Wrapper padding-top to aspect ratio
     setAspectRatio: function() {
-      if (this.state.mainVideoAspectRatio > 0) {
+      if (this.state.mainVideoAspectRatio > 0 && !this.state.audioOnly) {
         this.state.mainVideoInnerWrapper.css('padding-top', this.state.mainVideoAspectRatio + '%');
       }
     },
