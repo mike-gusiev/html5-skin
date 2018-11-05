@@ -2,11 +2,11 @@
   UP NEXT PANEL
 *********************************************************************/
 /**
-* The screen used while the video is playing.
-*
-* @class UpNextPanel
-* @constructor
-*/
+ * The screen used while the video is playing.
+ *
+ * @class UpNextPanel
+ * @constructor
+ */
 var React = require('react'),
     ReactDOM = require('react-dom'),
     CONSTANTS = require('./../constants/constants'),
@@ -15,7 +15,6 @@ var React = require('react'),
     CloseButton = require('./closeButton'),
     CountDownClock = require('./countDownClock'),
     Icon = require('../components/icon');
-
 var createReactClass = require('create-react-class');
 var PropTypes = require('prop-types');
 
@@ -35,11 +34,11 @@ var UpNextPanel = createReactClass({
     event.preventDefault();
     // Use the same way as sending out the click event on discovery content
     var eventData = {
-      'clickedVideo': this.props.upNextInfo.upNextData,
-      'custom': {
-        'source': CONSTANTS.SCREEN.UP_NEXT_SCREEN,
-        'countdown': 0,
-        'autoplay': true
+      clickedVideo: this.props.upNextInfo.upNextData,
+      custom: {
+        source: CONSTANTS.SCREEN.UP_NEXT_SCREEN,
+        countdown: 0,
+        autoplay: true
       }
     };
     this.props.controller.sendDiscoveryClickEvent(eventData, false);
@@ -61,12 +60,16 @@ var UpNextPanel = createReactClass({
     return (
       <div className={upNextClass}>
         <a className="oo-up-next-content" onClick={this.handleStartUpNextClick} style={thumbnailStyle}>
-          <Icon {...this.props} icon="play"/>
+          <Icon {...this.props} icon="play" />
         </a>
 
         <div className="oo-content-metadata">
           <div className="oo-up-next-title">
-            <CountDownClock {...this.props} timeToShow={this.props.skinConfig.upNext.timeToShow} currentPlayhead={this.props.currentPlayhead}/>
+            <CountDownClock
+              {...this.props}
+              timeToShow={this.props.skinConfig.upNext.timeToShow}
+              currentPlayhead={this.props.currentPlayhead}
+            />
 
             <div className="oo-up-next-title-text oo-text-truncate">
               {upNextString}
@@ -113,8 +116,8 @@ UpNextPanel.defaultProps = {
       timeToShow: 10
     },
     icons: {
-      play:{fontStyleClass:'oo-icon oo-icon-play'},
-      dismiss:{fontStyleClass:'oo-icon oo-icon-close'}
+      play: { fontStyleClass: 'oo-icon oo-icon-play' },
+      dismiss: { fontStyleClass: 'oo-icon oo-icon-close' }
     }
   },
   upNextInfo: {
@@ -122,7 +125,7 @@ UpNextPanel.defaultProps = {
   },
   controller: {
     upNextDismissButtonClicked: function() {},
-    sendDiscoveryClickEvent: function(a,b) {}
+    sendDiscoveryClickEvent: function(a, b) {}
   }
 };
 
