@@ -11,8 +11,15 @@ var DeepMerge = require('deepmerge');
 var Fullscreen = require('screenfull');
 var Skin = require('./skin');
 var SkinJSON = require('../config/skin');
-var Bulk = require('bulk-require');
-var Localization = Bulk('./config', ['languageFiles/*.json']);
+var Localization = {
+  languageFiles: {
+    en: require('../config/languageFiles/en.json'),
+    es: require('../config/languageFiles/es.json'),
+    ja: require('../config/languageFiles/ja.json'),
+    ko: require('../config/languageFiles/ko.json'),
+    zh: require('../config/languageFiles/zh.json'),
+  }
+};
 var DiscoveryMixin = require('./mixins/discoveryMixin');
 
 OO.plugin('Html5Skin', function(OO, _, $, W) {
