@@ -470,6 +470,16 @@ OO.plugin('Html5Skin', function(OO, _, $, W) {
       this.state.screenToShow = CONSTANTS.SCREEN.INITIAL_SCREEN;
     },
 
+
+    isChromecastEnabled: function (params) {
+      var chromecastConfig = params.chromecast;
+      var appId = Utils.getPropertyValue(chromecastConfig, 'appId', '');
+      if (typeof appId === 'string' && appId !== '' && Utils.getPropertyValue(chromecastConfig, 'enable', false)) {
+          return true;
+        }
+      return false;
+    },
+
     /**
      * Set style "touch-action: none" only for video 360 on mobile devices
      * see details: https://stackoverflow.com/questions/42206645/konvajs-unable-to-preventdefault-inside-passive-event-listener-due-to-target-be
