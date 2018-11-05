@@ -5,8 +5,9 @@ var React = require('react'),
     ClassNames = require('classnames'),
     CloseButton = require('./closeButton'),
     CONSTANTS = require('../constants/constants');
+var createReactClass = require('create-react-class');
 
-var AdOverlay = React.createClass({
+var AdOverlay = createReactClass({
   closeOverlay: function() {
     this.props.controller.closeNonlinearAd();
     this.props.controller.onSkipAdClicked();
@@ -37,11 +38,13 @@ var AdOverlay = React.createClass({
         <a onClick={this.handleOverlayClick}>
           <img src={this.props.overlay} className="oo-ad-overlay-image" onLoad={this.overlayLoaded} />
         </a>
-        <CloseButton {...this.props}
+        <CloseButton
+          {...this.props}
           cssClass={closeButtonClass}
           closeAction={this.closeOverlay}
-          className={"oo-ad-overlay-close-button-icon"}
-          ref="adOverlayCloseButton" />
+          className={'oo-ad-overlay-close-button-icon'}
+          ref="adOverlayCloseButton"
+        />
       </div>
     );
   }

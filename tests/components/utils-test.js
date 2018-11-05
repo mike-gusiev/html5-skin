@@ -7,15 +7,20 @@ var Utils = require('../../js/components/utils');
 var CONSTANTS = require('../../js/constants/constants');
 var DeepMerge = require('deepmerge');
 var SkinJSON = require('../../config/skin');
+var _ = require('underscore');
 OO = {
-  log: function(a) {console.info(a);}
+  log: function(a) {}
 };
 
 describe('Utils', function() {
   it('tests the utility functions', function() {
     var text = 'This is text. Really really long text that needs to be truncated to smaller text the fits on X amount of lines.';
     var div = document.createElement('div');
-    div.clientWidth = 20;
+    div.getBoundingClientRect = function() {
+      return {
+        width: 20
+      }
+    };
     var truncateText = Utils.truncateTextToWidth(div, text);
     expect(truncateText).toContain(text);
 
@@ -244,74 +249,241 @@ describe('Utils', function() {
 
   });
 
+  describe('getSkipTimes', function() {
+    let skinConfig;
+
+    beforeEach(function() {
+      skinConfig = {
+        skipControls: {
+          skipBackwardTime: 10,
+          skipForwardTime: 10,
+        }
+      };
+    });
+
+    it('should extract values from skin config', function() {
+      skinConfig.skipControls.skipBackwardTime = 5;
+      skinConfig.skipControls.skipForwardTime = 15;
+      expect(Utils.getSkipTimes(skinConfig)).toEqual({
+        backward: 5,
+        forward: 15
+      });
+    });
+
+    it('should return default values when passing invalid data', function() {
+      const defaults = {
+        backward: CONSTANTS.UI.DEFAULT_SKIP_BACKWARD_TIME,
+        forward: CONSTANTS.UI.DEFAULT_SKIP_FORWARD_TIME
+      };
+      expect(Utils.getSkipTimes(null)).toEqual(defaults);
+      expect(Utils.getSkipTimes({})).toEqual(defaults);
+      skinConfig.skipControls.skipBackwardTime = "abc";
+      skinConfig.skipControls.skipForwardTime = {};
+      expect(Utils.getSkipTimes(skinConfig)).toEqual(defaults);
+      skinConfig.skipControls.skipBackwardTime = undefined;
+      skinConfig.skipControls.skipForwardTime = undefined;
+      expect(Utils.getSkipTimes(skinConfig)).toEqual(defaults);
+    });
+
+    it('should constrain to minimum and maximum values', function() {
+      skinConfig.skipControls.skipBackwardTime = -1;
+      skinConfig.skipControls.skipForwardTime = -1;
+      expect(Utils.getSkipTimes(skinConfig)).toEqual({
+        backward: CONSTANTS.UI.MIN_SKIP_TIME,
+        forward: CONSTANTS.UI.MIN_SKIP_TIME
+      });
+      skinConfig.skipControls.skipBackwardTime = 150;
+      skinConfig.skipControls.skipForwardTime = 150;
+      expect(Utils.getSkipTimes(skinConfig)).toEqual({
+        backward: CONSTANTS.UI.MAX_SKIP_TIME,
+        forward: CONSTANTS.UI.MAX_SKIP_TIME
+      });
+    });
+
+    it('should enforce integer values', function() {
+      skinConfig.skipControls.skipBackwardTime = 10.05;
+      skinConfig.skipControls.skipForwardTime = 20.123232;
+      expect(Utils.getSkipTimes(skinConfig)).toEqual({
+        backward: 10,
+        forward: 20
+      });
+    });
+  });
+
+  describe('sanitizePlaybackSpeed', function() {
+
+    it('should return numerical version of value', function() {
+      expect(Utils.sanitizePlaybackSpeed('2')).toBe(2);
+      expect(Utils.sanitizePlaybackSpeed('1.25')).toBe(1.25);
+      expect(Utils.sanitizePlaybackSpeed('.5')).toBe(0.5);
+    });
+
+    it('should truncate values to at most two decimals', function() {
+      expect(Utils.sanitizePlaybackSpeed(0.55444)).toBe(0.55);
+      expect(Utils.sanitizePlaybackSpeed(0.77777)).toBe(0.78);
+      expect(Utils.sanitizePlaybackSpeed('1.33333')).toBe(1.33);
+    });
+
+    it('should constrain to min and max values when ignoreMinMax is false', function() {
+      expect(Utils.sanitizePlaybackSpeed(CONSTANTS.PLAYBACK_SPEED.MIN - 1, false)).toBe(CONSTANTS.PLAYBACK_SPEED.MIN);
+      expect(Utils.sanitizePlaybackSpeed(CONSTANTS.PLAYBACK_SPEED.MAX + 1, false)).toBe(CONSTANTS.PLAYBACK_SPEED.MAX);
+    });
+
+    it('should NOT constrain to min and max values when ignoreMinMax is true', function() {
+      expect(Utils.sanitizePlaybackSpeed(CONSTANTS.PLAYBACK_SPEED.MIN - 1, true)).toBe(CONSTANTS.PLAYBACK_SPEED.MIN - 1);
+      expect(Utils.sanitizePlaybackSpeed(CONSTANTS.PLAYBACK_SPEED.MAX + 1, true)).toBe(CONSTANTS.PLAYBACK_SPEED.MAX + 1);
+    });
+
+  });
+
+  describe('dedupeArray', function() {
+
+    it('should return a new array', function() {
+      const array = [1, 2, 3];
+      expect(Utils.dedupeArray(array)).not.toBe(array);
+      expect(Utils.dedupeArray(array)).toEqual(array);
+    });
+
+    it('should remove duplicate values from array', function() {
+      expect(Utils.dedupeArray([1, 2, 1, 2, 3])).toEqual([1, 2, 3]);
+      expect(Utils.dedupeArray(['1', '2', '1', '2', '3'])).toEqual(['1', '2', '3']);
+      const obj = { prop: 1 };
+      expect(Utils.dedupeArray([{}, obj, obj, { a: 2 }, obj])).toEqual([{}, obj, { a: 2 }]);
+    });
+
+    it('should return an empty array when input is not an array', function() {
+      expect(Utils.dedupeArray({})).toEqual([]);
+      expect(Utils.dedupeArray(3)).toEqual([]);
+      expect(Utils.dedupeArray('3')).toEqual([]);
+    });
+
+  });
+
+  describe('isMouseInsideRect', function() {
+    let mousePosition, clientRect;
+
+    beforeEach(function() {
+      mousePosition = {
+        clientX: 0,
+        clientY: 0
+      };
+      clientRect = {
+        top: 0,
+        right: 0,
+        bottom: 0,
+        left: 0,
+      };
+    });
+
+    it('should return true when mouse position is inside rect', function() {
+      mousePosition.clientX = 50;
+      mousePosition.clientY = 50;
+      clientRect.right = 100;
+      clientRect.bottom = 100;
+      expect(Utils.isMouseInsideRect(mousePosition, clientRect)).toBe(true);
+      mousePosition.clientX = 0;
+      mousePosition.clientY = 100;
+      expect(Utils.isMouseInsideRect(mousePosition, clientRect)).toBe(true);
+    });
+
+    it('should return false when mouse position is outside rect', function() {
+      mousePosition.clientX = 120;
+      mousePosition.clientY = 50;
+      clientRect.right = 100;
+      clientRect.bottom = 100;
+      expect(Utils.isMouseInsideRect(mousePosition, clientRect)).toBe(false);
+      mousePosition.clientX = -1;
+      mousePosition.clientY = 50;
+      expect(Utils.isMouseInsideRect(mousePosition, clientRect)).toBe(false);
+    });
+
+    it('should return false when invalid values are passed', function() {
+      mousePosition.clientX = null;
+      mousePosition.clientY = undefined;
+      clientRect.right = 100;
+      clientRect.bottom = 100;
+      expect(Utils.isMouseInsideRect(mousePosition, clientRect)).toBe(false);
+      expect(Utils.isMouseInsideRect(null, null)).toBe(false);
+    });
+
+  });
+
+  describe('getCurrentTimestamp', function() {
+
+    it('should return a numerical timestamp', function() {
+      expect(_.isNumber(Utils.getCurrentTimestamp())).toBe(true);
+    });
+
+  });
+
   it('tests isSafari', function() {
-    window.navigator.userAgent = 'AppleWebKit';
+    OO_setWindowNavigatorProperty('userAgent', 'AppleWebKit');
     var isSafari = Utils.isSafari();
     expect(isSafari).toBeTruthy();
-    window.navigator.userAgent = 'jsdom';
+    OO_setWindowNavigatorProperty('userAgent', 'jsdom');
     isSafari = Utils.isSafari();
     expect(isSafari).toBeFalsy();
   });
 
   it('tests isEdge', function() {
-    window.navigator.userAgent = 'Edge';
+    OO_setWindowNavigatorProperty('userAgent', 'Edge');
     var isEdge = Utils.isEdge();
     expect(isEdge).toBeTruthy();
-    window.navigator.userAgent = 'jsdom';
+    OO_setWindowNavigatorProperty('userAgent', 'jsdom');
     isEdge = Utils.isEdge();
     expect(isEdge).toBeFalsy();
   });
 
   it('tests isIE', function() {
-    window.navigator.userAgent = 'MSIE';
+    OO_setWindowNavigatorProperty('userAgent', 'MSIE');
     var isIE = Utils.isIE();
     expect(isIE).toBeTruthy();
-    window.navigator.userAgent = 'jsdom';
+    OO_setWindowNavigatorProperty('userAgent', 'jsdom');
     isIE = Utils.isIE();
     expect(isIE).toBeFalsy();
   });
 
   it('tests isAndroid', function() {
-    window.navigator.appVersion = 'Android';
+    OO_setWindowNavigatorProperty('appVersion', 'Android');
     var isAndroid = Utils.isAndroid();
     expect(isAndroid).toBeTruthy();
-    window.navigator.appVersion = 'jsdom';
+    OO_setWindowNavigatorProperty('appVersion', 'jsdom');
     isAndroid = Utils.isAndroid();
     expect(isAndroid).toBeFalsy();
   });
 
   it('tests isIos', function() {
-    window.navigator.platform = 'iPhone';
+    OO_setWindowNavigatorProperty('platform', 'iPhone');
     var isIos = Utils.isIos();
     expect(isIos).toBeTruthy();
-    window.navigator.platform = 'jsdom';
+    OO_setWindowNavigatorProperty('platform', 'jsdom');
     isIos = Utils.isIos();
     expect(isIos).toBeFalsy();
   });
 
   it('tests isIPhone', function() {
-    window.navigator.platform = 'iPod';
+    OO_setWindowNavigatorProperty('platform', 'iPod');
     var isIPhone = Utils.isIPhone();
     expect(isIPhone).toBeTruthy();
-    window.navigator.platform = 'jsdom';
+    OO_setWindowNavigatorProperty('platform', 'jsdom');
     isIPhone = Utils.isIPhone();
     expect(isIPhone).toBeFalsy();
   });
 
   it('tests isMobile', function() {
-    window.navigator.platform = 'iPod';
+    OO_setWindowNavigatorProperty('platform', 'iPod');
     var isMobile = Utils.isMobile();
     expect(isMobile).toBeTruthy();
-    window.navigator.platform = 'jsdom';
+    OO_setWindowNavigatorProperty('platform', 'jsdom');
     isMobile = Utils.isMobile();
     expect(isMobile).toBeFalsy();
   });
 
   it('tests isIE10', function() {
-    window.navigator.userAgent = 'MSIE 10';
+    OO_setWindowNavigatorProperty('userAgent', 'MSIE 10');
     var isIE10 = Utils.isIE10();
     expect(isIE10).toBeTruthy();
-    window.navigator.userAgent = 'jsdom';
+    OO_setWindowNavigatorProperty('userAgent', 'jsdom');
     isIE10 = Utils.isIE10();
     expect(isIE10).toBeFalsy();
   });
@@ -349,6 +521,11 @@ describe('Utils', function() {
     };
     var getLanguageToUse = Utils.getLanguageToUse(skinConfig);
     expect(getLanguageToUse).toEqual('zh');
+    //window.navigator.languages defaults to ['en-US', 'en']
+    getLanguageToUse = Utils.getLanguageToUse(skinConfig2);
+    expect(getLanguageToUse).toEqual('en');
+    //test window.navigator.browserLanguage
+    OO_setWindowNavigatorProperty('languages', null);
     window.navigator.browserLanguage = 'es-US';
     getLanguageToUse = Utils.getLanguageToUse(skinConfig2);
     expect(getLanguageToUse).toEqual('es');
@@ -360,7 +537,7 @@ describe('Utils', function() {
     expect(localizedString).toBe(text);
 
     localizedString = Utils.getLocalizedString(null, null, null);
-    expect(localizedString).toBe('');
+    expect(localizedString).toBe(null);
   });
 
   it('tests getStartCountdown', function() {
@@ -368,7 +545,7 @@ describe('Utils', function() {
     var countDownText = Utils.getStartCountdown(537289879);
     expect(countDownText).toBe(text);
 
-    localizedString = Utils.getStartCountdown(-100000000);
+    var localizedString = Utils.getStartCountdown(-100000000);
     expect(localizedString).toBe('');
   });
 
@@ -593,11 +770,46 @@ describe('Utils', function() {
     expect(finalConfig.shareScreen.shareContent[1]).not.toBe(SkinJSON.shareScreen.shareContent[1]);
     expect(finalConfig.shareScreen.shareContent).toEqual(['social', 'ooyala']);
     // test array merge for buttons (prepend)
-    expect(finalConfig.buttons.desktopContent.length).toBe(17);
+    expect(finalConfig.buttons.desktopContent.length).toBe(18);
     // test new buttons are placed after flexibleSpace
     expect(finalConfig.buttons.desktopContent[4].name).toBe('flexibleSpace');
     expect(finalConfig.buttons.desktopContent[5].name).toBe('ooyala');
     expect(finalConfig.buttons.desktopContent[6].name).toBe('alice');
-    expect(finalConfig.buttons.desktopContent[10].alice).toBe('video');
+    expect(finalConfig.buttons.desktopContent[11].alice).toBe('video');
+  });
+
+  it('tests getUserDevice', function() {
+    OO_setWindowNavigatorProperty('userAgent', 'Phone');
+    var device = Utils.getUserDevice();
+    expect(device).toBe('phone');
+    OO_setWindowNavigatorProperty('userAgent', 'Tablet');
+    device = Utils.getUserDevice();
+    expect(device).toBe('tablet');
+    OO_setWindowNavigatorProperty('userAgent', 'Webkit');
+    device = Utils.getUserDevice();
+    expect(device).toBe('desktop');
+  });
+
+  it('tests getPlayButtonDetails', function() {
+    let playingDetails = Utils.getPlayButtonDetails(CONSTANTS.STATE.PAUSE);
+    expect(playingDetails).toEqual({
+      icon: 'play',
+      ariaLabel: CONSTANTS.ARIA_LABELS.PLAY,
+      buttonTooltip: CONSTANTS.SKIN_TEXT.PLAY
+    });
+
+    playingDetails = Utils.getPlayButtonDetails(CONSTANTS.STATE.PLAYING);
+    expect(playingDetails).toEqual({
+      icon: 'pause',
+      ariaLabel: CONSTANTS.ARIA_LABELS.PAUSE,
+      buttonTooltip: CONSTANTS.SKIN_TEXT.PAUSE
+    });
+
+    playingDetails = Utils.getPlayButtonDetails(CONSTANTS.STATE.END);
+    expect(playingDetails).toEqual({
+      icon: 'replay',
+      ariaLabel: CONSTANTS.ARIA_LABELS.REPLAY,
+      buttonTooltip: CONSTANTS.SKIN_TEXT.REPLAY
+    });
   });
 });

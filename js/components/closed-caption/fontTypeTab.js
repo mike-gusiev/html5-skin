@@ -1,12 +1,22 @@
 var React = require('react'),
     CONSTANTS = require('../../constants/constants'),
     DataSelector = require('../dataSelector');
+var createReactClass = require('create-react-class');
+var PropTypes = require('prop-types');
 
-var FontTypeTab = React.createClass({
+var FontTypeTab = createReactClass({
   getInitialState: function() {
     return {
       selectedFontType: this.props.closedCaptionOptions.fontType,
-      availableFontTypes: ['Monospaced Serif', 'Proportional Serif', 'Monospaced Sans-Serif', 'Proportional Sans-Serif', 'Casual', 'Cursive', 'Small Capitals']
+      availableFontTypes: [
+        'Monospaced Serif',
+        'Proportional Serif',
+        'Monospaced Sans-Serif',
+        'Proportional Sans-Serif',
+        'Casual',
+        'Cursive',
+        'Small Capitals'
+      ]
     };
   },
 
@@ -39,7 +49,7 @@ var FontTypeTab = React.createClass({
 });
 
 FontTypeTab.propTypes = {
-  dataItemsPerPage: React.PropTypes.objectOf(React.PropTypes.number)
+  dataItemsPerPage: PropTypes.objectOf(PropTypes.number)
 };
 
 FontTypeTab.defaultProps = {

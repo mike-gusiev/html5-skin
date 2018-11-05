@@ -11,7 +11,7 @@ var AccessibilityControls = function(controller) {
   this.keyDirectionMap[CONSTANTS.KEYCODES.S] = CONSTANTS.DIRECTIONS.DOWN;
   this.state = {
     seekRate: 1,
-    lastKeyDownTime: 0,
+    lastKeyDownTime: 0
   };
   this.prevKeyPressedArr = []; // list of codes of pressed buttons
   this.keyEventDown = this.keyEventDown.bind(this);
@@ -24,7 +24,18 @@ var AccessibilityControls = function(controller) {
 };
 
 AccessibilityControls.prototype = {
-  cleanUp : function() {
+
+  SEEK_RATE: {
+    // Factor by which the seeking rate is increased
+    INCREASE: 1.1,
+    // Maximum allowed value of seeking rate
+    MAXIMUM: 300,
+    // Calling getSeekRate() with a frequency below this threshold
+    // will result in a seek rate increase
+    TIME_THRESHOLD: 500,
+  },
+
+  cleanUp: function() {
     document.removeEventListener('keydown', this.keyEventDown);
     document.removeEventListener('keyup', this.keyEventUp);
   },
@@ -63,8 +74,12 @@ AccessibilityControls.prototype = {
       case CONSTANTS.KEYCODES.RIGHT_ARROW_KEY:
         if (this.areArrowKeysAllowed()) {
           e.preventDefault();
-          var forward = e.keyCode === CONSTANTS.KEYCODES.RIGHT_ARROW_KEY ? true : false;
-          this.seekBy(CONSTANTS.A11Y_CTRLS.SEEK_DELTA, forward);
+          var forward = e.keyCode === CONSTANTS.KEYCODES.RIGHT_ARROW_KEY;
+          var skinConfig = Utils.getPropertyValue(this.controller, 'skin.props.skinConfig');
+          var skipTimes = Utils.getSkipTimes(skinConfig);
+          var delta = forward ? skipTimes.forward : skipTimes.backward;
+
+          this.seekBy(delta, forward, true);
         }
         break;
       default:
@@ -78,7 +93,7 @@ AccessibilityControls.prototype = {
    * Please note that this doesn't cover all possible cases at the moment, only
    * roles that are in use in this project have been added so far.
    * @private
-   * @return {Boolean} True if arrow key shortcuts are allowed, false otherwise.
+   * @returns {Boolean} True if arrow key shortcuts are allowed, false otherwise.
    */
   areArrowKeysAllowed: function() {
     var activeElementRole = '';
@@ -100,7 +115,7 @@ AccessibilityControls.prototype = {
   /**
    * @description handlers for keyup event
    * @private
-   * @param e - event
+   * @param {Event} e - event
    */
   keyEventUp: function(e) {
     if (!(this.controller.state.accessibilityControlsEnabled || this.controller.state.isClickedOutside)) {
@@ -109,14 +124,14 @@ AccessibilityControls.prototype = {
     if (this.controller.videoVr) {
       var targetTagName = this.getTargetTagName(e);
       var charCode = e.which || e.keyCode;
-      this.moveVrToDirection(e, charCode, false, targetTagName);  // stop rotate 360
+      this.moveVrToDirection(e, charCode, false, targetTagName); // stop rotate 360
     }
   },
 
   /**
    * @description get name of target tag, for example "button" etc
    * @private
-   * @param e - event
+   * @param {Event} e - event
    * @returns {string} name of the target tag
    */
   getTargetTagName: function(e) {
@@ -130,10 +145,10 @@ AccessibilityControls.prototype = {
   /**
    * @description call moveVrToDirection from controller for rotation a vr video
    * @private
-   * @param e - event
-   * @param charCode {number} - char code;
-   * @param isKeyDown {boolean} - true if key is pressed
-   * @param targetTagName {string} - name of the clicked tag
+   * @param {Event} e - event
+   * @param {number} charCode - char code;
+   * @param {boolean} isKeyDown - true if key is pressed
+   * @param {string} targetTagName - name of the clicked tag
    * @returns {boolean} true if moved
    */
   moveVrToDirection: function(e, charCode, isKeyDown, targetTagName) {
@@ -161,7 +176,8 @@ AccessibilityControls.prototype = {
       if (newBtn) {
         this.prevKeyPressedArr.push(charCode);
       }
-    } else { // if button is up, remove it from this.prevKeyPressedArr
+    } else {
+      // if button is up, remove it from this.prevKeyPressedArr
       var inPrevKeyPressedArrIndex = -1;
       // check if button code is already in list of pressed buttons (this.prevKeyPressedArr)
       // if code is in the array return index of the code
@@ -177,7 +193,7 @@ AccessibilityControls.prototype = {
     }
     if (this.prevKeyPressedArr.length) {
       isKeyDown = true;
-      charCode = this.prevKeyPressedArr[this.prevKeyPressedArr.length-1];
+      charCode = this.prevKeyPressedArr[this.prevKeyPressedArr.length - 1];
     }
     // rotate if a button is pressed, stop rotate if other case
     this.controller.moveVrToDirection(isKeyDown, keyDirectionMap[charCode]);
@@ -213,7 +229,7 @@ AccessibilityControls.prototype = {
   /**
    * Determines whether or not the controller is in a state that allows seeking the video.
    * @private
-   * @return {Boolean} True if seeking is possible, false otherwise.
+   * @returns {Boolean} True if seeking is possible, false otherwise.
    */
   canSeek: function() {
     var seekingEnabled = false;
@@ -237,41 +253,59 @@ AccessibilityControls.prototype = {
   /**
    * Seeks the video by the specified number of seconds. The direction of the playhead
    * can be specified with the forward parameter. If a value exceeds the minimum or maximum
-   * seekable range it will be constrained to appropriate values.
+   * seekable range it will be constrained to appropriate values. By default, the seeking rate
+   * (i.e. amount of seconds) will increase automatically when this function is called repeatedly
+   * (e.g. when the user holds down the arrow key).
    * @public
    * @param {Number} seconds The number of seconds to increase or decrease relative to the current playhead.
    * @param {Boolean} forward True to seek forward, false to seek backward.
+   * @param {Boolean} useConstantRate Determines whether or not the seeking rate is kept constant when the method is called repeatedly.
    */
-  seekBy: function(seconds, forward) {
+  seekBy: function(seconds, forward, useConstantRate) {
     if (!this.canSeek()) {
       return;
     }
     var shiftSeconds = Utils.ensureNumber(seconds, 1);
     var shiftSign = forward ? 1 : -1; // Positive 1 for fast forward, negative for rewind
-    var seekRateIncrease = 1.1;
+    var seekRate = 1;
 
-    var currentTime = Date.now();
-    var timeSinceLastSeek = currentTime - this.state.lastKeyDownTime;
-
-    if (timeSinceLastSeek < 500) {
-      // Increasing seek rate to go faster if key is pressed often
-      if (this.state.seekRate < 300) {
-        this.state.seekRate *= seekRateIncrease;
-      }
-    } else {
-      this.state.seekRate = 1;
+    if (!useConstantRate) {
+      seekRate = this.getSeekRate();
     }
-    this.state.lastKeyDownTime = currentTime;
 
     // Calculate the new playhead
-    var delta = shiftSeconds * shiftSign * this.state.seekRate;
+    var delta = shiftSeconds * shiftSign * seekRate;
     var seekTo = Utils.ensureNumber(this.controller.skin.state.currentPlayhead, 0) + delta;
     seekTo = Utils.constrainToRange(seekTo, 0, this.controller.skin.state.duration);
 
     // Refresh UI and then instruct the player to seek
     this.controller.updateSeekingPlayhead(seekTo);
     this.controller.seek(seekTo);
+  },
+
+  /**
+   * Linearly increases the seeking rate every time that the function is called
+   * within a certain time threshold. The seeking rate is reset when the last time
+   * the function was called exceeds the time threshold.
+   * @public
+   * @return {Number} A number between 1 and this.SEEK_RATE.MAXIMUM which represents the current seeking rate.
+   */
+  getSeekRate: function() {
+    var currentTime = Date.now();
+    var timeSinceLastSeek = currentTime - this.state.lastKeyDownTime;
+
+    if (timeSinceLastSeek < this.SEEK_RATE.TIME_THRESHOLD) {
+      // Increasing seek rate to go faster if key is pressed often
+      if (this.state.seekRate < this.SEEK_RATE.MAXIMUM) {
+        this.state.seekRate *= this.SEEK_RATE.INCREASE;
+      }
+    } else {
+      this.state.seekRate = 1;
+    }
+    this.state.lastKeyDownTime = currentTime;
+    return this.state.seekRate;
   }
+
 };
 
 module.exports = AccessibilityControls;

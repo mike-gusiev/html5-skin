@@ -2,13 +2,13 @@ var MACROS = require('./macros');
 /** ******************************************************************
  CONSTANT
  *********************************************************************/
-module.exports = {
+var CONSTANTS = {
   STATE: {
-    START : 'start',
-    PLAYING : 'playing',
-    PAUSE : 'pause',
-    END : 'end',
-    ERROR : 'error'
+    START: 'start',
+    PLAYING: 'playing',
+    PAUSE: 'pause',
+    END: 'end',
+    ERROR: 'error'
   },
 
   SCREEN: {
@@ -19,6 +19,7 @@ module.exports = {
     END_CARD: 'endCard',
     END_SCREEN: 'endScreen',
     SHARE_SCREEN: 'shareScreen',
+    VOLUME_SCREEN: 'volumeScreen',
     DISCOVERY_SCREEN: 'discoveryScreen',
     UP_NEXT_SCREEN: 'upNextScreen',
     AD_SCREEN: 'adScreen',
@@ -28,13 +29,15 @@ module.exports = {
     CLOSED_CAPTION_SCREEN: 'closedCaptionScreen',
     VIDEO_QUALITY_SCREEN: 'videoQualityScreen',
     ERROR_SCREEN: 'errorScreen',
-    MULTI_AUDIO_SCREEN: 'multiAudioScreen'
+    MULTI_AUDIO_SCREEN: 'multiAudioScreen',
+    PLAYBACK_SPEED_SCREEN: 'playbackSpeedScreen'
   },
 
   MENU_OPTIONS: {
     VIDEO_QUALITY: 'videoQualityOptions',
     CLOSED_CAPTIONS: 'closedCaptionOptions',
-    MULTI_AUDIO: 'multiAudioOptions'
+    MULTI_AUDIO: 'multiAudioOptions',
+    PLAYBACK_SPEED: 'playbackSpeedOptions'
   },
 
   SKIN_TEXT: {
@@ -63,8 +66,9 @@ module.exports = {
     OPTIONAL_MESSAGE: 'Optional Message',
     SEND: 'Send',
     ERROR_ACTION: 'RELOAD YOUR SCREEN OR TRY SELECTING A DIFFERENT VIDEO',
-    UNKNOWN_ERROR: 'Something happened while we were trying to play your video! ' +
-    'Click replay or simply reload your page.',
+    UNKNOWN_ERROR:
+      'Something happened while we were trying to play your video! ' +
+      'Click replay or simply reload your page.',
     LANGUAGE_TAB_TITLE: 'Language',
     COLOR_SELECTION_TAB_TITLE: 'Color Selection',
     CAPTION_OPACITY_TAB_TITLE: 'Caption Opacity',
@@ -107,13 +111,18 @@ module.exports = {
     EXIT_FULL_SCREEN: 'Exit Full Screen',
     VIDEO_QUALITY: 'Video Quality',
     AUTO_QUALITY: 'Auto',
+    PLAYBACK_SPEED: 'Speed',
+    NORMAL_SPEED: 'Normal',
     SHARE: 'Share',
     MORE_OPTIONS: 'More Options',
     SELECT_TO_UNMUTE: 'SELECT TO UNMUTE',
     AUDIO: 'Audio',
     SUBTITLES: 'Subtitles',
     UNDEFINED_LANGUAGE: 'Undefined language',
-    NO_LINGUISTIC_CONTENT: 'No linguistic content'
+    NO_LINGUISTIC_CONTENT: 'No linguistic content',
+    UNCODED_LANGUAGES: 'Uncoded languages',
+    MULTIPLE_LANGUAGES: 'Multiple languages',
+    CHROMECAST: 'Chromecast'
   },
 
   ARIA_LABELS: {
@@ -123,6 +132,7 @@ module.exports = {
     PAUSE: 'Pause',
     REPLAY: 'Replay',
     MUTE: 'Mute',
+    MUTED: 'Player is muted',
     UNMUTE: 'Unmute',
     CLOSED_CAPTIONS: 'Closed Captions',
     VIDEO_QUALITY: 'Video Quality',
@@ -153,7 +163,35 @@ module.exports = {
     FONT_SIZE_MENU: 'Font Size',
     TEXT_ENHANCEMENTS_MENU: 'Text Enhancements',
     TOGGLE_MULTI_AUDIO: 'Toggle Multi Audio',
-    MULTI_AUDIO_OPTIONS: 'Closed Multi Audio Options'
+    MULTI_AUDIO_OPTIONS: 'Closed Multi Audio Options',
+    PREVIOUS_VIDEO: 'Previous Video',
+    NEXT_VIDEO: 'Next Video',
+    SKIP_BACKWARD: 'Rewind '  + MACROS.SECONDS + ' Seconds',
+    SKIP_FORWARD: 'Skip ' + MACROS.SECONDS + ' Seconds Forward',
+    PLAYBACK_SPEED: MACROS.RATE + 'x Playback Speed',
+    PLAYBACK_SPEED_OPTION: 'Speed',
+    NORMAL_SPEED: 'Normal Speed',
+    CHROMECAST: 'Chromecast'
+  },
+
+  CONTROL_BAR_KEYS: {
+    PLAY_PAUSE: 'playPause',
+    LIVE: 'live',
+    VOLUME: 'volume',
+    TIME_DURATION: 'timeDuration',
+    FLEXIBLE_SPACE: 'flexibleSpace',
+    MORE_OPTIONS: 'moreOptions',
+    QUALITY: 'quality',
+    DISCOVERY: 'discovery',
+    CLOSED_CAPTION: 'closedCaption',
+    AUDIO_AND_CC: 'audioAndCC',
+    PLAYBACK_SPEED: 'playbackSpeed',
+    SHARE: 'share',
+    STEREOSCOPIC: 'stereoscopic',
+    FULLSCREEN: 'fullscreen',
+    LOGO: 'logo',
+    CHROMECAST: 'chromecast',
+    SKIP_CONTROLS: 'skipControls'
   },
 
   ARIA_ROLES: {
@@ -172,19 +210,22 @@ module.exports = {
   KEYBD_FOCUS_ID_ATTR: 'data-focus-id',
 
   FOCUS_IDS: {
-    PLAY_PAUSE: 'playPause',
-    MUTE_UNMUTE: 'muteUnmute',
-    STEREO: 'stereo',
-    VIDEO_QUALITY: 'videoQuality',
-    CLOSED_CAPTIONS: 'closedCaptions',
-    FULLSCREEN: 'fullscreen',
     SCRUBBER_BAR: 'scrubberBar',
     VOLUME_CONTROLS: 'volumeControls',
     VOLUME_SLIDER: 'volumeSlider',
     QUALITY_LEVEL: 'qualityLevel',
     AUTO_QUALITY: 'autoQuality',
     CLOSE: 'close',
-    MULTI_AUDIO: 'multiAudio'
+    MULTI_AUDIO: 'multiAudio',
+    MENU_ITEM: 'menuItem'
+  },
+
+  SKIP_CTRLS_KEYS: {
+    PREVIOUS_VIDEO: 'previousVideo',
+    SKIP_BACKWARD: 'skipBackward',
+    SKIP_FORWARD: 'skipForward',
+    NEXT_VIDEO: 'nextVideo',
+    PLAY_PAUSE: 'playPause'
   },
 
   A11Y_CTRLS: {
@@ -238,8 +279,34 @@ module.exports = {
 
   UI: {
     defaultScrubberBarHeight: 4,
+    POPOVER_SCROLL_RATE: 0.6,
     DEFAULT_SCRUBBERBAR_LEFT_RIGHT_PADDING: 15,
-    MAX_BUFFERING_SPINNER_DELAY: 60000 // Max allowed value of bufferingSpinnerDelay in milliseconds
+    MAX_BUFFERING_SPINNER_DELAY: 60000, // Max allowed value of bufferingSpinnerDelay in milliseconds
+    DEFAULT_SKIP_BACKWARD_TIME: 10, // In seconds
+    DEFAULT_SKIP_FORWARD_TIME: 10, // In seconds
+    MIN_SKIP_TIME: 1, // Min allowed value for skip controls, in seconds
+    MAX_SKIP_TIME: 99, // Max allowed value for skip controls, in seconds
+    // If the previous video button is clicked more than once, this
+    // is the maximum amount of time (in milliseconds) between calls that would
+    // cause the controller to request the previous video instead of rewinding
+    REQUEST_PREVIOUS_TIME_THRESHOLD: 1500,
+    // When the previous video button is clicked, if the playhead value (in seconds) is
+    // below this constant the controller will request the previous video instead of rewinding
+    REQUEST_PREVIOUS_PLAYHEAD_THRESHOLD: 2,
+    AUDIO_ONLY_DEFAULT_HEIGHT: '138px'
+  },
+
+  PLAYBACK_SPEED: {
+    DEFAULT_VALUE: 1, // Default playback rate
+    DEFAULT_OPTIONS: [ 0.5, 0.75, 1, 1.25, 1.5, 2 ], // Default options for playback speed menu
+    MIN: 0.5,
+    MAX: 2,
+  },
+
+  TOOLTIP_ALIGNMENT: {
+    LEFT: 'left',
+    CENTER: 'center',
+    RIGHT: 'right',
   },
 
   WATERMARK: {
@@ -269,7 +336,10 @@ module.exports = {
     CHINESE: 'zh',
     JAPANESE: 'ja',
     NOT_MATCHED: 'und',
-    NO_LINGUISTIC_CONTENT: 'zxx'
+    UNDEFINED_LANGUAGE: 'und',
+    NO_LINGUISTIC_CONTENT: 'zxx',
+    UNCODED_LANGUAGES: 'mis',
+    MULTIPLE_LANGUAGES: 'mul'
   },
 
   ERROR_CODE: {
@@ -311,6 +381,7 @@ module.exports = {
   },
 
   QUALITY_SELECTION: {
+    AUTO_QUALITY: 'auto',
     FORMAT: {
       RESOLUTION: 'resolution',
       BITRATE: 'bitrate'
@@ -324,176 +395,172 @@ module.exports = {
   },
 
   RESOLUTION_TIER: {
-    TWO: [
-      'Low',
-      'High'
-    ],
-    THREE: [
-      'Low',
-      'Medium',
-      'High'
-    ]
+    TWO: ['Low', 'High'],
+    THREE: ['Low', 'Medium', 'High']
   },
 
   ERROR_MESSAGE: {
-    'network':{
+    network: {
       name: 'OO.ERROR.API.NETWORK',
       title: 'NETWORK ERROR',
       description: 'Cannot Contact Server'
     },
-    'sas':{
+    sas: {
       name: 'OO.ERROR.API.SAS.GENERIC',
       title: 'SAS ERROR',
       description: 'Invalid Authorization Response'
     },
-    'geo':{
+    geo: {
       name: 'OO.ERROR.API.SAS.GEO',
       title: 'SAS GEO ERROR',
       description: 'This video is not authorized in your location'
     },
-    'domain':{
+    domain: {
       name: 'OO.ERROR.API.SAS.DOMAIN',
       title: 'SAS DOMAIN ERROR',
       description: 'This video is not authorized for your domain'
     },
-    'future':{
+    future: {
       name: 'OO.ERROR.API.SAS.FUTURE',
       title: 'VIDEO COMING SOON!',
       description: 'This video is not available yet',
       action: 'You may need to refresh the page to access the video after it becomes available'
     },
-    'past':{
+    past: {
       name: 'OO.ERROR.API.SAS.PAST',
       title: 'VIDEO NO LONGER AVAILABLE',
       description: 'This video is no longer available'
     },
-    'device':{
+    device: {
       name: 'OO.ERROR.API.SAS.DEVICE',
       title: 'SAS DEVICE ERROR',
       description: 'This video is not authorized for playback on this device'
     },
-    'proxy':{
+    proxy: {
       name: 'OO.ERROR.API.SAS.PROXY',
       title: 'SAS PROXY ERROR',
       description: 'An anonymous proxy was detected. Please disable the proxy and retry.'
     },
-    'concurrent_streams':{
+    concurrent_streams: {
       name: 'OO.ERROR.API.SAS.CONCURRENT_STREAMS',
       title: 'CONCURRENT STREAMS NUMBER EXCEEDED',
       description: 'You have exceeded the maximum number of concurrent streams'
     },
-    'device_binding_failed':{
+    device_binding_failed: {
       name: 'OO.ERROR.API.SAS.ERROR.DEVICE_BINDING_FAILED',
       title: 'DEVICE BINDING ERROR',
       description: 'Device binding failed'
     },
-    'device_id_too_long':{
+    device_id_too_long: {
       name: 'OO.ERROR.API.SAS.ERROR.DEVICE_ID_TOO_LONG',
       title: 'DEVICE ID TOO LONG',
       description: 'Device ID is too long'
     },
-    'device_invalid_auth_token':{
+    device_invalid_auth_token: {
       name: 'OO.ERROR.API.SAS.ERROR.DEVICE_INVALID_AUTH_TOKEN',
       title: 'INVALID PLAYER TOKEN',
       description: 'Invalid Ooyala Player token'
     },
-    'device_limit_reached':{
+    device_limit_reached: {
       name: 'OO.ERROR.API.SAS.ERROR.ERROR_DEVICE_LIMIT_REACHED',
       title: 'AUTHORIZATION ERROR',
-      description: 'Unable to access this content, as the maximum number of devices' + 
-      ' has already been authorized. Error Code 29',
+      description:
+        'Unable to access this content, as the maximum number of devices' +
+        ' has already been authorized. Error Code 29',
       action: 'Please remove one of your authorized devices to enable this device.'
     },
-    'non_registered_device':{
+    non_registered_device: {
       name: 'OO.ERROR.API.SAS.ERROR.ERROR_NON_REGISTERED_DEVICE',
       title: 'AUTHORIZATION ERROR',
-      description: 'Unable to register this device to this account, as the maximum' + 
-      ' number of authorized devices has already been reached. Error Code 22',
+      description:
+        'Unable to register this device to this account, as the maximum' +
+        ' number of authorized devices has already been reached. Error Code 22',
       action: 'Please remove one of your authorized devices to enable this device.'
     },
-    'drm_general_failure':{
+    drm_general_failure: {
       name: 'OO.ERROR.API.SAS.ERROR_DRM_GENERAL_FAILURE',
       title: 'LICENSE ERROR',
       description: 'General error acquiring license'
     },
-    'drm_server_error':{
+    drm_server_error: {
       name: 'OO.ERROR.API.SAS.ERROR_DRM_RIGHTS_SERVER_ERROR',
       title: 'DRM SERVER ERROR',
       description: 'DRM server error'
     },
-    'invalid_entitlements':{
+    invalid_entitlements: {
       name: 'OO.ERROR.API.SAS.ERROR_INVALID_ENTITLEMENTS',
       title: 'INVALID ENTITLEMENTS ERROR',
       description: 'User Entitlement Terminated - Stream No Longer Active for the User'
     },
-    'invalid_heartbeat':{
+    invalid_heartbeat: {
       name: 'OO.ERROR.API.SAS.INVALID_HEARTBEAT',
       title: 'INVALID HEARTBEAT',
       description: 'Invalid heartbeat response'
     },
-    'content_tree':{
+    content_tree: {
       name: 'OO.ERROR.API.CONTENT_TREE',
       title: 'INVALID CONTENT',
       description: 'Invalid Content'
     },
-    'metadata':{
+    metadata: {
       name: 'OO.ERROR.API.METADATA',
       title: 'INVALID METADATA',
       description: 'Invalid Metadata'
     },
-    'playback':{
+    playback: {
       name: 'OO.ERROR.PLAYBACK.GENERIC',
       title: 'PLAYBACK ERROR',
       description: 'Could not play the content'
     },
-    'stream':{
+    stream: {
       name: 'OO.ERROR.PLAYBACK.STREAM',
       title: 'PLAYBACK STREAM ERROR',
       description: 'This video isn\'t encoded for your device'
     },
-    'livestream':{
+    livestream: {
       name: 'OO.ERROR.PLAYBACK.LIVESTREAM',
       title: 'PLAYBACK LIVESTREAM ERROR',
       description: 'Live stream is off air'
     },
-    'network_error':{
+    network_error: {
       name: 'OO.ERROR.PLAYBACK.NETWORK',
       title: 'PLAYBACK NETWORK ERROR',
       description: 'Network connection temporarily lost'
     },
-    'unplayable_content':{
+    unplayable_content: {
       name: 'OO.ERROR.UNPLAYABLE_CONTENT',
       title: 'UNPLAYABLE CONTENT ERROR',
       description: 'This video is not playable on this player'
     },
-    'invalid_external_id':{
+    invalid_external_id: {
       name: 'OO.ERROR.INVALID.EXTERNAL_ID',
       title: 'INVALID EXTERNAL ID',
       description: 'Invalid External ID'
     },
-    'empty_channel':{
+    empty_channel: {
       name: 'OO.ERROR.EMPTY_CHANNEL',
       title: 'EMPTY CHANNEL ERROR',
       description: 'This channel is empty'
     },
-    'empty_channel_set':{
+    empty_channel_set: {
       name: 'OO.ERROR.EMPTY_CHANNEL_SET',
       title: 'EMPTY CHANNEL SET ERROR',
       description: 'This channel set is empty'
     },
-    'channel_content':{
+    channel_content: {
       name: 'OO.ERROR.CHANNEL_CONTENT',
       title: 'CHANNEL CONTENT ERROR',
       description: 'This channel is not playable at this time'
     },
-    'unsupported_encoding':{
+    unsupported_encoding: {
       name: 'OO.ERROR.VC.UNSUPPORTED_ENCODING',
       description: 'This video isn\'t encoded for your device'
     },
-    'unable_to_create_video_element':{
+    unable_to_create_video_element: {
       name: 'OO.ERROR.VC.UNABLE_TO_CREATE_VIDEO_ELEMENT',
-      description: 'Something happened while we were trying to play your video! ' +
-      'Click replay or simply reload your page.'
+      description:
+        'Something happened while we were trying to play your video! ' +
+        'Click replay or simply reload your page.'
     }
   },
   THUMBNAIL: {
@@ -506,3 +573,12 @@ module.exports = {
     SELECTABLE_SCREEN: 'oo-state-screen-selectable'
   }
 };
+
+// Maps menu options to their respective screens
+CONSTANTS.MENU_OPTIONS_SCREENS = {};
+CONSTANTS.MENU_OPTIONS_SCREENS[CONSTANTS.MENU_OPTIONS.VIDEO_QUALITY] = CONSTANTS.SCREEN.VIDEO_QUALITY_SCREEN;
+CONSTANTS.MENU_OPTIONS_SCREENS[CONSTANTS.MENU_OPTIONS.CLOSED_CAPTIONS] = CONSTANTS.SCREEN.CLOSED_CAPTION_SCREEN;
+CONSTANTS.MENU_OPTIONS_SCREENS[CONSTANTS.MENU_OPTIONS.MULTI_AUDIO] = CONSTANTS.SCREEN.MULTI_AUDIO_SCREEN;
+CONSTANTS.MENU_OPTIONS_SCREENS[CONSTANTS.MENU_OPTIONS.PLAYBACK_SPEED] = CONSTANTS.SCREEN.PLAYBACK_SPEED_SCREEN;
+
+module.exports = CONSTANTS;

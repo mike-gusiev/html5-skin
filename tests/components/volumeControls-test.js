@@ -6,16 +6,16 @@ jest
 .dontMock('../../config/skin.json')
 .dontMock('classnames');
 
-var React = require('react');
-var ReactDOM = require('react-dom');
-var TestUtils = require('react-addons-test-utils');
-var VolumeControls = require('../../js/components/volumeControls');
-var defaultSkinConfig = require('../../config/skin.json');
-var CONSTANTS = require('../../js/constants/constants');
-var sinon = require('sinon');
+import React from 'react';
+import {mount} from 'enzyme';
+import VolumeControls from '../../js/components/volumeControls';
+import defaultSkinConfig from '../../config/skin.json';
+import CONSTANTS from '../../js/constants/constants';
+import sinon from 'sinon';
 
 describe('VolumeControls', function() {
-  var mockCtrl, skinConfig;
+  let mockCtrl;
+  let skinConfig;
 
   beforeEach(function() {
     mockCtrl = {
@@ -39,38 +39,45 @@ describe('VolumeControls', function() {
   });
 
   it('should change volume according to value of clicked volume bar', function() {
-    var DOM = TestUtils.renderIntoDocument(
+    const wrapper = mount(
       <VolumeControls controller={mockCtrl} skinConfig={skinConfig} />
     );
-    var volumeBars = TestUtils.scryRenderedDOMComponentsWithClass(DOM, 'oo-volume-bar');
-    TestUtils.Simulate.click(volumeBars[4], { target: { dataset: { volume: 0.5 } } });
+    const volumeBars = wrapper.find('.oo-volume-bar');
+    volumeBars.at(4).simulate('click', { target: { dataset: { volume: 0.5 } } });
     expect(mockCtrl.state.volumeState.volume).toBe(0.5);
-    TestUtils.Simulate.click(volumeBars[0], { target: { dataset: { volume: 0.1 } } });
+    volumeBars.at(0).simulate('click', { target: { dataset: { volume: 0.1 } } });
     expect(mockCtrl.state.volumeState.volume).toBe(0.1);
+  });
+
+  it(`should set volume aria-valuetext to "${CONSTANTS.ARIA_LABELS.MUTED}" if player is muted`, function() {
+    mockCtrl.state.volumeState.muted = true;
+    const wrapper = mount(
+      <VolumeControls controller={mockCtrl} skinConfig={skinConfig} />
+    );
+    const volumeControls = wrapper.find('.oo-volume-controls').getDOMNode();
+    const ariaValueText = volumeControls.getAttribute('aria-valuetext');
+    expect(ariaValueText).toBe(CONSTANTS.ARIA_LABELS.MUTED);
+    mockCtrl.state.volumeState.muted = false;
   });
 
   it('should set active css class on bars that match the current volume level', function() {
     mockCtrl.state.volumeState.volume = 0.5;
-    var DOM = TestUtils.renderIntoDocument(
+    const wrapper = mount(
       <VolumeControls controller={mockCtrl} skinConfig={skinConfig} />
     );
-    var volumeBars = TestUtils.scryRenderedDOMComponentsWithClass(DOM, 'oo-volume-bar');
-    for (var i = 0; i < volumeBars.length; i++) {
-      var volumeBar = volumeBars[i];
-      if (i < 5) {
-        expect(volumeBar.className).toEqual('oo-volume-bar oo-on');
-      } else {
-        expect(volumeBar.className).toEqual('oo-volume-bar');
-      }
-    }
+    wrapper.find('.oo-volume-bar').forEach((bar, i) => {
+      const className = bar.getDOMNode().className;
+      const expected = i < 5 ? 'oo-volume-bar oo-on' : 'oo-volume-bar';
+      expect(className).toEqual(expected);
+    });
   });
 
   it('should set the right ARIA attributes on volume controls', function() {
     mockCtrl.state.volumeState.volume = 0.5;
-    var DOM = TestUtils.renderIntoDocument(
+    const wrapper = mount(
       <VolumeControls controller={mockCtrl} skinConfig={skinConfig} />
     );
-    var volumeControls = TestUtils.findRenderedDOMComponentWithClass(DOM, 'oo-volume-controls');
+    const volumeControls = wrapper.find('.oo-volume-controls').getDOMNode();
     expect(volumeControls.getAttribute('aria-label')).toBe(CONSTANTS.ARIA_LABELS.VOLUME_SLIDER);
     expect(volumeControls.getAttribute('aria-valuemin')).toBe('0');
     expect(volumeControls.getAttribute('aria-valuemax')).toBe('100');
@@ -79,8 +86,8 @@ describe('VolumeControls', function() {
   });
 
   it('should allow changing the volume with the keyboard', function() {
-    var increaseVolumeCalled = 0;
-    var decreaseVolumeCalled = 0;
+    let increaseVolumeCalled = 0;
+    let decreaseVolumeCalled = 0;
     mockCtrl.accessibilityControls = {
       changeVolumeBy: function(percent, increase) {
         if (increase) {
@@ -90,47 +97,48 @@ describe('VolumeControls', function() {
         }
       }
     };
-    var DOM = TestUtils.renderIntoDocument(
+    const wrapper = mount(
       <VolumeControls controller={mockCtrl} skinConfig={skinConfig} />
     );
-    var volumeControls = TestUtils.findRenderedDOMComponentWithClass(DOM, 'oo-volume-controls');
-    TestUtils.Simulate.keyDown(volumeControls, { key: CONSTANTS.KEY_VALUES.ARROW_UP });
-    TestUtils.Simulate.keyDown(volumeControls, { key: CONSTANTS.KEY_VALUES.ARROW_RIGHT });
+    const volumeControls = wrapper.find('.oo-volume-controls');
+    volumeControls.simulate('keyDown', { key: CONSTANTS.KEY_VALUES.ARROW_UP });
+    volumeControls.simulate('keyDown', { key: CONSTANTS.KEY_VALUES.ARROW_RIGHT });
     expect(increaseVolumeCalled).toBe(2);
     expect(decreaseVolumeCalled).toBe(0);
-    TestUtils.Simulate.keyDown(volumeControls, { key: CONSTANTS.KEY_VALUES.ARROW_DOWN });
-    TestUtils.Simulate.keyDown(volumeControls, { key: CONSTANTS.KEY_VALUES.ARROW_LEFT });
+    volumeControls.simulate('keyDown', { key: CONSTANTS.KEY_VALUES.ARROW_DOWN });
+    volumeControls.simulate('keyDown', { key: CONSTANTS.KEY_VALUES.ARROW_LEFT });
     expect(increaseVolumeCalled).toBe(2);
     expect(decreaseVolumeCalled).toBe(2);
   });
 
   it('should change volume by 100% when using the HOME or END keys', function() {
-    var volumePercent, volumeIncrease;
+    let volumePercent;
+    let volumeIncrease;
     mockCtrl.accessibilityControls = {
       changeVolumeBy: function(percent, increase) {
         volumePercent = percent;
         volumeIncrease = increase;
       }
     };
-    var DOM = TestUtils.renderIntoDocument(
+    const wrapper = mount(
       <VolumeControls controller={mockCtrl} skinConfig={skinConfig} />
     );
-    var volumeControls = TestUtils.findRenderedDOMComponentWithClass(DOM, 'oo-volume-controls');
-    TestUtils.Simulate.keyDown(volumeControls, { key: CONSTANTS.KEY_VALUES.HOME });
+    const volumeControls = wrapper.find('.oo-volume-controls');
+    volumeControls.simulate('keyDown', { key: CONSTANTS.KEY_VALUES.HOME });
     expect(volumePercent).toBe(100);
     expect(volumeIncrease).toBe(false);
-    TestUtils.Simulate.keyDown(volumeControls, { key: CONSTANTS.KEY_VALUES.END });
+    volumeControls.simulate('keyDown', { key: CONSTANTS.KEY_VALUES.END });
     expect(volumePercent).toBe(100);
     expect(volumeIncrease).toBe(true);
   });
 
   it('should unmute when volume is changed when muted', function() {
-    var spy = sinon.spy(mockCtrl, 'toggleMute');
-    var DOM = TestUtils.renderIntoDocument(
+    const spy = sinon.spy(mockCtrl, 'toggleMute');
+    const wrapper = mount(
       <VolumeControls controller={mockCtrl} skinConfig={skinConfig} />
     );
-    var volumeBars = TestUtils.scryRenderedDOMComponentsWithClass(DOM, 'oo-volume-bar');
-    TestUtils.Simulate.click(volumeBars[4], { target: { dataset: { volume: 0.5 } } });
+    const volumeBars = wrapper.find('.oo-volume-bar');
+    volumeBars.at(4).simulate('click', { target: { dataset: { volume: 0.5 } } });
     expect(mockCtrl.state.volumeState.volume).toBe(0.5);
     expect(spy.callCount).toBe(1);
     expect(spy.calledWith(false)).toBe(true);
@@ -142,26 +150,23 @@ describe('VolumeControls', function() {
     mockCtrl.state.volumeState.volume = 0.5;
     mockCtrl.state.volumeState.muted = true;
 
-    var DOM = TestUtils.renderIntoDocument(
+    const wrapper = mount(
       <VolumeControls controller={mockCtrl} skinConfig={skinConfig} />
     );
-    var volumeBars = TestUtils.scryRenderedDOMComponentsWithClass(DOM, 'oo-volume-bar');
-    for (var i = 0; i < volumeBars.length; i++) {
-      var volumeBar = volumeBars[i];
-      expect(volumeBar.className).toEqual('oo-volume-bar');
-    }
+    wrapper.find('.oo-volume-bar').forEach(bar => {
+      const className = bar.getDOMNode().className;
+      expect(className).toEqual('oo-volume-bar')
+    });
   });
 
   it('mobile volume slider should have correct value when not muted', function() {
     mockCtrl.state.isMobile = true;
     mockCtrl.state.volumeState.volume = 0.5;
     mockCtrl.state.volumeState.volumeSliderVisible = true;
-
-    var DOM = TestUtils.renderIntoDocument(
+    const wrapper = mount(
       <VolumeControls controller={mockCtrl} skinConfig={skinConfig} />
     );
-
-    var volumeSlider = TestUtils.findRenderedDOMComponentWithClass(DOM, 'oo-slider');
+    const volumeSlider = wrapper.find('.oo-slider').getDOMNode();
     expect(volumeSlider.value).toEqual('0.5');
   });
 
@@ -170,13 +175,22 @@ describe('VolumeControls', function() {
     mockCtrl.state.volumeState.volume = 0.5;
     mockCtrl.state.volumeState.volumeSliderVisible = true;
     mockCtrl.state.volumeState.muted = true;
-
-    var DOM = TestUtils.renderIntoDocument(
+    const wrapper = mount(
       <VolumeControls controller={mockCtrl} skinConfig={skinConfig} />
     );
-
-    var volumeSlider = TestUtils.findRenderedDOMComponentWithClass(DOM, 'oo-slider');
+    const volumeSlider = wrapper.find('.oo-slider').getDOMNode();
     expect(volumeSlider.value).toEqual('0');
+  });
+
+  it('should render slider with correct volume when audio only', function() {
+    mockCtrl.state.audioOnly = true;
+    mockCtrl.state.volumeState.volume = 0.5;
+    mockCtrl.state.volumeState.volumeSliderVisible = true;
+    const wrapper = mount(
+      <VolumeControls controller={mockCtrl} skinConfig={skinConfig} />
+    );
+    const volumeSlider = wrapper.find('.oo-slider').getDOMNode();
+    expect(volumeSlider.value).toEqual('0.5');
   });
 
 });

@@ -1,11 +1,16 @@
 var React = require('react');
 var classnames = require('classnames');
+var _ = require('underscore');
+
+var Utils = require('../utils');
+
 var CONSTANTS = require('../../constants/constants');
 var Tab = require('./tab');
 var MultiAudioTab = require('./multiAudioTab');
-var _ = require('underscore');
+var createReactClass = require('create-react-class');
+var PropTypes = require('prop-types');
 
-var ClosedCaptionMultiAudioMenu = React.createClass({
+var ClosedCaptionMultiAudioMenu = createReactClass({
   /**
    *
    * @param {Array} languageList - list of available languages
@@ -78,9 +83,17 @@ var ClosedCaptionMultiAudioMenu = React.createClass({
     ) {
       multiAudioCol = (
         <MultiAudioTab
+          header={Utils.getLocalizedString(
+            this.props.language,
+            CONSTANTS.SKIN_TEXT.AUDIO,
+            this.props.localizableStrings
+          )}
           handleClick={this.handleMultiAudioClick}
           skinConfig={this.props.skinConfig}
           audioTracksList={this.props.controller.state.multiAudio.tracks}
+          language={this.props.language}
+          languageList={this.props.controller.languageList}
+          localizableStrings={this.props.localizableStrings}
         />
       );
     }
@@ -102,7 +115,11 @@ var ClosedCaptionMultiAudioMenu = React.createClass({
           handleClick={this.handleClosedCaptionClick}
           skinConfig={this.props.skinConfig}
           itemsList={closedCaptionList}
-          header={CONSTANTS.SKIN_TEXT.SUBTITLES}
+          header={Utils.getLocalizedString(
+            this.props.language,
+            CONSTANTS.SKIN_TEXT.SUBTITLES,
+            this.props.localizableStrings
+          )}
         />
       );
     }
@@ -117,18 +134,21 @@ var ClosedCaptionMultiAudioMenu = React.createClass({
 });
 
 ClosedCaptionMultiAudioMenu.propTypes = {
-  menuClassName: React.PropTypes.string,
-  skinConfig: React.PropTypes.object,
-  togglePopoverAction: React.PropTypes.func,
-  controller: React.PropTypes.shape({
-    setCurrentAudio: React.PropTypes.func,
-    onClosedCaptionChange: React.PropTypes.func,
-    state: React.PropTypes.shape({
-      closedCaptionOptions: React.PropTypes.object,
-      multiAudio: React.PropTypes.shape({
-        tracks: React.PropTypes.array
+  menuClassName: PropTypes.string,
+  skinConfig: PropTypes.object,
+  togglePopoverAction: PropTypes.func,
+  language: PropTypes.string,
+  localizableStrings: PropTypes.object,
+  controller: PropTypes.shape({
+    setCurrentAudio: PropTypes.func,
+    onClosedCaptionChange: PropTypes.func,
+    state: PropTypes.shape({
+      closedCaptionOptions: PropTypes.object,
+      multiAudio: PropTypes.shape({
+        tracks: PropTypes.array
       })
-    })
+    }),
+    languageList: PropTypes.array
   })
 };
 

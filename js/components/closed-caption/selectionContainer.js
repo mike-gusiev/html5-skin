@@ -1,18 +1,22 @@
 var React = require('react');
 var CONSTANTS = require('../../constants/constants');
+var createReactClass = require('create-react-class');
+var PropTypes = require('prop-types');
 
-var SelectionContainer = React.createClass({
+var SelectionContainer = createReactClass({
   render: function() {
     return (
       <div className={'oo-selection-container' + (this.props.className ? ' ' + this.props.className : '')}>
         <div className="oo-selection-inner-wrapper">
           <div className="oo-selection-container-title">
-            {this.props.title}: <span className="oo-selection-container-selection-text">{this.props.selectionText}</span>
+            {this.props.title}:{' '}
+            <span className="oo-selection-container-selection-text">{this.props.selectionText}</span>
           </div>
           <div
             className="oo-selection-items-container"
             aria-label={this.props.ariaLabel}
-            role={this.props.role}>
+            role={this.props.role}
+          >
             {this.props.children}
           </div>
         </div>
@@ -22,15 +26,12 @@ var SelectionContainer = React.createClass({
 });
 
 SelectionContainer.propTypes = {
-  className: React.PropTypes.string,
-  selectionText: React.PropTypes.string,
-  title: React.PropTypes.string,
-  ariaLabel: React.PropTypes.string,
-  role: React.PropTypes.string,
-  children: React.PropTypes.oneOfType([
-    React.PropTypes.array,
-    React.PropTypes.element
-  ]).isRequired
+  className: PropTypes.string,
+  selectionText: PropTypes.string,
+  title: PropTypes.string,
+  ariaLabel: PropTypes.string,
+  role: PropTypes.string,
+  children: PropTypes.oneOfType([PropTypes.array, PropTypes.element]).isRequired
 };
 
 module.exports = SelectionContainer;

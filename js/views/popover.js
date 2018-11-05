@@ -1,9 +1,10 @@
 var React = require('react');
 var Utils = require('../components/utils');
 var CONSTANTS = require('../constants/constants');
+var createReactClass = require('create-react-class');
+var PropTypes = require('prop-types');
 
-var Popover = React.createClass({
-
+var Popover = createReactClass({
   componentDidMount: function() {
     // We listen to the event on the document instead of the element in order to
     // allow closing the popover with ESC even when it doesn't have focus.
@@ -45,8 +46,11 @@ var Popover = React.createClass({
   render: function() {
     return (
       <div
-        ref={function(e) { this.domElement = e; }.bind(this)}
-        className={this.props.popoverClassName}>
+        ref={function(e) {
+          this.domElement = e;
+        }.bind(this)}
+        className={this.props.popoverClassName}
+      >
         {this.props.children}
       </div>
     );
@@ -54,15 +58,15 @@ var Popover = React.createClass({
 });
 
 Popover.propTypes = {
-  popoverClassName: React.PropTypes.string.isRequired,
-  closeActionEnabled: React.PropTypes.bool,
-  closeAction: React.PropTypes.func
+  popoverClassName: PropTypes.string.isRequired,
+  closeActionEnabled: PropTypes.bool,
+  closeAction: PropTypes.func
 };
 
 Popover.defaultProps = {
   popoverClassName: 'oo-popover',
   closeActionEnabled: false,
-  closeAction: function() {},
+  closeAction: function() {}
 };
 
 module.exports = Popover;

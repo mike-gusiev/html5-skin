@@ -11,13 +11,16 @@ var React = require('react'),
     DiscoverItem = require('./discoverItem'),
     ResizeMixin = require('../mixins/resizeMixin'),
     Icon = require('../components/icon');
+var createReactClass = require('create-react-class');
+var PropTypes = require('prop-types');
 
-var DiscoveryPanel = React.createClass({
+var DiscoveryPanel = createReactClass({
   mixins: [ResizeMixin],
 
   getInitialState: function() {
     return {
-      showDiscoveryCountDown: this.props.skinConfig.discoveryScreen.showCountDownTimerOnEndScreen || this.props.forceCountDownTimer,
+      showDiscoveryCountDown:
+        this.props.skinConfig.discoveryScreen.showCountDownTimerOnEndScreen || this.props.forceCountDownTimer,
       currentPage: 1,
       componentHeight: null
     };
@@ -31,8 +34,10 @@ var DiscoveryPanel = React.createClass({
     // If we are changing view sizes, adjust the currentPage number to reflect the new number of items per page.
     var currentViewSize = this.props.responsiveView;
     var nextViewSize = nextProps.responsiveView;
-    var firstDiscoverIndex = this.state.currentPage * this.props.videosPerPage[currentViewSize] - this.props.videosPerPage[currentViewSize];
-    var newCurrentPage = Math.floor(firstDiscoverIndex/nextProps.videosPerPage[nextViewSize]) + 1;
+    var firstDiscoverIndex =
+      this.state.currentPage * this.props.videosPerPage[currentViewSize] -
+      this.props.videosPerPage[currentViewSize];
+    var newCurrentPage = Math.floor(firstDiscoverIndex / nextProps.videosPerPage[nextViewSize]) + 1;
     this.setState({
       currentPage: newCurrentPage
     });
@@ -55,8 +60,8 @@ var DiscoveryPanel = React.createClass({
 
   handleDiscoveryContentClick: function(index) {
     var eventData = {
-      'clickedVideo': this.props.discoveryData.relatedVideos[index],
-      'custom': this.props.discoveryData.custom
+      clickedVideo: this.props.discoveryData.relatedVideos[index],
+      custom: this.props.discoveryData.custom
     };
     // TODO: figure out countdown value
     // eventData.custom.countdown = 0;
@@ -110,7 +115,11 @@ var DiscoveryPanel = React.createClass({
     var discoveryToaster = ClassNames({
       'oo-discovery-toaster-container-style': true,
       'oo-flexcontainer': true,
-      'oo-scale-size': (this.props.responsiveView == this.props.skinConfig.responsive.breakpoints.xs.id && (this.props.componentWidth <= 420 || this.state.componentHeight <= 175)) || (this.props.responsiveView == this.props.skinConfig.responsive.breakpoints.sm.id && (this.props.componentWidth <= 420 || this.state.componentHeight <= 320))
+      'oo-scale-size':
+        (this.props.responsiveView === this.props.skinConfig.responsive.breakpoints.xs.id &&
+          (this.props.componentWidth <= 420 || this.state.componentHeight <= 175)) ||
+        (this.props.responsiveView === this.props.skinConfig.responsive.breakpoints.sm.id &&
+          (this.props.componentWidth <= 420 || this.state.componentHeight <= 320))
     });
     var leftButtonClass = ClassNames({
       'oo-left-button': true,
@@ -123,9 +132,12 @@ var DiscoveryPanel = React.createClass({
     var countDownClock = this.shouldShowCountdownTimer() ? (
       <div className={discoveryCountDownWrapperStyle}>
         <a className="oo-discovery-count-down-icon-style" onClick={this.handleDiscoveryCountDownClick}>
-          <CountDownClock {...this.props} timeToShow={this.props.skinConfig.discoveryScreen.countDownTime}
-          ref="CountDownClock" />
-          <Icon {...this.props} icon="pause"/>
+          <CountDownClock
+            {...this.props}
+            timeToShow={this.props.skinConfig.discoveryScreen.countDownTime}
+            ref="CountDownClock"
+          />
+          <Icon {...this.props} icon="pause" />
         </a>
       </div>
     ) : null;
@@ -134,29 +146,33 @@ var DiscoveryPanel = React.createClass({
     var discoveryContentBlocks = [];
     for (var i = 0; i < relatedVideoPage.length; i++) {
       discoveryContentBlocks.push(
-        <DiscoverItem {...this.props}
+        <DiscoverItem
+          {...this.props}
           key={i}
           src={relatedVideoPage[i].preview_image_url}
           contentTitle={relatedVideoPage[i].name}
           contentTitleClassName={discoveryContentName}
-          onClickAction={this.handleDiscoveryContentClick.bind(this, videosPerPage * (this.state.currentPage - 1) + i)}
+          onClickAction={this.handleDiscoveryContentClick.bind(
+            this,
+            videosPerPage * (this.state.currentPage - 1) + i
+          )}
         >
-          {(countDownClock && i === 0 && this.state.currentPage <= 1) ? countDownClock : null}
+          {countDownClock && i === 0 && this.state.currentPage <= 1 ? countDownClock : null}
         </DiscoverItem>
       );
     }
 
     return (
       <div className="oo-content-panel oo-discovery-panel" ref="discoveryPanel">
-        <div className={discoveryToaster} id="DiscoveryToasterContainer" ref="DiscoveryToasterContainer">
+        <div className={discoveryToaster} ref="DiscoveryToasterContainer">
           {discoveryContentBlocks}
         </div>
 
         <a className={leftButtonClass} ref="ChevronLeftButton" onClick={this.handleLeftButtonClick}>
-          <Icon {...this.props} icon="left"/>
+          <Icon {...this.props} icon="left" />
         </a>
         <a className={rightButtonClass} ref="ChevronRightButton" onClick={this.handleRightButtonClick}>
-          <Icon {...this.props} icon="right"/>
+          <Icon {...this.props} icon="right" />
         </a>
       </div>
     );
@@ -164,26 +180,28 @@ var DiscoveryPanel = React.createClass({
 });
 
 DiscoveryPanel.propTypes = {
-  responsiveView: React.PropTypes.string,
-  videosPerPage: React.PropTypes.objectOf(React.PropTypes.number),
-  discoveryData: React.PropTypes.shape({
-    relatedVideos: React.PropTypes.arrayOf(React.PropTypes.shape({
-      preview_image_url: React.PropTypes.string,
-      name: React.PropTypes.string
-    }))
+  responsiveView: PropTypes.string,
+  videosPerPage: PropTypes.objectOf(PropTypes.number),
+  discoveryData: PropTypes.shape({
+    relatedVideos: PropTypes.arrayOf(
+      PropTypes.shape({
+        preview_image_url: PropTypes.string,
+        name: PropTypes.string
+      })
+    )
   }),
-  skinConfig: React.PropTypes.shape({
-    discoveryScreen: React.PropTypes.shape({
-      showCountDownTimerOnEndScreen: React.PropTypes.bool,
-      countDownTime: React.PropTypes.number,
-      contentTitle: React.PropTypes.shape({
-        show: React.PropTypes.bool
+  skinConfig: PropTypes.shape({
+    discoveryScreen: PropTypes.shape({
+      showCountDownTimerOnEndScreen: PropTypes.bool,
+      countDownTime: PropTypes.number,
+      contentTitle: PropTypes.shape({
+        show: PropTypes.bool
       })
     }),
-    icons: React.PropTypes.objectOf(React.PropTypes.object)
+    icons: PropTypes.objectOf(PropTypes.object)
   }),
-  controller: React.PropTypes.shape({
-    sendDiscoveryClickEvent: React.PropTypes.func
+  controller: PropTypes.shape({
+    sendDiscoveryClickEvent: PropTypes.func
   })
 };
 
@@ -203,17 +221,17 @@ DiscoveryPanel.defaultProps = {
       }
     },
     icons: {
-      pause:{fontStyleClass:'oo-icon oo-icon-pause'},
-      discovery:{fontStyleClass:'oo-icon oo-icon-topmenu-discovery'},
-      left:{fontStyleClass:'oo-icon oo-icon-left'},
-      right:{fontStyleClass:'oo-icon oo-icon-right'}
+      pause: { fontStyleClass: 'oo-icon oo-icon-pause' },
+      discovery: { fontStyleClass: 'oo-icon oo-icon-topmenu-discovery' },
+      left: { fontStyleClass: 'oo-icon oo-icon-left' },
+      right: { fontStyleClass: 'oo-icon oo-icon-right' }
     },
     responsive: {
       breakpoints: {
-        xs: {id: 'xs'},
-        sm: {id: 'sm'},
-        md: {id: 'md'},
-        lg: {id: 'lg'}
+        xs: { id: 'xs' },
+        sm: { id: 'sm' },
+        md: { id: 'md' },
+        lg: { id: 'lg' }
       }
     }
   },
@@ -221,7 +239,7 @@ DiscoveryPanel.defaultProps = {
     relatedVideos: []
   },
   controller: {
-    sendDiscoveryClickEvent: function(a,b) {}
+    sendDiscoveryClickEvent: function(a, b) {}
   },
   responsiveView: 'md'
 };
