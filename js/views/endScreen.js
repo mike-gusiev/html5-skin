@@ -12,7 +12,9 @@ var React = require('react'),
     Utils = require('../components/utils'),
     CONSTANTS = require('../constants/constants');
 
-var EndScreen = React.createClass({
+var createReactClass = require('create-react-class');
+
+var EndScreen = createReactClass({
   mixins: [ResizeMixin],
 
   getInitialState: function() {
@@ -92,9 +94,9 @@ var EndScreen = React.createClass({
 
     return (
       <div className="oo-state-screen oo-end-screen" style={posterStyle}>
-        <div className="oo-underlay-gradient"></div>
+        <div className="oo-underlay-gradient"/>
 
-        <a className="oo-state-screen-selectable" onClick={this.handleClick}></a>
+        <a className="oo-state-screen-selectable" onClick={this.handleClick}/>
 
         <Watermark {...this.props} controlBarVisible={this.state.controlBarVisible}/>
 

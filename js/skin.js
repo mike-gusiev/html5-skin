@@ -22,7 +22,9 @@ var React = require('react'),
     ContentScreen = require('./views/contentScreen'),
     ResponsiveManagerMixin = require('./mixins/responsiveManagerMixin');
 
-var Skin = React.createClass({
+var createReactClass = require('create-react-class');
+
+var Skin = createReactClass({
   mixins: [ResponsiveManagerMixin],
 
   getInitialState: function() {

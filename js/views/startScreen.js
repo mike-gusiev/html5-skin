@@ -11,7 +11,10 @@ var React = require('react'),
     ResizeMixin = require('../mixins/resizeMixin'),
     Utils = require('../components/utils');
 
-var StartScreen = React.createClass({
+var createReactClass = require('create-react-class');
+var PropTypes = require('prop-types');
+
+var StartScreen = createReactClass({
   mixins: [ResizeMixin],
 
   getInitialState: function() {
@@ -115,8 +118,8 @@ var StartScreen = React.createClass({
     return (
       <div className="oo-state-screen oo-start-screen">
         <div className={stateScreenPosterClass} style={posterStyle}>
-          <div className="oo-start-screen-linear-gradient"></div>
-          <a className="oo-state-screen-selectable" onClick={this.handleClick}></a>
+          <div className="oo-start-screen-linear-gradient"/>
+          <a className="oo-state-screen-selectable" onClick={this.handleClick}/>
         </div>
         <Watermark {...this.props} controlBarVisible={false}/>
         <div className={infoPanelClass}>
@@ -132,16 +135,16 @@ var StartScreen = React.createClass({
 });
 
 StartScreen.propTypes = {
-  isInitializing: React.PropTypes.bool,
-  skinConfig: React.PropTypes.shape({
-    startScreen: React.PropTypes.shape({
-      playIconStyle: React.PropTypes.shape({
-        color: React.PropTypes.string
+  isInitializing: PropTypes.bool,
+  skinConfig: PropTypes.shape({
+    startScreen: PropTypes.shape({
+      playIconStyle: PropTypes.shape({
+        color: PropTypes.string
       })
     }),
-    icons: React.PropTypes.objectOf(React.PropTypes.object)
+    icons: PropTypes.objectOf(PropTypes.object)
   }),
-  showSpinner: React.PropTypes.bool
+  showSpinner: PropTypes.bool
 };
 
 StartScreen.defaultProps = {

@@ -80,5 +80,8 @@ module.exports = {
     port: 4444,
     compress: true,
     open: true
+  },
+  node: {
+    fs: 'empty'
   }
 };

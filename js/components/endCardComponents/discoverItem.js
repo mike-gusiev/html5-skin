@@ -1,7 +1,10 @@
 var React = require('react'),
     Utils = require('../utils');
 
-var DiscoverItem = React.createClass({
+var createReactClass = require('create-react-class');
+var PropTypes = require('prop-types');
+
+var DiscoverItem = createReactClass({
     getInitialState: function() {
         return {
             imgError: false
@@ -71,23 +74,23 @@ var DiscoverItem = React.createClass({
 });
 
 DiscoverItem.propTypes = {
-    skinConfig: React.PropTypes.shape({
-        discoveryScreen: React.PropTypes.shape({
-            contentTitle: React.PropTypes.shape({
-                font: React.PropTypes.shape({
-                    color: React.PropTypes.string,
-                    fontFamily: React.PropTypes.string
+    skinConfig: PropTypes.shape({
+        discoveryScreen: PropTypes.shape({
+            contentTitle: PropTypes.shape({
+                font: PropTypes.shape({
+                    color: PropTypes.string,
+                    fontFamily: PropTypes.string
                 })
             })
         })
     }),
-    src: React.PropTypes.string,
-    image: React.PropTypes.string,
-    contentTitle: React.PropTypes.string,
-    franchise: React.PropTypes.string,
-    duration: React.PropTypes.number,
-    contentTitleClassName: React.PropTypes.string,
-    onClickAction: React.PropTypes.func
+    src: PropTypes.string,
+    image: PropTypes.string,
+    contentTitle: PropTypes.string,
+    franchise: PropTypes.string,
+    duration: PropTypes.number,
+    contentTitleClassName: PropTypes.string,
+    onClickAction: PropTypes.func
 };
 
 module.exports = DiscoverItem;

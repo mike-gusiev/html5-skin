@@ -8,7 +8,9 @@ var React = require('react'),
     Watermark = require('../components/watermark'),
     Icon = require('../components/icon');
 
-var EndCard = React.createClass({
+var createReactClass = require('create-react-class');
+
+var EndCard = createReactClass({
 
     getInitialState: function() {
         return {
@@ -39,9 +41,9 @@ var EndCard = React.createClass({
         });
         return (
             <div className="oo-state-screen oo-end-card" style={posterStyle}>
-                <div className="oo-underlay-gradient"></div>
+                <div className="oo-underlay-gradient"/>
 
-                <a className="oo-state-screen-selectable" onClick={this.handleClick}></a>
+                <a className="oo-state-screen-selectable" onClick={this.handleClick}/>
 
                 <Watermark {...this.props} controlBarVisible={this.state.controlBarVisible}/>
 
