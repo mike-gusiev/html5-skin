@@ -1,9 +1,9 @@
-
 {
     "general": {
         "watermark": {"imageResource": {"url": "","androidResource" : "logo","iosResource" : "logo"  },
             "position": "bottomRight", "clickUrl": "", "target": "_blank", "transparency": 1, "scalingOption": "default", "scalingPercentage": 20
         },
+        "bufferingSpinnerDelay": 750,
         "loadingImage": {"imageResource": {"url": "//player.ooyala.com/static/v4/candidate/latest/skin-plugin/assets/images/loader_svg.svg" } },
         "accentColor":"#448aff"
     },
@@ -27,11 +27,39 @@
                 "languageFile": "/assets/zh.json",
                 "androidResource": "skin-config/zh.json",
                 "iosResource": "zh"
+            },
+            {
+                "language": "ja",
+                "languageFile": "",
+                "androidResource": "/assets/ja.json",
+                "iosResource": "ja"
+            },
+            {
+                "language": "ko",
+                "languageFile": "",
+                "androidResource": "/assets/ko.json",
+                "iosResource": "ko"
             }
         ]
     },
+    "languageDirections": {
+        "ar": "rtl",
+        "dv": "rtl",
+        "he": "rtl",
+        "fa": "rtl",
+        "ks": "rtl",
+        "ku": "rtl",
+        "pa": "rtl",
+        "ps": "rtl",
+        "sd": "rtl",
+        "tk": "rtl",
+        "ug": "rtl",
+        "ur": "rtl",
+        "yi": "rtl"
+    },
     "responsive": {
         "breakpoints": {
+            "audio-only-xs": {"id": "audio-only-xs", "name": "oo-xsmall", "multiplier": 0.7},
             "xs": {"id": "xs", "name": "oo-xsmall", "maxWidth": 559, "multiplier": 0.7},
             "sm": {"id": "sm", "name": "oo-small", "minWidth": 560, "maxWidth": 767, "multiplier": 1},
             "md": {"id": "md", "name": "oo-medium", "minWidth": 768, "maxWidth": 979, "multiplier": 1},
@@ -125,6 +153,7 @@
     },
     "shareScreen": {
         "shareContent": ["social", "embed"],
+        "socialContent": ["twitter", "facebook", "google+", "email"],
         "embed": {
             "source": "<iframe width='640' height='480' frameborder='0' allowfullscreen src='//<WEBSITE_HOST>/iframe.html?ec=<ASSET_ID>&pbid=<PLAYER_ID>&pcode=<PUBLISHER_ID>'></iframe>"
         }
@@ -161,6 +190,54 @@
     "upNext": {
         "showUpNext": false,
         "timeToShow": "5"
+    },
+    "playbackSpeed": {
+        "options": [ 0.5, 0.75, 1, 1.25, 1.5, 2 ]
+    },
+    "skipControls": {
+        "enabled": false,
+        "skipBackwardTime": 10,
+        "skipForwardTime": 10,
+        "buttons": {
+            "previousVideo": {
+                "enabled": true,
+                "index": 1
+            },
+            "skipBackward": {
+                "enabled": true,
+                "index": 2
+            },
+            "skipForward": {
+                "enabled": true,
+                "index": 3
+            },
+            "nextVideo": {
+                "enabled": true,
+                "index": 4
+            }
+        },
+        "controlBarSkipControls": {
+            "previousVideo": {
+                "enabled": true,
+                "index": 1
+            },
+            "skipBackward": {
+                "enabled": true,
+                "index": 2
+            },
+            "playPause": {
+                "enabled": true,
+                "index": 3
+            },
+            "skipForward": {
+                "enabled": true,
+                "index": 4
+            },
+            "nextVideo": {
+                "enabled": true,
+                "index": 5
+            }
+        }
     },
     "controlBar": {
         "volumeControl": {
@@ -199,10 +276,27 @@
             "scrubberHandleColor": "rgba(67,137,255,1)",
             "scrubberHandleBorderColor": "rgba(255,255,255,1)",
             "thumbnailPreview": true
+        },
+        "tooltips":{
+            "enabled":false
+        },
+        "qualitySelection":{
+            "format": "bitrate"
         }
     },
     "live": {
         "forceDvrDisabled": false
+    },
+    "isVrAnimationEnabled": {
+        "vrNotification": true,
+        "vrIcon": false
+    },
+    "audio": {
+        "audioLanguage": "none"
+    },
+    "animationDurations": {
+        "vrNotification": 5,
+        "vrIcon": 4
     },
     "buttons": {
         "desktopContent": [
@@ -211,10 +305,14 @@
             {"name":"live", "location":"controlBar", "whenDoesNotFit":"keep", "minWidth":45},
             {"name":"timeDuration", "location":"controlBar", "whenDoesNotFit":"drop", "minWidth":115 },
             {"name":"flexibleSpace", "location":"controlBar", "whenDoesNotFit":"keep", "minWidth":1 },
+            {"name":"chromecast", "location": "controlBar", "whenDoesNotFit":"moveToMoreOptions", "minWidth":45 },
             {"name":"share", "location":"controlBar", "whenDoesNotFit":"moveToMoreOptions", "minWidth":50 },
+            {"name":"discovery", "location":"controlBar", "whenDoesNotFit":"moveToMoreOptions", "minWidth":45 },
             {"name":"closedCaption", "location":"controlBar", "whenDoesNotFit":"moveToMoreOptions", "minWidth":33 },
             {"name":"quality", "location":"controlBar", "whenDoesNotFit":"moveToMoreOptions", "minWidth":45 },
             {"name":"logo", "location":"controlBar", "whenDoesNotFit":"keep", "minWidth":125 },
+            {"name":"stereoscopic", "location":"controlBar", "whenDoesNotFit":"keep", "minWidth":45 },
+            {"name":"audioAndCC", "location": "controlBar", "whenDoesNotFit":"moveToMoreOptions", "minWidth":45 },
             {"name":"theater", "location":"controlBar", "whenDoesNotFit":"keep", "minWidth":44 },
             {"name":"fullscreen", "location":"controlBar", "whenDoesNotFit":"keep", "minWidth":44 },
             {"name":"moreOptions", "location":"controlBar", "whenDoesNotFit":"keep", "minWidth":25 },
@@ -226,6 +324,8 @@
             {"name":"timeDuration", "location":"controlBar", "whenDoesNotFit":"drop", "minWidth":115 },
             {"name":"flexibleSpace", "location":"controlBar", "whenDoesNotFit":"keep", "minWidth":1 },
             {"name":"logo", "location":"controlBar", "whenDoesNotFit":"keep", "minWidth":125 },
+            {"name":"stereoscopic", "location":"controlBar", "whenDoesNotFit":"keep", "minWidth":50 },
+            {"name":"audioAndCC", "location": "controlBar", "whenDoesNotFit":"keep", "minWidth":50 },
             {"name":"theater", "location":"controlBar", "whenDoesNotFit":"keep", "minWidth":44 },
             {"name":"fullscreen", "location":"controlBar", "whenDoesNotFit":"keep", "minWidth":45 },
             {"name":"moreOptions", "location":"controlBar", "whenDoesNotFit":"keep", "minWidth":25 }
@@ -235,7 +335,9 @@
             {"name":"live", "location":"controlBar", "whenDoesNotFit":"keep", "minWidth":45},
             {"name":"timeDuration", "location":"controlBar", "whenDoesNotFit":"drop", "minWidth":100 },
             {"name":"flexibleSpace", "location":"controlBar", "whenDoesNotFit":"keep", "minWidth":1 },
+            {"name":"chromecast", "location": "controlBar", "whenDoesNotFit":"moveToMoreOptions", "minWidth":50 },
             {"name":"share", "location":"moreOptions" },
+            {"name":"discovery", "location":"moreOptions" },
             {"name":"closedCaption", "location":"moreOptions" },
             {"name":"fullscreen", "location":"controlBar", "whenDoesNotFit":"keep", "minWidth":50 },
             {"name":"moreOptions", "location":"controlBar", "whenDoesNotFit":"keep", "minWidth":50 }
@@ -246,6 +348,13 @@
             {"name":"flexibleSpace", "location":"controlBar", "whenDoesNotFit":"keep", "minWidth":1 },
             {"name":"fullscreen", "location":"controlBar", "whenDoesNotFit":"keep", "minWidth":50 },
             {"name":"moreOptions", "location":"controlBar", "whenDoesNotFit":"keep", "minWidth":50 }
+        ],
+        "audioOnly": [
+            {"name":"volume", "location":"controlBar", "whenDoesNotFit":"keep", "minWidth":200 },
+            {"name":"skipControls", "location":"controlBar", "whenDoesNotFit":"keep", "minWidth":200 },
+            {"name":"moreOptions", "location":"controlBar", "whenDoesNotFit":"keep", "minWidth":50 },
+            {"name":"share", "location":"moreOptions" },
+            {"name":"playbackSpeed", "location":"moreOptions" }
         ]
     },
     "icons": {
@@ -258,8 +367,11 @@
         "theater": {"fontFamilyName": "ooyala-slick-type", "fontString": "\u0069", "fontStyleClass": "oo-icon oo-icon-system-fullscreen"},
         "ellipsis": {"fontFamilyName": "ooyala-slick-type", "fontString": "\u0066", "fontStyleClass": "oo-icon oo-icon-system-menu"},
         "replay": {"fontFamilyName": "ooyala-slick-type", "fontString": "\u0063", "fontStyleClass": "oo-icon oo-icon-system-replay"},
+        "previous": {"fontFamilyName": "ooyala-slick-type", "fontString": "\u003c", "fontStyleClass": "oo-icon oo-icon-previous"},
+        "forward": {"fontFamilyName": "ooyala-slick-type", "fontString": "\u0028", "fontStyleClass": "oo-icon oo-icon-forward"},
         "share": {"fontFamilyName": "ooyala-slick-type", "fontString": "\u006f", "fontStyleClass": "oo-icon oo-icon-share"},
         "cc": {"fontFamilyName": "ooyala-slick-type", "fontString": "\u006B", "fontStyleClass": "oo-icon oo-icon-cc"},
+        "stereoscopic": {"fontFamilyName": "ooyala-slick-type", "fontString": "\u0057", "fontStyleClass": "oo-icon"},
         "discovery": {"fontFamilyName": "ooyala-slick-type", "fontString": "\u006C", "fontStyleClass": "oo-icon oo-icon-discovery-binoculars"},
         "quality": {"fontFamilyName": "ooyala-slick-type", "fontString": "\u006D", "fontStyleClass": "oo-icon oo-icon-bitrate"},
         "setting": {"fontFamilyName": "ooyala-slick-type", "fontString": "\u006E", "fontStyleClass": "oo-icon oo-icon-system-settings"},
@@ -271,6 +383,17 @@
         "learn": {"fontFamilyName": "ooyala-slick-type", "fontString": "\u0074", "fontStyleClass": "oo-icon oo-icon-system-more-information"},
         "skip": {"fontFamilyName": "ooyala-slick-type", "fontString": "\u0075", "fontStyleClass": "oo-icon oo-icon-skip-slick"},
         "warning": {"fontFamilyName": "fontawesome", "fontString": "\uf06a", "fontStyleClass": ""},
-        "auto": {"fontFamilyName": "ooyala-slick-type", "fontString": "\u0064", "fontStyleClass": "oo-icon oo-icon-system-auto"}
+        "auto": {"fontFamilyName": "ooyala-slick-type", "fontString": "\u0064", "fontStyleClass": "oo-icon oo-icon-system-auto"},
+        "arrowsBlack": {"fontFamilyName": "ooyala-slick-type", "fontString": "\u0052", "fontStyleClass": "oo-icon"},
+        "arrowsWhite": {"fontFamilyName": "ooyala-slick-type", "fontString": "\u0052", "fontStyleClass": "oo-icon"},
+        "circleArrowsBlack": {"fontFamilyName": "ooyala-slick-type", "fontString": "\u005D", "fontStyleClass": "oo-icon"},
+        "circleArrowsWhite": {"fontFamilyName": "ooyala-slick-type", "fontString": "\u005D", "fontStyleClass": "oo-icon"},
+        "stereoOn": {"fontFamilyName": "ooyala-slick-type", "fontString": "\u0057", "fontStyleClass": "oo-icon oo-icon-system-auto"},
+        "stereoOff": {"fontFamilyName": "ooyala-slick-type", "fontString": "\u0057", "fontStyleClass": "oo-icon oo-icon-system-auto"},
+        "vrIcon": {"fontFamilyName": "ooyala-slick-type", "fontString": "\u0059", "fontStyleClass": "oo-icon"},
+        "audioAndCC": {"fontFamilyName": "ooyala-slick-type", "fontString": "\u005F", "fontStyleClass": "oo-icon oo-icon-audio-and-cc"},
+        "selected": {"fontFamilyName": "ooyala-slick-type", "fontString": "\u0040", "fontStyleClass": "oo-icon oo-icon-selected"},
+        "chromecast-connected": {"fontFamilyName": "ooyala-slick-type", "fontString": "\u003B", "fontStyleClass": "oo-icon"},
+        "chromecast-disconnected": {"fontFamilyName": "ooyala-slick-type", "fontString": "\u003A", "fontStyleClass": "oo-icon"}
     }
 }
