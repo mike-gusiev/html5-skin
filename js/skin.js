@@ -22,7 +22,7 @@ const ErrorScreen = require('./views/errorScreen');
 const ContentScreen = require('./views/contentScreen');
 const ResponsiveManagerMixin = require('./mixins/responsiveManagerMixin');
 const createReactClass = require('create-react-class');
-const DiscoveryBar = require('./components/endCardComponents/discoveryBar');
+const DiscoveryBar = require('./components/pgatour/endCardComponents/discoveryBar');
 const EndCard = require('./views/endCard');
 
 import {PlayingScreenWithAutoHide} from './views/playingScreen';

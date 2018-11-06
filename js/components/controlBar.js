@@ -10,7 +10,7 @@ var React = require('react'),
     AccessibleButton = require('./accessibleButton'),
     ControlButton = require('./controlButton'),
     PlaybackSpeedButton = require('./playbackSpeedButton'),
-    VolumeControls = require('./volumeControls'),
+    VolumeControls = require('./pgatour/volumeControls'),
     VideoQualityPanel = require('./videoQualityPanel'),
     PlaybackSpeedPanel = require('./playbackSpeedPanel'),
     ClosedCaptionPopover = require('./closed-caption/closedCaptionPopover'),
@@ -460,6 +460,7 @@ var ControlBar = createReactClass({
             ariaLabel={volumeAriaLabel}
             icon={volumeIcon}
             tooltip={mutedInUi ? CONSTANTS.SKIN_TEXT.UNMUTE : CONSTANTS.SKIN_TEXT.MUTE}
+            style={{ float: 'left' }}
             onClick={this.handleVolumeIconClick}>
           </ControlButton>
           {!this.props.hideVolumeControls && <VolumeControls {...this.props} />}

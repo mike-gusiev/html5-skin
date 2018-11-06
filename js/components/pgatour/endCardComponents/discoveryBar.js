@@ -6,11 +6,11 @@
 var React = require('react'),
     ReactDOM = require('react-dom'),
     ClassNames = require('classnames'),
-    CONSTANTS = require('../../constants/constants'),
+    CONSTANTS = require('../../../constants/constants'),
     Clock = require('./clock'),
     DiscoverItem = require('./discoverItem'),
-    ResizeMixin = require('../../mixins/resizeMixin'),
-    Icon = require('../../components/icon');
+    ResizeMixin = require('../../../mixins/resizeMixin'),
+    Icon = require('../../icon');
 
 var createReactClass = require('create-react-class');
 var PropTypes = require('prop-types');

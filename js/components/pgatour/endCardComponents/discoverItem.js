@@ -1,5 +1,5 @@
 var React = require('react'),
-    Utils = require('../utils');
+    Utils = require('../../utils');
 
 var createReactClass = require('create-react-class');
 var PropTypes = require('prop-types');
