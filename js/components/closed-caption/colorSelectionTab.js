@@ -3,9 +3,9 @@ var React = require('react'),
     CONSTANTS = require('../../constants/constants'),
     SelectionContainer = require('./selectionContainer'),
     ColorSelector = require('../colorSelector');
+var createReactClass = require('create-react-class');
 
-var ColorSelectionTab = React.createClass({
-
+var ColorSelectionTab = createReactClass({
   getInitialState: function() {
     return {
       selectedTextColor: this.props.closedCaptionOptions.textColor,
@@ -48,22 +48,33 @@ var ColorSelectionTab = React.createClass({
   },
 
   render: function() {
-
-    var textColorTitle = Utils.getLocalizedString(this.props.language, CONSTANTS.SKIN_TEXT.TEXT_COLOR, this.props.localizableStrings);
+    var textColorTitle = Utils.getLocalizedString(
+      this.props.language,
+      CONSTANTS.SKIN_TEXT.TEXT_COLOR,
+      this.props.localizableStrings
+    );
     var textColorSelection = Utils.getLocalizedString(
       this.props.language,
       CONSTANTS.SKIN_TEXT[this.props.closedCaptionOptions.textColor.toUpperCase()],
       this.props.localizableStrings
     );
 
-    var backgroundColorTitle = Utils.getLocalizedString(this.props.language, CONSTANTS.SKIN_TEXT.BACKGROUND_COLOR, this.props.localizableStrings);
+    var backgroundColorTitle = Utils.getLocalizedString(
+      this.props.language,
+      CONSTANTS.SKIN_TEXT.BACKGROUND_COLOR,
+      this.props.localizableStrings
+    );
     var backgroundColorSelection = Utils.getLocalizedString(
       this.props.language,
       CONSTANTS.SKIN_TEXT[this.props.closedCaptionOptions.backgroundColor.toUpperCase()],
       this.props.localizableStrings
     );
 
-    var windowColorTitle = Utils.getLocalizedString(this.props.language, CONSTANTS.SKIN_TEXT.WINDOW_COLOR, this.props.localizableStrings);
+    var windowColorTitle = Utils.getLocalizedString(
+      this.props.language,
+      CONSTANTS.SKIN_TEXT.WINDOW_COLOR,
+      this.props.localizableStrings
+    );
     var windowColorSelection = Utils.getLocalizedString(
       this.props.language,
       CONSTANTS.SKIN_TEXT[this.props.closedCaptionOptions.windowColor.toUpperCase()],
@@ -77,7 +88,7 @@ var ColorSelectionTab = React.createClass({
             className="oo-text-color-selection-container"
             title={textColorTitle}
             selectionText={textColorSelection}
-            >
+          >
             <div className="oo-text-color-items-container">
               <ColorSelector
                 {...this.props}
@@ -90,10 +101,7 @@ var ColorSelectionTab = React.createClass({
             </div>
           </SelectionContainer>
 
-          <SelectionContainer
-            title={backgroundColorTitle}
-            selectionText={backgroundColorSelection}
-            >
+          <SelectionContainer title={backgroundColorTitle} selectionText={backgroundColorSelection}>
             <ColorSelector
               {...this.props}
               ariaLabel={CONSTANTS.ARIA_LABELS.BACKGROUND_COLOR_MENU}
@@ -104,10 +112,7 @@ var ColorSelectionTab = React.createClass({
             />
           </SelectionContainer>
 
-          <SelectionContainer
-            title={windowColorTitle}
-            selectionText={windowColorSelection}
-            >
+          <SelectionContainer title={windowColorTitle} selectionText={windowColorSelection}>
             <ColorSelector
               {...this.props}
               ariaLabel={CONSTANTS.ARIA_LABELS.WINDOW_COLOR_MENU}

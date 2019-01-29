@@ -2,6 +2,8 @@ jest.dontMock('../../js/components/accessibilityControls');
 jest.dontMock('../../js/constants/constants');
 jest.dontMock('../../js/components/utils');
 
+var React = require('react');
+var ReactDOM = require('react-dom');
 var CONSTANTS = require('../../js/constants/constants');
 var AccessibilityControls = require('../../js/components/accessibilityControls');
 
@@ -172,6 +174,14 @@ describe('AccessibilityControls', function() {
           state: {
             currentPlayhead: 0,
             duration: 60
+          },
+          props: {
+            skinConfig: {
+              skipControls: {
+                skipBackwardTime: 10,
+                skipForwardTime: 10
+              }
+            }
           }
         },
         setVolume: function() {},
@@ -186,11 +196,14 @@ describe('AccessibilityControls', function() {
 
       beforeEach(function() {
         div = document.createElement('div');
-        document.activeElement = div;
+        //jsdom requires a valid tabindex to be set for the element to be focusable. See:
+        //https://stackoverflow.com/questions/38681827/jsdom-9-1-does-not-set-document-activeelement-when-focusing-a-node
+        div.setAttribute('tabindex', 1);
+        div.focus();
       });
 
       afterEach(function() {
-        document.activeElement = null;
+        div.blur();
       });
 
       it ('should NOT allow global arrow keys when focused element is a menu item', function() {
@@ -335,6 +348,26 @@ describe('AccessibilityControls', function() {
         mockCtrl.skin.state.currentPlayhead = 0;
         a11yCtrls.seekBy(5, true);
         expect(newPlayhead).toBeNull();
+      });
+
+      it('should call seekBy on key down using values from skin config', function() {
+        const spy = jest.spyOn(a11yCtrls, 'seekBy');
+        const mockEvent = {
+          keyCode: CONSTANTS.KEYCODES.LEFT_ARROW_KEY,
+          preventDefault: function() {}
+        };
+        a11yCtrls.controller.skin.props.skinConfig.skipControls.skipBackwardTime = 20;
+        a11yCtrls.controller.skin.props.skinConfig.skipControls.skipForwardTime = 40;
+
+        a11yCtrls.keyEventDown(mockEvent);
+        expect(spy.mock.calls.length).toBe(1);
+        expect(spy.mock.calls[0]).toEqual([20, false, true]);
+
+        mockEvent.keyCode = CONSTANTS.KEYCODES.RIGHT_ARROW_KEY;
+        a11yCtrls.keyEventDown(mockEvent);
+        expect(spy.mock.calls.length).toBe(2);
+        expect(spy.mock.calls[1]).toEqual([40, true, true]);
+        spy.mockRestore();
       });
 
     });

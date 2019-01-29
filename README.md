@@ -8,7 +8,7 @@ An open-source HTML5 UI skin based on [React.js](https://github.com/facebook/rea
 `core.js` is a lightweight core player that enables basic video playback functionality and provides Message Bus environment. Most of additional capabilities such as ads, discovery and skin are separated from core player JS. You may want to load additional plugins.
 
 ## Examples
-We have a sample HTML page ready for you. Check out [sample page](http://debug.ooyala.com/ea/index.html?ec=RmZW4zcDo6KqkTIhn1LnowEZyUYn5Tb2&pbid=26e2e3c1049c4e70ae08a242638b5c40&pcode=5zb2wxOlZcNCe_HVT3a6cawW298X&core_player=http%3A%2F%2Fplayer.ooyala.com%2Fstatic%2Fv4%2Fproduction%2Flatest%2Fcore.min.js&video_plugins=http%3A%2F%2Fplayer.ooyala.com%2Fstatic%2Fv4%2Fproduction%2Flatest%2Fvideo-plugin%2Fmain_html5.min.js%0Ahttp%3A%2F%2Fplayer.ooyala.com%2Fstatic%2Fv4%2Fproduction%2Flatest%2Fvideo-plugin%2Fosmf_flash.min.js%0Ahttp%3A%2F%2Fplayer.ooyala.com%2Fstatic%2Fv4%2Fproduction%2Flatest%2Fvideo-plugin%2Fbit_wrapper.min.js&html5_skin=http%3A%2F%2Fplayer.ooyala.com%2Fstatic%2Fv4%2Fproduction%2Flatest%2Fskin-plugin%2Fhtml5-skin.min.js&skin_asset=http%3A%2F%2Fplayer.ooyala.com%2Fstatic%2Fv4%2Fproduction%2Flatest%2Fskin-plugin%2Fhtml5-skin.min.css&skin_config=http%3A%2F%2Fplayer.ooyala.com%2Fstatic%2Fv4%2Fproduction%2Flatest%2Fskin-plugin%2Fskin.json&ad_plugin=http%3A%2F%2Fplayer.ooyala.com%2Fstatic%2Fv4%2Fproduction%2Flatest%2Fad-plugin%2Ffreewheel.min.js&additional_plugins=http%3A%2F%2Fplayer.ooyala.com%2Fstatic%2Fv4%2Fproduction%2Flatest%2Fother-plugin%2Fdiscovery_api.min.js&options=%7B%22freewheel-ads-manager%22%3A%7B%22fw_video_asset_id%22%3A%22NqcGg4bzoOmMiV35ZttQDtBX1oNQBnT-%22%2C%22html5_ad_server%22%3A%22http%3A%2F%2Fg1.v.fwmrm.net%22%2C%22fw_android_ad_server%22%3A%22http%3A%2F%2Fg1.v.fwmrm.net%2F%22%2C%22html5_player_profile%22%3A%2290750%3Aooyala_html5%22%2C%22fw_android_player_profile%22%3A%2290750%3Aooyala_android%22%2C%22fw_mrm_network_id%22%3A%22380912%22%7D%7D)
+We have a sample HTML page ready for you. Check out [sample page](http://debug.ooyala.com/ea/index.html?ec=RmZW4zcDo6KqkTIhn1LnowEZyUYn5Tb2&pbid=26e2e3c1049c4e70ae08a242638b5c40&pcode=5zb2wxOlZcNCe_HVT3a6cawW298X&core_player=http%3A%2F%2Fplayer.ooyala.com%2Fstatic%2Fv4%2Fproduction%2Flatest%2Fcore.min.js&video_plugins=http%3A%2F%2Fplayer.ooyala.com%2Fstatic%2Fv4%2Fproduction%2Flatest%2Fvideo-plugin%2Fmain_html5.min.js%0Ahttp%3A%2F%2Fplayer.ooyala.com%2Fstatic%2Fv4%2Fproduction%2Flatest%2Fvideo-plugin%2Fbit_wrapper.min.js&html5_skin=http%3A%2F%2Fplayer.ooyala.com%2Fstatic%2Fv4%2Fproduction%2Flatest%2Fskin-plugin%2Fhtml5-skin.min.js&skin_asset=http%3A%2F%2Fplayer.ooyala.com%2Fstatic%2Fv4%2Fproduction%2Flatest%2Fskin-plugin%2Fhtml5-skin.min.css&skin_config=http%3A%2F%2Fplayer.ooyala.com%2Fstatic%2Fv4%2Fproduction%2Flatest%2Fskin-plugin%2Fskin.json&trackingLevel=unset)
 
 This simple test HTML page can also be hosted on your environment to showcase html5 skin.
 ```html
@@ -19,7 +19,6 @@ This simple test HTML page can also be hosted on your environment to showcase ht
   <!-- V4 JS core and at least one video plugin is required. Plugins such as skin, discovery and Advertising need to be loaded separately -->
   <script src="//player.ooyala.com/static/v4/production/latest/core.min.js"></script>
   <script src="//player.ooyala.com/static/v4/production/latest/video-plugin/main_html5.min.js"></script>
-  <script src="//player.ooyala.com/static/v4/production/latest/video-plugin/osmf_flash.min.js"></script>
   <script src="//player.ooyala.com/static/v4/production/latest/video-plugin/bit_wrapper.min.js"></script>
   <!-- Change these html5-skin.min.css and html5-skin.min.js to your local build if necessary -->
   <script src="//player.ooyala.com/static/v4/production/latest/skin-plugin/html5-skin.min.js"></script>
@@ -51,7 +50,7 @@ This simple test HTML page can also be hosted on your environment to showcase ht
 ## Developer Setup
 1. [Install git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 
-2. [Install Node.js] (https://nodejs.org/download/release/v0.10.33/) v0.10.33
+2. [Install Node.js] (https://nodejs.org/download/release/v8.11.3/) v8.11.3
 
 3. Install [gulp](http://gulpjs.com) globally by running: `npm install --global gulp-cli`
 
@@ -59,9 +58,7 @@ This simple test HTML page can also be hosted on your environment to showcase ht
 
 5. After cloning, just `cd` in there, install dependencies by running `npm install`
 
-6. One of our dependencies currently has an issue in which it incorrectly declares React as a dependency rather than a peer dependency. This began causing build issues after React 16.0.0 was released. Until this issue is addressed, you can work around it by running `npm dedupe`
-
-7. This project also makes use of *git submodule* for the config directory. This needs to be initialized
+6. This project also makes use of *git submodule* for the config directory. This needs to be initialized
 using *git submodule* commands:
    ```sh
        git submodule init
@@ -70,13 +67,21 @@ using *git submodule* commands:
    ```
    The *init* and *update* should only need to be run once, afterward *git pull* will update the submodule as well as the parent repo.
 
-8. Build the project by running: `gulp`
+7. Build the project by running: `gulp`
 
    This will perform an initial build and start a watch that will update the `build/` folder with any changes made in `js/` or `scss/` folders.
 
    Once the app is built a webserver will start and serve `sample.html` in your browser [http://0.0.0.0:4444/](http://0.0.0.0:4444/).
 
-9. Or you can just use `gulp browserify` - to build only html5-skin.js file
+You can also use webpack-dev-server instead of gulp:
+
+1. Start dev-server by running: `npm start`
+
+   This will start webpack dev-server in your browser [http://localhost:4444/](http://localhost:4444/).
+
+2. Build the project by running: `npm run build` or `npm run build-prod`
+
+   This will perform an initial build and start a watch that will update the `build/` folder with any changes made in `js/` or `scss/` folders.
 
 ## Style
 We use [Sass](http://sass-lang.com/) (SCSS) for CSS preprocessor.

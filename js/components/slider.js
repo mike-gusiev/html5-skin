@@ -3,9 +3,10 @@ var React = require('react'),
     MACROS = require('../constants/macros'),
     CONSTANTS = require('../constants/constants'),
     Utils = require('./utils');
+var createReactClass = require('create-react-class');
+var PropTypes = require('prop-types');
 
-var Slider = React.createClass({
-
+var Slider = createReactClass({
   componentDidMount: function() {
     this.handleSliderColoring(this.props);
 
@@ -21,7 +22,7 @@ var Slider = React.createClass({
   },
 
   componentWillReceiveProps: function(nextProps) {
-    if (nextProps.value != this.props.value) {
+    if (nextProps.value !== this.props.value) {
       this.handleSliderColoring(nextProps);
     }
   },
@@ -34,14 +35,14 @@ var Slider = React.createClass({
       var colorBeforeThumb = style.getPropertyValue('border-left-color');
       var colorAfterThumb = style.getPropertyValue('border-right-color');
 
-      var value = (props.value - props.minValue)/(props.maxValue - props.minValue);
+      var value = (props.value - props.minValue) / (props.maxValue - props.minValue);
       input.style.backgroundImage = [
         '-webkit-gradient(',
         'linear, ',
         'left top, ',
         'right top, ',
-        'color-stop(' + value + ', '+ colorBeforeThumb + '), ',
-        'color-stop(' + value + ', '+ colorAfterThumb + ')',
+        'color-stop(' + value + ', ' + colorBeforeThumb + '), ',
+        'color-stop(' + value + ', ' + colorAfterThumb + ')',
         ')'
       ].join('');
     }
@@ -70,7 +71,7 @@ var Slider = React.createClass({
    * Determines whether a workaround is required for the IE11 issue in which
    * change event doesn't fire when controlling slider with keyboard.
    * @private
-   * @return {Boolean} True if the fix is required, false otherwise
+   * @returns {Boolean} True if the fix is required, false otherwise
    */
   isIeFixRequired: function() {
     return Utils.isIE();
@@ -82,7 +83,7 @@ var Slider = React.createClass({
    * not triggered when controlling the input with the arrow keys.
    * @private
    * @param {Node} target The html element which we want to observe.
-   * @return {MutationObserver} The new mutation observer instance that was set up or undefined if setup failed.
+   * @returns {MutationObserver} The new mutation observer instance that was set up or undefined if setup failed.
    */
   setUpValueObserver: function(target) {
     if (!target || !window.MutationObserver) {
@@ -172,12 +173,12 @@ var Slider = React.createClass({
    * This is needed as a workaround for an IE11 issue and should only be used for this purpose.
    * @private
    * @param {Boolean} forward If true gets the value to the right of the current value or the one to the left otherwise.
-   * @return {Number} The next value to the left or right of the current value.
+   * @returns {Number} The next value to the left or right of the current value.
    */
   getNextSliderValue: function(forward) {
     var value = 0;
     var sign = forward ? 1 : -1;
-    var delta = Utils.ensureNumber(this.props.value) + (Utils.ensureNumber(this.props.step, 1) * sign);
+    var delta = Utils.ensureNumber(this.props.value) + Utils.ensureNumber(this.props.step, 1) * sign;
     var min = Utils.ensureNumber(this.props.minValue, -Infinity);
     var max = Utils.ensureNumber(this.props.maxValue, Infinity);
     value = Utils.constrainToRange(delta, min, max);
@@ -190,7 +191,7 @@ var Slider = React.createClass({
    * associated with sliders. Will format values as a percentage if this.props.usePercentageForAria
    * is set to true.
    * @private
-   * @return {Object} An object with the following properties: valueMin, valueMax, valueNow, valueText.
+   * @returns {Object} An object with the following properties: valueMin, valueMax, valueNow, valueText.
    */
   getAriaValues: function() {
     var aria = {};
@@ -198,9 +199,12 @@ var Slider = React.createClass({
     if (this.props.usePercentageForAria) {
       aria.valueMin = 0;
       aria.valueMax = 100;
-      aria.valueNow = Utils.ensureNumber(this.props.value, 0) * 100 / Utils.ensureNumber(this.props.maxValue, 1);
+      aria.valueNow =
+        Utils.ensureNumber(this.props.value, 0) * 100 / Utils.ensureNumber(this.props.maxValue, 1);
       aria.valueText = CONSTANTS.ARIA_LABELS.SLIDER_VALUE_TEXT;
-      aria.valueText = aria.valueText.replace(MACROS.PERCENT, aria.valueNow).replace(MACROS.SETTING, this.props.settingName);
+      aria.valueText = aria.valueText
+        .replace(MACROS.PERCENT, aria.valueNow)
+        .replace(MACROS.SETTING, this.props.settingName);
     } else {
       aria.valueMin = this.props.minValue;
       aria.valueMax = this.props.maxValue;
@@ -235,32 +239,38 @@ var Slider = React.createClass({
         onChange={this.changeValue}
         onClick={this.changeValue}
         onMouseMove={this.onMouseMove}
-        onKeyDown={this.isIeFixRequired() ? this.onKeyDown : null}/>
+        onKeyDown={this.isIeFixRequired() ? this.onKeyDown : null}
+      />
     );
   }
 });
 
 Slider.propTypes = {
-  value: React.PropTypes.number,
-  minValue: React.PropTypes.number,
-  maxValue: React.PropTypes.number,
-  step: React.PropTypes.number,
-  onChange: React.PropTypes.func,
-  ariaLabel: React.PropTypes.string,
-  usePercentageForAria: React.PropTypes.bool,
-  settingName: React.PropTypes.string,
-  className: React.PropTypes.string,
-  itemRef: React.PropTypes.string
+  value: PropTypes.number,
+  minValue: PropTypes.number,
+  maxValue: PropTypes.number,
+  step: PropTypes.number,
+  onChange: PropTypes.func,
+  ariaLabel: PropTypes.string,
+  usePercentageForAria: PropTypes.bool,
+  settingName: PropTypes.string,
+  className: PropTypes.string,
+  itemRef: PropTypes.string
 };
 
-Slider.defaultProps = Object.create({}, {
-  focusId: {
-    enumerable: true,
-    get: function() {
-      return Math.random().toString(36).substr(2, 10);
+Slider.defaultProps = Object.create(
+  {},
+  {
+    focusId: {
+      enumerable: true,
+      get: function() {
+        return Math.random()
+          .toString(36)
+          .substr(2, 10);
+      }
     }
   }
-});
+);
 
 Slider.defaultProps.usePercentageForAria = false;
 

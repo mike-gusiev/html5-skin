@@ -1,13 +1,17 @@
 var React = require('react');
+var createReactClass = require('create-react-class');
+var PropTypes = require('prop-types');
 
-var Logo = React.createClass({
+var Logo = createReactClass({
   render: function() {
-    var content = this.props.clickUrl ?
-      (<a href={this.props.clickUrl} target={this.props.target}>
-        <img width={this.props.width} height={this.props.height} src={this.props.imageUrl}/>
-      </a>) :
+    var content = this.props.clickUrl ? (
+      <a href={this.props.clickUrl} target={this.props.target}>
+        <img width={this.props.width} height={this.props.height} src={this.props.imageUrl} />
+      </a>
+    ) : (
       // if no link just show img
-      <img width={this.props.width} height={this.props.height} src={this.props.imageUrl}/>;
+      <img width={this.props.width} height={this.props.height} src={this.props.imageUrl} />
+    );
 
     return (
       <div className="oo-logo oo-control-bar-item" style={this.props.style}>
@@ -18,18 +22,12 @@ var Logo = React.createClass({
 });
 
 Logo.propTypes = {
-  imageUrl: React.PropTypes.string.isRequired,
-  clickUrl: React.PropTypes.string,
-  target: React.PropTypes.string,
-  width: React.PropTypes.oneOfType([
-    React.PropTypes.string,
-    React.PropTypes.number
-  ]),
-  height: React.PropTypes.oneOfType([
-    React.PropTypes.string,
-    React.PropTypes.number
-  ]),
-  style: React.PropTypes.object
+  imageUrl: PropTypes.string.isRequired,
+  clickUrl: PropTypes.string,
+  target: PropTypes.string,
+  width: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  height: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  style: PropTypes.object
 };
 
 Logo.defaultProps = {

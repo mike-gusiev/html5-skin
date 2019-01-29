@@ -1,4 +1,5 @@
 .oo-xsmall {
+  height: 100%;
 
   // Content Screens
   .oo-content-screen {
@@ -16,6 +17,14 @@
     position: absolute;
     top: xs($panel-padding);
     right: xs($panel-padding);
+  }
+  .oo-content-screen.oo-menu-content-screen {
+    padding: 0;
+
+    .oo-content-screen-title-bar {
+      padding: xs($panel-padding);
+      padding-bottom: xs($panel-padding) / 2;
+    }
   }
 
   // State Screens
@@ -294,36 +303,8 @@
     }
   }
 
-  //Video Quality
-  .oo-quality-panel {
-    height: $bitrate-horizontal-height - 25px;
-    .oo-quality-screen-content {
-      ul {
-        height: $bitrate-horizontal-height - 30px;
-        li {
-          margin: 0 14px;
-          .oo-quality-btn {
-            padding: 8px 6px;
-            font-size: 0.8em;
-          }
-          .oo-quality-auto-btn {
-            .oo-quality-auto-icon {
-              font-size: 1.4em;
-              padding:4px;
-              margin-bottom: 0;
-            }
-            .oo-quality-auto-label {
-              font-size: 0.8em;
-            }
-          }
-        }
-      }
-    }
-  }
-
   //Control Bar
   .oo-control-bar {
-    height: $control-bar-height-small !important;
     font-size: 25px * $xsmall-multiple;
 
     .oo-control-bar-items-wrapper {
@@ -356,6 +337,10 @@
         max-height: 24px * $xsmall-multiple;
       }
     }
+  }
+
+  .oo-animating-control-bar {
+    height: $control-bar-height-small !important;
   }
 
   //Volume Controls

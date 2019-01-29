@@ -9,10 +9,10 @@ var React = require('react'),
     Watermark = require('../components/watermark'),
     Icon = require('../components/icon'),
     ResizeMixin = require('../mixins/resizeMixin'),
-    Utils = require('../components/utils'),
-    CONSTANTS = require('../constants/constants');
+    Utils = require('../components/utils');
+var createReactClass = require('create-react-class');
 
-var EndScreen = React.createClass({
+var EndScreen = createReactClass({
   mixins: [ResizeMixin],
 
   getInitialState: function() {
@@ -20,7 +20,6 @@ var EndScreen = React.createClass({
       controlBarVisible: true,
       descriptionText: this.props.contentTree.description
     };
-
   },
 
   componentDidMount: function() {
@@ -30,7 +29,10 @@ var EndScreen = React.createClass({
   handleResize: function() {
     if (ReactDOM.findDOMNode(this.refs.description)) {
       this.setState({
-        descriptionText: Utils.truncateTextToWidth(ReactDOM.findDOMNode(this.refs.description), this.props.contentTree.description)
+        descriptionText: Utils.truncateTextToWidth(
+          ReactDOM.findDOMNode(this.refs.description),
+          this.props.contentTree.description
+        )
       });
     }
   },
@@ -54,11 +56,7 @@ var EndScreen = React.createClass({
     var descriptionStyle = {
       color: this.props.skinConfig.startScreen.descriptionFont.color
     };
-    var posterImage = this.props.contentTree.promo_image;
-    posterImage = posterImage.replace(CONSTANTS.IMAGE_URLS.NATIVE, CONSTANTS.IMAGE_URLS.POSTER_CLOUDINARY);
-    var posterStyle = {
-      backgroundImage: "url('" + posterImage + "')"
-    };
+
     var actionIconClass = ClassNames({
       'oo-action-icon': true,
       'oo-hidden': !this.props.skinConfig.endScreen.showReplayButton
@@ -87,16 +85,24 @@ var EndScreen = React.createClass({
       });
     }
 
-    var titleMetadata = (<div className={titleClass} style={titleStyle}>{this.props.contentTree.title}</div>);
-    var descriptionMetadata = (<div className={descriptionClass} ref="description" style={descriptionStyle}>{this.state.descriptionText}</div>);
+    var titleMetadata = (
+      <div className={titleClass} style={titleStyle}>
+        {this.props.contentTree.title}
+      </div>
+    );
+    var descriptionMetadata = (
+      <div className={descriptionClass} ref="description" style={descriptionStyle}>
+        {this.state.descriptionText}
+      </div>
+    );
 
     return (
-      <div className="oo-state-screen oo-end-screen" style={posterStyle}>
-        <div className="oo-underlay-gradient"></div>
+      <div className="oo-state-screen oo-end-screen">
+        <div className="oo-underlay-gradient" />
 
-        <a className="oo-state-screen-selectable" onClick={this.handleClick}></a>
+        <a className="oo-state-screen-selectable" onClick={this.handleClick} />
 
-        <Watermark {...this.props} controlBarVisible={this.state.controlBarVisible}/>
+        <Watermark {...this.props} controlBarVisible={this.state.controlBarVisible} />
 
         <div className={infoPanelClass}>
           {titleMetadata}
@@ -109,15 +115,20 @@ var EndScreen = React.createClass({
           onClick={this.handleClick}
           onMouseUp={Utils.blurOnMouseUp}
           tabIndex="0"
-          aria-label={CONSTANTS.ARIA_LABELS.REPLAY}>
-          <Icon {...this.props} icon="replay" style={actionIconStyle}/>
+          aria-label={CONSTANTS.ARIA_LABELS.REPLAY}
+        >
+          <Icon {...this.props} icon="replay" style={actionIconStyle} />
         </button>
 
         <div className="oo-interactive-container">
-          <ControlBar {...this.props}
+          <ControlBar
+            {...this.props}
+            height={this.props.skinConfig.controlBar.height}
+            animatingControlBar={true}
             controlBarVisible={this.state.controlBarVisible}
             playerState={this.props.playerState}
-            isLiveStream={this.props.isLiveStream} />
+            isLiveStream={this.props.isLiveStream}
+          />
         </div>
       </div>
     );

@@ -11,7 +11,10 @@ var React = require('react'),
     ReactDOM = require('react-dom'),
     ClassNames = require('classnames');
 
-var Clock = React.createClass({
+var createReactClass = require('create-react-class');
+var PropTypes = require('prop-types');
+
+var Clock = createReactClass({
     getInitialState: function() {
         this.canvas = null;
         this.context = null;
@@ -128,9 +131,9 @@ var Clock = React.createClass({
 });
 
 Clock.propTypes = {
-    timeToShow: React.PropTypes.number,
-    clockContainerWidth: React.PropTypes.number,
-    clockRadius: React.PropTypes.number
+    timeToShow: PropTypes.number,
+    clockContainerWidth: PropTypes.number,
+    clockRadius: PropTypes.number
 };
 
 Clock.defaultProps = {

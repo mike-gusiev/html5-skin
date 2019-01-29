@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <script src="//player.ooyala.com/static/v4/production/latest/core.min.js"></script>
+    <script src="//player.ooyala.com/static/v4/production/latest/video-plugin/main_html5.min.js"></script>
+    <script src="//player.ooyala.com/static/v4/production/latest/video-plugin/bit_wrapper.min.js"></script>
+    <script src="//player.ooyala.com/static/v4/production/latest/other-plugin/discovery_api.min.js"></script>
+</head>
+
+<body>
+<div id='container'></div>
+<script>
+  var playerParam = {
+    "pcode": "FsaTIxOjRh-XoYreyerA2QjhxTMb",
+    "playerBrandingId": "fc53804780f1456da1e7d5666406ea2c",
+    "debug": true,
+    "discoveryParams": {
+      "where": "metadata.language='en'"
+    },
+    "videoDetailsUrl": "https://cors-anywhere.herokuapp.com/https://beta61-www-pgatour.ctmsp.com/bin/data/feeds/video-details.json/videoIds={videoIds}&path=/content/pgatour",
+    "requestLocalizableData": true,
+    "skin": {
+      "config": "/assets/skin.json"
+    }
+  };
+  OO.ready(function() {
+    window.pp = OO.Player.create('container', 'J1eTI4ZTE64ZY0jDnlxZ_xmooHpFpsNz', playerParam);
+  });
+</script>
+
+</body>
+</html>

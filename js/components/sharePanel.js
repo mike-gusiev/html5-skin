@@ -13,7 +13,9 @@ var React = require('react'),
     Clipboard = require('clipboard'),
     CONSTANTS = require('../constants/constants');
 
-var SharePanel = React.createClass({
+var createReactClass = require('create-react-class');
+
+var SharePanel = createReactClass({
   tabs: {SHARE: 'social', EMBED: 'embed'},
 
   getInitialState: function() {

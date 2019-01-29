@@ -1,14 +1,29 @@
 jest.dontMock('../../../js/components/closed-caption-multi-audio-menu/helpers');
 jest.dontMock('../../../js/constants/constants');
-jest.dontMock('../../../js/constants/languages');
+jest.dontMock('../../../js/components/utils');
 jest.dontMock('underscore');
 
 var React = require('react');
 var _ = require('underscore');
-var TestUtils = require('react-addons-test-utils');
+var Enzyme = require('enzyme');
 
-var LANGUAGE_CONSTANTS = require('../../../js/constants/languages');
 var helpers = require('../../../js/components/closed-caption-multi-audio-menu/helpers');
+
+const LANGUAGE_LIST = [{
+  '1': 'en',
+  '3': 'eng',
+  'name': 'English',
+  '2B': 'eng',
+  '2T': '',
+  'local': 'English'
+},{
+  '1': 'de',
+  '3': 'deu',
+  'name': 'German',
+  '2B': 'ger',
+  '2T': 'deu',
+  'local': 'Deutsch'
+}];
 
 describe('closed caption & multi-audio helpers', function() {
   describe('getDisplayLanguage function', function() {
@@ -18,13 +33,15 @@ describe('closed caption & multi-audio helpers', function() {
       expect(helpers.getDisplayLanguage([], 'w00t')).toEqual('');
       expect(helpers.getDisplayLanguage([], 'und')).toEqual('');
       expect(helpers.getDisplayLanguage([], null)).toEqual('');
+      expect(helpers.getDisplayLanguage([], '')).toEqual('');
+      expect(helpers.getDisplayLanguage([], false)).toEqual('');
     });
 
     it('should return matched english equivalent', function() {
-      expect(helpers.getDisplayLanguage(LANGUAGE_CONSTANTS, 'eng')).toEqual('English');
-      expect(helpers.getDisplayLanguage(LANGUAGE_CONSTANTS, 'en')).toEqual('English');
-      expect(helpers.getDisplayLanguage(LANGUAGE_CONSTANTS, 'ger')).toEqual('Deutsch');
-      expect(helpers.getDisplayLanguage(LANGUAGE_CONSTANTS, 'deu')).toEqual('Deutsch');
+      expect(helpers.getDisplayLanguage(LANGUAGE_LIST, 'eng')).toEqual('English');
+      expect(helpers.getDisplayLanguage(LANGUAGE_LIST, 'en')).toEqual('English');
+      expect(helpers.getDisplayLanguage(LANGUAGE_LIST, 'ger')).toEqual('Deutsch');
+      expect(helpers.getDisplayLanguage(LANGUAGE_LIST, 'deu')).toEqual('Deutsch');
     });
   });
 
@@ -52,27 +69,87 @@ describe('closed caption & multi-audio helpers', function() {
 
   describe('getDisplayTitle function', function() {
     it('should return title from language and label', function() {
-      expect(helpers.getDisplayTitle('English', 'with Commentary')).toEqual('English with Commentary');
+      expect(helpers.getDisplayTitle({language: 'English', label: 'with Commentary'})).toEqual('English with Commentary');
     });
 
     it('should return title from just language', function() {
-      expect(helpers.getDisplayTitle('English', '')).toEqual('English');
-      expect(helpers.getDisplayTitle('English', null)).toEqual('English');
-      expect(helpers.getDisplayTitle('English', undefined)).toEqual('English');
+      expect(helpers.getDisplayTitle({language: 'English', label: ''})).toEqual('English');
+      expect(helpers.getDisplayTitle({language: 'English', label: null})).toEqual('English');
+      expect(helpers.getDisplayTitle({language: 'English', label: undefined})).toEqual('English');
     });
 
     it('should return title from just label', function() {
-      expect(helpers.getDisplayTitle('', 'with Commentary')).toEqual('with Commentary');
-      expect(helpers.getDisplayTitle(null, 'with Commentary')).toEqual('with Commentary');
-      expect(helpers.getDisplayTitle(undefined, 'with Commentary')).toEqual('with Commentary');
-      expect(helpers.getDisplayTitle(undefined, 'with Commentary')).toEqual('with Commentary');
+      expect(helpers.getDisplayTitle({language: '', label: 'with Commentary'})).toEqual('with Commentary');
+      expect(helpers.getDisplayTitle({language: null, label: 'with Commentary'})).toEqual('with Commentary');
+      expect(helpers.getDisplayTitle({language: undefined, label: 'with Commentary'})).toEqual('with Commentary');
+      expect(helpers.getDisplayTitle({language: undefined, label: 'with Commentary'})).toEqual('with Commentary');
     });
 
-    it('should return Undefined language if none of params are provided', function() {
-      expect(helpers.getDisplayTitle('', '')).toEqual('Undefined language');
-      expect(helpers.getDisplayTitle(null, null)).toEqual('Undefined language');
-      expect(helpers.getDisplayTitle(undefined, undefined)).toEqual('Undefined language');
-      expect(helpers.getDisplayTitle()).toEqual('Undefined language');
+    it('should return value for noLanguageText if none of params are provided', function() {
+      expect(helpers.getDisplayTitle({language: '', label: ''})).toEqual('Undefined language');
+      expect(helpers.getDisplayTitle({language: null, label: null})).toEqual('Undefined language');
+      expect(helpers.getDisplayTitle({language: undefined, label: undefined})).toEqual('Undefined language');
+      expect(helpers.getDisplayTitle({})).toEqual('Undefined language');
+      expect(helpers.getDisplayTitle({language: '', label: '', noLanguageText: 'Unknown track'})).toEqual('Unknown track');
+    });
+
+    it('should return Undefined language or label if langCode is und', function() {
+      expect(helpers.getDisplayTitle({language: 'Undefined language', label: 'Test label', langCode: 'und'})).toEqual('Test label');
+      expect(helpers.getDisplayTitle({language: 'Undefined language', label: '', langCode: 'und'})).toEqual('Undefined language');
+    });
+  });
+
+  describe('getLocalizedSpecialLanguage function', function() {
+    var localizableStrings = {
+      en: {
+        'Undefined language': 'Undefined language',
+        'No linguistic content': 'No linguistic content'
+      },
+      es: {
+        'Undefined language': 'Lenguaje indefinido',
+        'No linguistic content': 'Contenido no lingüístico'
+      }
+    };
+    var languageMap = {
+      'mis': 'Uncoded languages',
+      'und': 'Undefined language',
+      'mul': 'Multiple languages',
+      'zxx': 'No linguistic content'
+    };
+    it('should returns correct values', function() {
+      expect(helpers.getLocalizedSpecialLanguage('zxx', 'en', localizableStrings, languageMap))
+        .toEqual('No linguistic content');
+      expect(helpers.getLocalizedSpecialLanguage('zxx', 'es', localizableStrings, languageMap))
+        .toEqual('Contenido no lingüístico');
+      expect(helpers.getLocalizedSpecialLanguage('mul', 'en', localizableStrings, languageMap))
+        .toEqual('Multiple languages');
+      expect(helpers.getLocalizedSpecialLanguage('und', 'en', localizableStrings, languageMap))
+        .toEqual('Undefined language');
+      expect(helpers.getLocalizedSpecialLanguage('mis', 'en', localizableStrings, languageMap))
+        .toEqual('Uncoded languages');
+      expect(helpers.getLocalizedSpecialLanguage('other-one', 'en', localizableStrings)).toEqual('');
+      expect(helpers.getLocalizedSpecialLanguage('other-one', 'en', '', languageMap)).toEqual('');
+      expect(helpers.getLocalizedSpecialLanguage('other-one', 'en')).toEqual('');
+      expect(helpers.getLocalizedSpecialLanguage('other-one', 'en', null)).toEqual('');
+      expect(helpers.getLocalizedSpecialLanguage('other-one', null, languageMap)).toEqual('');
+      expect(helpers.getLocalizedSpecialLanguage(undefined, null, '', '')).toEqual('');
+    });
+  });
+
+  describe('isSpecialLanguage function', function() {
+    var languageMap = {
+      'mis': 'Uncoded languages',
+      'und': 'Undefined language',
+      'mul': 'Multiple languages',
+      'zxx': 'No linguistic content'
+    };
+    it('should returns correct values', function() {
+      expect(helpers.isSpecialLanguage('zxx', languageMap)).toBe(true);
+      expect(helpers.isSpecialLanguage('mis', languageMap)).toBe(true);
+      expect(helpers.isSpecialLanguage('mul', languageMap)).toBe(true);
+      expect(helpers.isSpecialLanguage('und', languageMap)).toBe(true);
+      expect(helpers.isSpecialLanguage('other-one', languageMap)).toBe(false);
+      expect(helpers.isSpecialLanguage()).toBe(false);
     });
   });
 

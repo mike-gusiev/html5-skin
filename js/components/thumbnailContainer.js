@@ -8,8 +8,10 @@ var React = require('react'),
     CONSTANTS = require('../constants/constants'),
     Thumbnail = require('./thumbnail'),
     ThumbnailCarousel = require('./thumbnailCarousel');
+var createReactClass = require('create-react-class');
+var PropTypes = require('prop-types');
 
-var ThumbnailContainer = React.createClass({
+var ThumbnailContainer = createReactClass({
   getInitialState: function() {
     this.child = null;
     this.positionY = 0;
@@ -69,8 +71,8 @@ var ThumbnailContainer = React.createClass({
     if (this.props.videoVr) {
       if (this.child !== null && typeof this.child === 'object') {
         if (this.child.refs && this.child.refs.thumbnail) {
-          var newThumbnailWidth = this.child.refs.thumbnail.clientWidth;
-          var newThumbnailHeight = this.child.refs.thumbnail.clientHeight;
+          var newThumbnailWidth = Utils.getClientWidth(this.child.refs.thumbnail);
+          var newThumbnailHeight = Utils.getClientHeight(this.child.refs.thumbnail);
           if (newThumbnailWidth !== this.thumbnailWidth || newThumbnailHeight !== this.thumbnailHeight) {
             this.thumbnailWidth = newThumbnailWidth;
             this.thumbnailHeight = newThumbnailHeight;
@@ -93,8 +95,8 @@ var ThumbnailContainer = React.createClass({
         }
         if (this.props.isCarousel) {
           if (this.child.refs && this.child.refs.thumbnailCarousel) {
-            var newThumbnailCarouselWidth = this.child.refs.thumbnailCarousel.clientWidth;
-            var newThumbnailCarouselHeight = this.child.refs.thumbnailCarousel.clientHeight;
+            var newThumbnailCarouselWidth = Utils.getClientWidth(this.child.refs.thumbnailCarousel);
+            var newThumbnailCarouselHeight = Utils.getClientHeight(this.child.refs.thumbnailCarousel);
             if (newThumbnailCarouselWidth !== this.thumbnailCarouselWidth) {
               this.thumbnailCarouselWidth = newThumbnailCarouselWidth;
             }
@@ -125,8 +127,8 @@ var ThumbnailContainer = React.createClass({
    */
   setThumbnailSize: function(refName, widthName, heightName) {
     if (this.child.refs && this.child.refs[refName]) {
-      var width = this.child.refs[refName].clientWidth;
-      var height = this.child.refs[refName].clientHeight;
+      var width = Utils.getClientWidth(this.child.refs[refName]);
+      var height = Utils.getClientHeight(this.child.refs[refName]);
       if (width) {
         this[widthName] = width;
       }
@@ -137,14 +139,20 @@ var ThumbnailContainer = React.createClass({
   },
 
   setImageSizes: function() {
-    var thumbnail = Utils.findThumbnail(this.props.thumbnails, this.props.hoverTime, this.props.duration, this.props.videoVr);
+    var thumbnail = Utils.findThumbnail(
+      this.props.thumbnails,
+      this.props.hoverTime,
+      this.props.duration,
+      this.props.videoVr
+    );
     if (thumbnail !== null && typeof thumbnail === 'object') {
       var imageWidth = thumbnail.imageWidth;
       var imageHeight = thumbnail.imageHeight;
       if (imageWidth && imageHeight) {
         if (imageWidth > CONSTANTS.THUMBNAIL.MAX_VR_THUMBNAIL_BG_WIDTH) {
           imageWidth = CONSTANTS.THUMBNAIL.MAX_VR_THUMBNAIL_BG_WIDTH;
-          imageHeight = thumbnail.imageHeight * CONSTANTS.THUMBNAIL.MAX_VR_THUMBNAIL_BG_WIDTH / thumbnail.imageWidth;
+          imageHeight =
+            thumbnail.imageHeight * CONSTANTS.THUMBNAIL.MAX_VR_THUMBNAIL_BG_WIDTH / thumbnail.imageWidth;
         }
         this.imageWidth = imageWidth;
         this.imageHeight = imageHeight;
@@ -177,7 +185,7 @@ var ThumbnailContainer = React.createClass({
     yaw = this.getCurrentYawVr(yaw);
     pitch = pitch >= 360 ? 0 : pitch;
 
-    var positionY = -(((imageHeight - thumbnailHeight) / 2) - pitch);
+    var positionY = -((imageHeight - thumbnailHeight) / 2 - pitch);
     var bottomCoordinate = -(imageHeight - thumbnailHeight);
     if (positionY > 0) {
       positionY = 0;
@@ -185,7 +193,7 @@ var ThumbnailContainer = React.createClass({
       positionY = bottomCoordinate;
     }
     var positionX = -(imageWidth - thumbnailWidth / 2 - imageWidth * yaw / 360);
-    return {positionX: positionX, positionY: positionY};
+    return { positionX: positionX, positionY: positionY };
   },
 
   /**
@@ -207,10 +215,17 @@ var ThumbnailContainer = React.createClass({
   },
 
   render: function() {
-    var time = isFinite(parseInt(this.props.hoverTime)) ? Utils.formatSeconds(parseInt(this.props.hoverTime)) : null;
+    var time = isFinite(parseInt(this.props.hoverTime))
+      ? Utils.formatSeconds(parseInt(this.props.hoverTime))
+      : null;
     var thumbnail = null;
 
-    var thumbnails = Utils.findThumbnail(this.props.thumbnails, this.props.hoverTime, this.props.duration, this.props.videoVr);
+    var thumbnails = Utils.findThumbnail(
+      this.props.thumbnails,
+      this.props.hoverTime,
+      this.props.duration,
+      this.props.videoVr
+    );
     var thumbnailStyle = {};
     thumbnailStyle.left = this.props.hoverPosition;
     if (Utils.isValidString(thumbnails.url)) {
@@ -223,7 +238,7 @@ var ThumbnailContainer = React.createClass({
     }
 
     if (this.props.isCarousel) {
-      thumbnail =
+      thumbnail = (
         <ThumbnailCarousel
           onRef={this.onRef}
           time={time}
@@ -241,7 +256,8 @@ var ThumbnailContainer = React.createClass({
           thumbnailCarouselHeight={this.thumbnailCarouselHeight}
           centralThumbnail={thumbnails}
           thumbnailStyle={thumbnailStyle}
-        />;
+        />
+      );
     } else {
       thumbnail = (
         <Thumbnail
@@ -262,11 +278,7 @@ var ThumbnailContainer = React.createClass({
       );
     }
 
-    return (
-      <div className="oo-scrubber-thumbnail-wrapper">
-        {thumbnail}
-      </div>
-    );
+    return <div className="oo-scrubber-thumbnail-wrapper">{thumbnail}</div>;
   }
 });
 
@@ -282,19 +294,19 @@ ThumbnailContainer.defaultProps = {
 };
 
 ThumbnailContainer.propTypes = {
-  vrViewingDirection: React.PropTypes.shape({
-    yaw: React.PropTypes.number,
-    roll: React.PropTypes.number,
-    pitch: React.PropTypes.number
+  vrViewingDirection: PropTypes.shape({
+    yaw: PropTypes.number,
+    roll: PropTypes.number,
+    pitch: PropTypes.number
   }),
-  thumbnails: React.PropTypes.object,
-  hoverPosition: React.PropTypes.number,
-  hoverTime: React.PropTypes.number,
-  duration: React.PropTypes.number,
-  scrubberBarWidth: React.PropTypes.number,
-  isCarousel: React.PropTypes.bool,
-  videoVr: React.PropTypes.bool,
-  fullscreen: React.PropTypes.bool
+  thumbnails: PropTypes.object,
+  hoverPosition: PropTypes.number,
+  hoverTime: PropTypes.number,
+  duration: PropTypes.number,
+  scrubberBarWidth: PropTypes.number,
+  isCarousel: PropTypes.bool,
+  videoVr: PropTypes.bool,
+  fullscreen: PropTypes.bool
 };
 
 module.exports = ThumbnailContainer;

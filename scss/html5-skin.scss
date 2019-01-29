@@ -24,6 +24,7 @@
   @import "components/state-screen";
   @import "components/start-screen";
   @import "components/pause-screen";
+  @import "components/playing-screen";
   @import "components/error-screen";
   @import "components/ad-screen";
   @import "components/popover";
@@ -33,7 +34,6 @@
   @import "components/share-panel";
   @import "components/closed-captions";
   @import "components/scrollbar";
-  @import "components/webvtt";
   @import "components/webkit-media-controls";
   @import "components/buttons";
   @import "components/forms";
@@ -50,31 +50,23 @@
   @import "components/plugins";
   @import "components/text-track";
   @import "components/more-options";
-  @import "components/video-quality";
   @import "components/tabs";
   @import "components/thumbnail";
   @import "components/watermark";
   @import "components/unmute";
   @import "components/cc-ma-menu";
+  @import "components/skip-controls";
+  @import "components/playback-speed-button";
+  @import "components/menu-panel";
+  @import "components/menu-panel-popover";
+  @import "components/menu-panel-screen";
 
   // Responsive
   @import "responsive/xsmall";
   @import "responsive/small";
   @import "responsive/medium";
   @import "responsive/large";
-  @import "responsive/portrait";
 
   // Skin
   @import "skin/default";
-}
-
-//override non-responsive css on debug.ooyala.com
-//remove this after test site updated
-#video_container {
-  display: inline !important;
-  margin: 0 !important;
-}
-#ooplayer {
-  width:auto !important;
-  height:auto !important;
 }

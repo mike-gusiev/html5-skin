@@ -1,4 +1,3 @@
-
 module.exports = {
   VOLUME: '{volume}',
   CURRENT_TIME: '{currentTime}',
@@ -8,5 +7,7 @@ module.exports = {
   RESOLUTION_TIER: '{resolutionTier}',
   BITRATE: '{bitrate}',
   PERCENT: '{percent}',
-  SETTING: '{setting}'
+  SETTING: '{setting}',
+  SECONDS: '{seconds}',
+  RATE: '{rate}',
 };

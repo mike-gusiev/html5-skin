@@ -3,8 +3,9 @@ var React = require('react'),
     AccessibleButton = require('../accessibleButton'),
     CONSTANTS = require('../../constants/constants'),
     ClassNames = require('classnames');
+var createReactClass = require('create-react-class');
 
-var OnOffSwitch = React.createClass({
+var OnOffSwitch = createReactClass({
   handleOnOffSwitch: function() {
     this.props.controller.toggleClosedCaptionEnabled();
   },
@@ -27,16 +28,29 @@ var OnOffSwitch = React.createClass({
       'oo-switch-captions oo-switch-captions-off': true,
       'oo-switch-captions-active': !this.props.closedCaptionOptions.enabled
     });
-    var ccOnStyle =  {backgroundColor: this.props.closedCaptionOptions.enabled && this.props.skinConfig.general.accentColor ? this.props.skinConfig.general.accentColor : null};
-    var offString = Utils.getLocalizedString(this.props.language, CONSTANTS.SKIN_TEXT.OFF, this.props.localizableStrings);
-    var onString = Utils.getLocalizedString(this.props.language, CONSTANTS.SKIN_TEXT.ON, this.props.localizableStrings);
+    var ccOnStyle = {
+      backgroundColor:
+        this.props.closedCaptionOptions.enabled && this.props.skinConfig.general.accentColor
+          ? this.props.skinConfig.general.accentColor
+          : null
+    };
+    var offString = Utils.getLocalizedString(
+      this.props.language,
+      CONSTANTS.SKIN_TEXT.OFF,
+      this.props.localizableStrings
+    );
+    var onString = Utils.getLocalizedString(
+      this.props.language,
+      CONSTANTS.SKIN_TEXT.ON,
+      this.props.localizableStrings
+    );
 
     return (
       <div className="oo-switch-container">
         <span className={offCaptionClassName}>{offString}</span>
         <div className="oo-switch-element">
-          <span className={switchBodyClassName} style={ccOnStyle}></span>
-          <span className={switchThumbClassName}></span>
+          <span className={switchBodyClassName} style={ccOnStyle} />
+          <span className={switchThumbClassName} />
         </div>
         <span className={onCaptionClassName}>{onString}</span>
         <AccessibleButton
@@ -44,8 +58,8 @@ var OnOffSwitch = React.createClass({
           ariaLabel={this.props.ariaLabel}
           ariaChecked={this.props.closedCaptionOptions.enabled}
           role={this.props.role || CONSTANTS.ARIA_ROLES.CHECKBOX}
-          onClick={this.handleOnOffSwitch}>
-        </AccessibleButton>
+          onClick={this.handleOnOffSwitch}
+        />
       </div>
     );
   }

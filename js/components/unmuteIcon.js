@@ -2,8 +2,10 @@ var React = require('react'),
     Icon = require('./icon'),
     ClassNames = require('classnames'),
     CONSTANTS = require('../constants/constants');
+var createReactClass = require('create-react-class');
+var PropTypes = require('prop-types');
 
-var UnmuteIcon = React.createClass({
+var UnmuteIcon = createReactClass({
   getInitialState: function() {
     return {
       collapseTime: 2000
@@ -18,10 +20,13 @@ var UnmuteIcon = React.createClass({
     var expanded = !this.props.controller.state.volumeState.unmuteIconCollapsed;
     if (expanded) {
       clearTimeout(this.timeout);
-      this.timeout = setTimeout(function() {
-        this.props.controller.state.volumeState.unmuteIconCollapsed = true;
-        this.setState({});
-      }.bind(this), this.state.collapseTime);
+      this.timeout = setTimeout(
+        function() {
+          this.props.controller.state.volumeState.unmuteIconCollapsed = true;
+          this.setState({});
+        }.bind(this),
+        this.state.collapseTime
+      );
     }
   },
 
@@ -47,30 +52,29 @@ var UnmuteIcon = React.createClass({
     });
 
     return (
-      <button className={myClass}
+      <button
+        className={myClass}
         onClick={this.unmuteClick}
         type="button"
         tabIndex="0"
         aria-label={volumeAriaLabel}
-        >
-
+      >
         <div className="oo-unmute-icon-wrapper">
-          <Icon {...this.props} icon={volumeIcon} ref="volumeIcon"/>
+          <Icon {...this.props} icon={volumeIcon} ref="volumeIcon" />
         </div>
 
         {expanded ? <div className="oo-unmute-message">{CONSTANTS.SKIN_TEXT.SELECT_TO_UNMUTE}</div> : null}
-
       </button>
     );
   }
 });
 
 UnmuteIcon.propTypes = {
-  controller: React.PropTypes.shape({
-    state: React.PropTypes.shape({
-      volumeState: React.PropTypes.shape({
-        muted: React.PropTypes.bool,
-        unmuteIconCollapsed: React.PropTypes.bool
+  controller: PropTypes.shape({
+    state: PropTypes.shape({
+      volumeState: PropTypes.shape({
+        muted: PropTypes.bool,
+        unmuteIconCollapsed: PropTypes.bool
       })
     })
   })

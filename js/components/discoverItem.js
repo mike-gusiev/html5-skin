@@ -1,7 +1,9 @@
 var React = require('react'),
     Utils = require('./utils');
+var createReactClass = require('create-react-class');
+var PropTypes = require('prop-types');
 
-var DiscoverItem = React.createClass({
+var DiscoverItem = createReactClass({
   getInitialState: function() {
     return {
       imgError: false
@@ -32,30 +34,37 @@ var DiscoverItem = React.createClass({
 
     var itemTitleStyle = {
       color: Utils.getPropertyValue(this.props.skinConfig, 'discoveryScreen.contentTitle.font.color'),
-      fontFamily: Utils.getPropertyValue(this.props.skinConfig, 'discoveryScreen.contentTitle.font.fontFamily')
+      fontFamily: Utils.getPropertyValue(
+        this.props.skinConfig,
+        'discoveryScreen.contentTitle.font.fontFamily'
+      )
     };
 
     return (
       <div className="oo-discovery-image-wrapper-style">
         <div className="oo-discovery-wrapper">
           <a onClick={this.props.onClickAction}>
-            <div className="oo-image-style" style={thumbnailStyle}></div>
+            <div className="oo-image-style" style={thumbnailStyle} />
           </a>
           {this.props.children}
         </div>
-        <div className={this.props.contentTitleClassName} style={itemTitleStyle} dangerouslySetInnerHTML={Utils.createMarkup(this.props.contentTitle)}></div>
+        <div
+          className={this.props.contentTitleClassName}
+          style={itemTitleStyle}
+          dangerouslySetInnerHTML={Utils.createMarkup(this.props.contentTitle)}
+        />
       </div>
     );
   }
 });
 
 DiscoverItem.propTypes = {
-  skinConfig: React.PropTypes.shape({
-    discoveryScreen: React.PropTypes.shape({
-      contentTitle: React.PropTypes.shape({
-        font: React.PropTypes.shape({
-          color: React.PropTypes.string,
-          fontFamily: React.PropTypes.string
+  skinConfig: PropTypes.shape({
+    discoveryScreen: PropTypes.shape({
+      contentTitle: PropTypes.shape({
+        font: PropTypes.shape({
+          color: PropTypes.string,
+          fontFamily: PropTypes.string
         })
       })
     })
