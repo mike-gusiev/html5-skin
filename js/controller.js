@@ -1108,8 +1108,10 @@ OO.plugin('Html5Skin', function(OO, _, $, W) {
         this.state.upNextInfo.delayedSetEmbedCodeEvent = false;
         this.state.upNextInfo.delayedContentData = null;
       } else if (
-        this.state.discoveryData &&
-        this.skin.props.skinConfig.endScreen.screenToShowOnEnd === 'discovery' &&
+        this.state.discoveryData && (
+          this.skin.props.skinConfig.endScreen.screenToShowOnEnd === 'discovery' ||
+          this.skin.props.skinConfig.endScreen.screenToShowOnEnd === 'endCard'
+        ) &&
         !(!Utils.canRenderSkin() || (Utils.isIos() && this.state.fullscreen))
       ) {
         OO.log('Should display DISCOVERY_SCREEN on end');
