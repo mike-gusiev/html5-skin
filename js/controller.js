@@ -1121,10 +1121,10 @@ OO.plugin('Html5Skin', function(OO, _, $, W) {
         this.state.screenToShow = CONSTANTS.SCREEN.SHARE_SCREEN;
       } else {
         this.state.screenToShow = CONSTANTS.SCREEN.END_SCREEN;
-        if (this.state.config.endScreen.screenToShowOnEnd === 'endCard') {
-            this.state.screenToShow = CONSTANTS.SCREEN.END_CARD;
-        }
         this.mb.publish(OO.EVENTS.END_SCREEN_SHOWN);
+      }
+      if (this.state.config.endScreen.screenToShowOnEnd === 'endCard') {
+        this.state.screenToShow = CONSTANTS.SCREEN.END_CARD;
       }
       if (!Utils.canRenderSkin()) {
         // iPhone < iOS10 end screen is the same as start screen, except for the replay button
